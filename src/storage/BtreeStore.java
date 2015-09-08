@@ -14,7 +14,7 @@ public class BtreeStore {
 
 	private String        DATABASE;
 	private String        BTREE_NAME;
-	private RecordManager recman;
+	private RecordManager recordManager;
 	private long          recid;
 	private BTree         btree;
 	private Properties    props;
@@ -27,22 +27,22 @@ public class BtreeStore {
 		//btrees = new Hashtable();
     	props = new Properties();
     	DATABASE = filename;    	           
-        recman = RecordManagerFactory.createRecordManager( DATABASE, props );
+        recordManager = RecordManagerFactory.createRecordManager( DATABASE, props );
         this.pagesize = pagesize;
     }
 	
 	public void createBTree(int treeid) throws Exception{
     	
     	BTREE_NAME = String.valueOf(treeid);
-    	recid = recman.getNamedObject( BTREE_NAME );
+    	recid = recordManager.getNamedObject( BTREE_NAME );
 	    if ( recid != 0 ) {
 	           System.out.println("Existing BTree: " + DATABASE + "," + treeid);
 	           System.exit(-1);
 	    } 
 	    else {
 	    	int fanout = pagesize/4-2;
-	        btree = BTree.createInstance( recman, new IntegerComparator(), new IntegerSerializer(), new DefaultSerializer(), fanout);
-	        recman.setNamedObject( BTREE_NAME, btree.getRecid() );	          
+	        btree = BTree.createInstance( recordManager, new IntegerComparator(), new IntegerSerializer(), new DefaultSerializer(), fanout);
+	        recordManager.setNamedObject( BTREE_NAME, btree.getRecid() );	          
 	    }
 	   // btrees.put(treeid, btree);    	
     	
@@ -50,9 +50,9 @@ public class BtreeStore {
     public void loadBTree(int treeid) throws Exception{
     	
     	BTREE_NAME = String.valueOf(treeid);
-    	recid = recman.getNamedObject( BTREE_NAME );
+    	recid = recordManager.getNamedObject( BTREE_NAME );
 	    if ( recid != 0 ) {
-	    	btree = BTree.load( recman, recid );
+	    	btree = BTree.load( recordManager, recid );
 	    } 
 	    else {
 	    	System.out.println("Can't find BTree: " + DATABASE + "," + treeid);
@@ -62,7 +62,7 @@ public class BtreeStore {
     
 	public void flush() throws Exception
 	{	
-			recman.commit();					
+			recordManager.commit();					
 	}
 	
 	public void write(int id, byte[] data)throws Exception{
@@ -70,7 +70,7 @@ public class BtreeStore {
 			btree.insert(id, data, true);
 			
 			if(count % 10000 == 0)
-				recman.commit();
+				recordManager.commit();
 			count++;		
 	}
 	
