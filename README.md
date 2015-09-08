@@ -14,3 +14,11 @@
 	* Y Coordinate: Double
 
 + Text File: Contains the keywords corresponding to the locations in location file. The keywords are stored in a B-tree.
+
+## Creating the Text File
+
+The keywords corresponding to each spatio-textual object is stored in the *text file* in the form of a B-tree. ```build.StoreDocument``` class is used to create this *text file*. The input file of this class should contain entries of the following format in each line:
+
+	wordId1 weight1, wordId2 weight2, ....
+
+Where wordId should be an integer and weight should be a double.

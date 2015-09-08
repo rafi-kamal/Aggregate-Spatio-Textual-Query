@@ -71,9 +71,9 @@ public class LKT {
 			
 			Query q = new Query(id);
 			for(int j = 3; j < temp.length; j++){
-				q.qwords.add(Integer.parseInt(temp[j]));
+				q.keywords.add(Integer.parseInt(temp[j]));
 			}
-			q.qpoint = new Point(f);
+			q.point = new Point(f);
 			
 			System.out.println("query " + count);
 			count++;

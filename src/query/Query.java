@@ -8,13 +8,13 @@ import spatialindex.spatialindex.Point;
 
 public class Query {
 	public int id;
-	public Vector qwords;
-	public Point qpoint;
+	public Vector keywords;
+	public Point point;
 
 	
 	public Query(int id){
 		this.id = id;
-		this.qwords = new Vector();
+		this.keywords = new Vector();
 		
 	}
 	

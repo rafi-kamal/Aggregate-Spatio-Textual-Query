@@ -10,4 +10,5 @@ tmp/
 local.properties
 .settings/
 .loadpath
+.classpath
 *.html
