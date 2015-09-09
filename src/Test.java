@@ -25,8 +25,8 @@ public class Test {
 		String query_file = args[2];
 		int topk = Integer.parseInt(args[3]);
 		double alpha = Double.parseDouble(args[4]);
-		DocumentStore ds = new DocumentStore(text_file, 4096);
-		ds.load(0);
+		DocumentStore documentStore = new DocumentStore(text_file, 4096);
+		documentStore.load(0);
 
 		LineNumberReader locationfile = new LineNumberReader(new FileReader(location_file));
 		LineNumberReader queryfile = new LineNumberReader(new FileReader(query_file));
@@ -66,22 +66,22 @@ public class Test {
 				f[1] = y;
 				Point point = new Point(f);
 
-				Vector document = ds.read(id);
-				Hashtable words = new Hashtable();
+				Vector document = documentStore.read(id);
+				Hashtable keywords = new Hashtable();
 				for (int i = 0; i < document.size(); i++) {
-					WeightEntry de = (WeightEntry) document.get(i);
-					words.put(de.word, de.weight);
+					WeightEntry keywordEntry = (WeightEntry) document.get(i);
+					keywords.put(keywordEntry.word, keywordEntry.weight);
 				}
 
-				double ir = 0;
+				double irScore = 0;
 				for (int i = 0; i < query.keywords.size(); i++) {
-					int word = (Integer) query.keywords.get(i);
-					if (words.containsKey(word))
-						ir += (Double) words.get(word);
+					int queryKeyword = (Integer) query.keywords.get(i);
+					if (keywords.containsKey(queryKeyword))
+						irScore += (Double) keywords.get(queryKeyword);
 				}
 
-				double d = query.point.getMinimumDistance(point);
-				double score = RTree.combinedScore(d, ir);
+				double spatialScore = query.point.getMinimumDistance(point);
+				double score = RTree.combinedScore(spatialScore, irScore);
 
 				RtreeEntry e = new RtreeEntry(id, false);
 				queue.add(new NNEntry(e, score));
