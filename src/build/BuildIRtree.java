@@ -1,13 +1,11 @@
 package build;
 
+import documentindex.InvertedFile;
 import spatialindex.rtree.RTree;
 import spatialindex.storagemanager.DiskStorageManager;
-import spatialindex.storagemanager.IBuffer;
 import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.PropertySet;
-import spatialindex.storagemanager.RandomEvictionsBuffer;
 import storage.DocumentStore;
-import documentindex.InvertedFile;
 
 public class BuildIRtree {
 
