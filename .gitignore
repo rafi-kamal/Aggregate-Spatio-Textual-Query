@@ -11,4 +11,6 @@ local.properties
 .settings/
 .loadpath
 .classpath
+data/*
 *.html
+data/*

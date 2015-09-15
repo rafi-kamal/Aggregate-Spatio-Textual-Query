@@ -29,10 +29,10 @@
 
 package spatialindex.storagemanager;
 
-public class InvalidPageException extends RuntimeException
-{
-	public InvalidPageException(int id)
-	{
+public class InvalidPageException extends RuntimeException {
+	private static final long serialVersionUID = 8947378635199579572L;
+
+	public InvalidPageException(int id) {
 		super("" + id);
 	}
 }

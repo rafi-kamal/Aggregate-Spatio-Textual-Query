@@ -31,17 +31,14 @@ package spatialindex.storagemanager;
 
 import java.util.*;
 
-public class PropertySet
-{
+public class PropertySet {
 	private HashMap m_propertySet = new HashMap();
 
-	public Object getProperty(String property)
-	{
+	public Object getProperty(String property) {
 		return m_propertySet.get(property);
 	}
 
-	public void setProperty(String property, Object o)
-	{
+	public void setProperty(String property, Object o) {
 		m_propertySet.put(property, o);
 	}
 } // PropertySet

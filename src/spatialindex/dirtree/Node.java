@@ -34,7 +34,7 @@ import java.io.*;
 
 import spatialindex.spatialindex.*;
 
-abstract class Node implements INode
+public abstract class Node implements INode
 {
 	protected DIRTree m_pTree = null;
 		// Parent of all nodes.

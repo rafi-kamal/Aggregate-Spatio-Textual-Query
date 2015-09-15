@@ -78,34 +78,9 @@ public class Weightcompute {
 		
 	}
 	
-	public static void main(String arg[]){
-		String infile = "Y:\\EVALUATION\\IRTrees\\doc";
-		String outfile = "Y:\\EVALUATION\\IRTrees\\doc_tw";
+	public static void main(String args[]) {
+		String infile = args[0];
+		String outfile = args[1];
 		ComputeTermWeights(infile, outfile);
-		/*String infile = "C:\\temp\\route query\\flickrdata\\cluster.final";
-		String outfile = "C:\\temp\\route query\\flickrdata\\UTM";
-		CoordinateConversion cc = new CoordinateConversion(); 			
-		
-		try{
-			LineNumberReader lr = new LineNumberReader(new FileReader(infile));
-			FileWriter fw = new FileWriter(outfile);
-			PrintWriter out = new PrintWriter(fw);
-			
-			String line = lr.readLine();
-			while( line != null){
-				String[] cols = line.split(":");
-				String[] coor = cols[0].split(",");
-				double lat = Double.parseDouble(coor[0]);
-				double lon = Double.parseDouble(coor[1]);
-				String res = cc.latLon2UTM(lat, lon);
-				out.println(res);
-				line = lr.readLine();
-			}			
-			lr.close();
-			out.close();
-			fw.close();
-		}catch(Exception e){
-			e.printStackTrace();
-		}*/
 	}
 }

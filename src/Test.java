@@ -25,6 +25,7 @@ public class Test {
 		String query_file = args[2];
 		int topk = Integer.parseInt(args[3]);
 		double alpha = Double.parseDouble(args[4]);
+		
 		DocumentStore documentStore = new DocumentStore(text_file, 4096);
 		documentStore.load(0);
 

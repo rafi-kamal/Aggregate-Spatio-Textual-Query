@@ -4,13 +4,10 @@ import java.io.FileReader;
 import java.io.LineNumberReader;
 
 import spatialindex.rtree.RTree;
-import spatialindex.spatialindex.ISpatialIndex;
 import spatialindex.spatialindex.Region;
 import spatialindex.storagemanager.DiskStorageManager;
-import spatialindex.storagemanager.IBuffer;
 import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.PropertySet;
-import spatialindex.storagemanager.RandomEvictionsBuffer;
 
 public class BuildRtree {
 

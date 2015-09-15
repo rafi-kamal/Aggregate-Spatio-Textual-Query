@@ -40,16 +40,16 @@ public class BuildDIRtree {
 
 		Boolean b = new Boolean(true);
 		ps.setProperty("Overwrite", b);
-			//overwrite the file if it exists.
+		//overwrite the file if it exists.
 
 		ps.setProperty("FileName", index_file + beta_area + ".rtree");
 			// .idx and .dat extensions will be added.
 
 		Integer i = new Integer(page_size);
 		ps.setProperty("PageSize", i);
-			// specify the page size. Since the index may also contain user defined data
-			// there is no way to know how big a single node may become. The storage manager
-			// will use multiple pages per node if needed. Off course this will slow down performance.
+		// specify the page size. Since the index may also contain user defined data
+		// there is no way to know how big a single node may become. The storage manager
+		// will use multiple pages per node if needed. Off course this will slow down performance.
 
 		IStorageManager diskfile = new DiskStorageManager(ps);
 
@@ -70,7 +70,6 @@ public class BuildDIRtree {
 		ps2.setProperty("DocumentFile", text_file);
 		
 		DIRTree tree = new DIRTree(ps2, diskfile, beta_area);
-		
 		
 		int count = 0;
 		int id;
