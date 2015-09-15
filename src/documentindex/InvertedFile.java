@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import spatialindex.rtree.RTree;
-import spatialindex.spatialindex.Region;
 import storage.BtreeStore;
 import storage.WeightEntry;
 

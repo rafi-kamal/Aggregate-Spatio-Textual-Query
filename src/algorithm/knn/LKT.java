@@ -4,14 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
+import documentindex.InvertedFile;
 import query.Query;
 import spatialindex.rtree.RTree;
 import spatialindex.spatialindex.Point;
 import spatialindex.storagemanager.DiskStorageManager;
 import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.PropertySet;
-import storage.DocumentStore;
-import documentindex.InvertedFile;
 
 public class LKT {
 
