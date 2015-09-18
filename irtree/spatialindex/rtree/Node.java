@@ -34,35 +34,34 @@ import java.io.*;
 
 import spatialindex.spatialindex.*;
 
-abstract class Node implements INode
-{
+abstract class Node implements INode {
 	protected RTree m_pTree = null;
-		// Parent of all nodes.
+	// Parent of all nodes.
 
-	protected int m_level = -1;
-		// The level of the node in the tree.
-		// Leaves are always at level 0.
+	protected int level = -1;
+	// The level of the node in the tree.
+	// Leaves are always at level 0.
 
-	protected int m_identifier = -1;
-		// The unique ID of this node.
+	protected int identifier = -1;
+	// The unique ID of this node.
 
-	protected int m_children = 0;
-		// The number of children pointed by this node.
+	protected int children = 0;
+	// The number of children pointed by this node.
 
 	protected int m_capacity = -1;
-		// Specifies the node capacity.
+	// Specifies the node capacity.
 
 	protected Region m_nodeMBR = null;
-		// The minimum bounding region enclosing all data contained in the node.
+	// The minimum bounding region enclosing all data contained in the node.
 
 	protected byte[][] m_pData = null;
-		// The data stored in the node.
+	// The data stored in the node.
 
-	protected Region[] m_pMBR = null;
-		// The corresponding data MBRs.
+	protected Region[] pMBR = null;
+	// The corresponding data MBRs.
 
-	protected int[] m_pIdentifier = null;
-		// The corresponding data identifiers.
+	protected int[] pIdentifiers = null;
+	// The corresponding data identifiers.
 
 	protected int[] m_pDataLength = null;
 
@@ -73,20 +72,20 @@ abstract class Node implements INode
 	//
 
 	protected abstract Node chooseSubtree(Region mbr, int level, Stack pathBuffer);
+
 	protected abstract Leaf findLeaf(Region mbr, int id, Stack pathBuffer);
+
 	protected abstract Node[] split(byte[] pData, Region mbr, int id);
 
 	//
 	// IEntry interface
 	//
 
-	public int getIdentifier()
-	{
-		return m_identifier;
+	public int getIdentifier() {
+		return identifier;
 	}
 
-	public IShape getShape()
-	{
+	public IShape getShape() {
 		return (IShape) m_nodeMBR.clone();
 	}
 
@@ -94,126 +93,112 @@ abstract class Node implements INode
 	// INode interface
 	//
 
-	public int getChildrenCount()
-	{
-		return m_children;
+	public int getChildrenCount() {
+		return children;
 	}
 
-	public int getChildIdentifier(int index) throws IndexOutOfBoundsException
-	{
-		if (index < 0 || index >= m_children) throw new IndexOutOfBoundsException("" + index);
+	public int getChildIdentifier(int index) throws IndexOutOfBoundsException {
+		if (index < 0 || index >= children)
+			throw new IndexOutOfBoundsException("" + index);
 
-		return m_pIdentifier[index];
+		return pIdentifiers[index];
 	}
 
-	public IShape getChildShape(int index) throws IndexOutOfBoundsException
-	{
-		if (index < 0 || index >= m_children) throw new IndexOutOfBoundsException("" + index);
+	public IShape getChildShape(int index) throws IndexOutOfBoundsException {
+		if (index < 0 || index >= children)
+			throw new IndexOutOfBoundsException("" + index);
 
-		return new Region(m_pMBR[index]);
+		return new Region(pMBR[index]);
 	}
 
-	public int getLevel()
-	{
-		return m_level;
+	public int getLevel() {
+		return level;
 	}
 
-	public boolean isLeaf()
-	{
-		return (m_level == 0);
+	public boolean isLeaf() {
+		return (level == 0);
 	}
 
-	public boolean isIndex()
-	{
-		return (m_level != 0);
+	public boolean isIndex() {
+		return (level != 0);
 	}
 
 	//
 	// Internal
 	//
 
-	protected Node(RTree pTree, int id, int level, int capacity)
-	{
+	protected Node(RTree pTree, int id, int level, int capacity) {
 		m_pTree = pTree;
-		m_level = level;
-		m_identifier = id;
+		this.level = level;
+		identifier = id;
 		m_capacity = capacity;
 		m_nodeMBR = (Region) pTree.infiniteRegion.clone();
 
 		m_pDataLength = new int[m_capacity + 1];
 		m_pData = new byte[m_capacity + 1][];
-		m_pMBR = new Region[m_capacity + 1];
-		m_pIdentifier = new int[m_capacity + 1];
+		pMBR = new Region[m_capacity + 1];
+		pIdentifiers = new int[m_capacity + 1];
 	}
 
-	protected void insertEntry(byte[] pData, Region mbr, int id) throws IllegalStateException
-	{
-		if (m_children >= m_capacity) throw new IllegalStateException("m_children >= m_nodeCapacity");
+	protected void insertEntry(byte[] pData, Region mbr, int id) throws IllegalStateException {
+		if (children >= m_capacity)
+			throw new IllegalStateException("m_children >= m_nodeCapacity");
 
-		m_pDataLength[m_children] = (pData != null) ? pData.length : 0;
-		m_pData[m_children] = pData;
-		m_pMBR[m_children] = mbr;
-		m_pIdentifier[m_children] = id;
+		m_pDataLength[children] = (pData != null) ? pData.length : 0;
+		m_pData[children] = pData;
+		pMBR[children] = mbr;
+		pIdentifiers[children] = id;
 
-		m_totalDataLength += m_pDataLength[m_children];
-		m_children++;
+		m_totalDataLength += m_pDataLength[children];
+		children++;
 
 		Region.combinedRegion(m_nodeMBR, mbr);
 	}
 
-	protected void deleteEntry(int index) throws IndexOutOfBoundsException
-	{
-		if (index < 0 || index >= m_children) throw new IndexOutOfBoundsException("" + index);
+	protected void deleteEntry(int index) throws IndexOutOfBoundsException {
+		if (index < 0 || index >= children)
+			throw new IndexOutOfBoundsException("" + index);
 
-		boolean touches = m_nodeMBR.touches(m_pMBR[index]);
+		boolean touches = m_nodeMBR.touches(pMBR[index]);
 
 		m_totalDataLength -= m_pDataLength[index];
 		m_pData[index] = null;
 
-		if (m_children > 1 && index != m_children - 1)
-		{
-			m_pDataLength[index] = m_pDataLength[m_children - 1];
-			m_pData[index] = m_pData[m_children - 1];
-			m_pData[m_children - 1] = null;
-			m_pMBR[index] = m_pMBR[m_children - 1];
-			m_pMBR[m_children - 1] = null;
-			m_pIdentifier[index] = m_pIdentifier[m_children - 1];
+		if (children > 1 && index != children - 1) {
+			m_pDataLength[index] = m_pDataLength[children - 1];
+			m_pData[index] = m_pData[children - 1];
+			m_pData[children - 1] = null;
+			pMBR[index] = pMBR[children - 1];
+			pMBR[children - 1] = null;
+			pIdentifiers[index] = pIdentifiers[children - 1];
 		}
 
-		m_children--;
+		children--;
 
-		if (m_children == 0)
-		{
+		if (children == 0) {
 			m_nodeMBR = (Region) m_pTree.infiniteRegion.clone();
-		}
-		else if (touches)
-		{
-			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
-			{
+		} else if (touches) {
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++) {
 				m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 				m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
 
-				for (int cChild = 0; cChild < m_children; cChild++)
-				{
-					m_nodeMBR.m_pLow[cDim] = Math.min(m_nodeMBR.m_pLow[cDim], m_pMBR[cChild].m_pLow[cDim]);
-					m_nodeMBR.m_pHigh[cDim] = Math.max(m_nodeMBR.m_pHigh[cDim], m_pMBR[cChild].m_pHigh[cDim]);
+				for (int cChild = 0; cChild < children; cChild++) {
+					m_nodeMBR.m_pLow[cDim] = Math.min(m_nodeMBR.m_pLow[cDim], pMBR[cChild].m_pLow[cDim]);
+					m_nodeMBR.m_pHigh[cDim] = Math.max(m_nodeMBR.m_pHigh[cDim], pMBR[cChild].m_pHigh[cDim]);
 				}
 			}
 		}
 	}
 
-	protected boolean insertData(byte[] pData, Region mbr, int id, Stack pathBuffer, boolean[] overflowTable)
-	{
-		if (m_children < m_capacity)
-		{
+	protected boolean insertData(byte[] pData, Region mbr, int id, Stack pathBuffer, boolean[] overflowTable) {
+		if (children < m_capacity) {
 			boolean adjusted = false;
 			boolean b = m_nodeMBR.contains(mbr);
 
 			insertEntry(pData, mbr, id);
 			m_pTree.writeNode(this);
 
-			if (! b && ! pathBuffer.empty())
-			{
+			if (!b && !pathBuffer.empty()) {
 				int cParent = ((Integer) pathBuffer.pop()).intValue();
 				Index p = (Index) m_pTree.readNode(cParent);
 				p.adjustTree(this, pathBuffer);
@@ -221,10 +206,9 @@ abstract class Node implements INode
 			}
 
 			return adjusted;
-		}
-		else if (m_pTree.treeVariant == SpatialIndex.RtreeVariantRstar && ! pathBuffer.empty() && overflowTable[m_level] == false)
-		{
-			overflowTable[m_level] = true;
+		} else if (m_pTree.treeVariant == SpatialIndex.RtreeVariantRstar && !pathBuffer.empty()
+				&& overflowTable[level] == false) {
+			overflowTable[level] = true;
 
 			ArrayList vReinsert = new ArrayList(), vKeep = new ArrayList();
 			reinsertData(pData, mbr, id, vReinsert, vKeep);
@@ -243,91 +227,81 @@ abstract class Node implements INode
 
 			int cIndex;
 
-			for (cIndex = 0; cIndex < lReinsert; cIndex++)
-			{
+			for (cIndex = 0; cIndex < lReinsert; cIndex++) {
 				int i = ((Integer) vReinsert.get(cIndex)).intValue();
 				reinsertlen[cIndex] = m_pDataLength[i];
 				reinsertdata[cIndex] = m_pData[i];
-				reinsertmbr[cIndex] = m_pMBR[i];
-				reinsertid[cIndex] = m_pIdentifier[i];
+				reinsertmbr[cIndex] = pMBR[i];
+				reinsertid[cIndex] = pIdentifiers[i];
 			}
 
-			for (cIndex = 0; cIndex < lKeep; cIndex++)
-			{
+			for (cIndex = 0; cIndex < lKeep; cIndex++) {
 				int i = ((Integer) vKeep.get(cIndex)).intValue();
 				keeplen[cIndex] = m_pDataLength[i];
 				keepdata[cIndex] = m_pData[i];
-				keepmbr[cIndex] = m_pMBR[i];
-				keepid[cIndex] = m_pIdentifier[i];
+				keepmbr[cIndex] = pMBR[i];
+				keepid[cIndex] = pIdentifiers[i];
 			}
 
 			m_pDataLength = keeplen;
 			m_pData = keepdata;
-			m_pMBR = keepmbr;
-			m_pIdentifier = keepid;
-			m_children = lKeep;
+			pMBR = keepmbr;
+			pIdentifiers = keepid;
+			children = lKeep;
 			m_totalDataLength = 0;
-			for (int cChild = 0; cChild < m_children; cChild++) m_totalDataLength += m_pDataLength[cChild];
+			for (int cChild = 0; cChild < children; cChild++)
+				m_totalDataLength += m_pDataLength[cChild];
 
-			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
-			{
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++) {
 				m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 				m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
 
-				for (int cChild = 0; cChild < m_children; cChild++)
-				{
-					m_nodeMBR.m_pLow[cDim] = Math.min(m_nodeMBR.m_pLow[cDim], m_pMBR[cChild].m_pLow[cDim]);
-					m_nodeMBR.m_pHigh[cDim] = Math.max(m_nodeMBR.m_pHigh[cDim], m_pMBR[cChild].m_pHigh[cDim]);
+				for (int cChild = 0; cChild < children; cChild++) {
+					m_nodeMBR.m_pLow[cDim] = Math.min(m_nodeMBR.m_pLow[cDim], pMBR[cChild].m_pLow[cDim]);
+					m_nodeMBR.m_pHigh[cDim] = Math.max(m_nodeMBR.m_pHigh[cDim], pMBR[cChild].m_pHigh[cDim]);
 				}
 			}
 
 			m_pTree.writeNode(this);
 
 			// Divertion from R*-Tree algorithm here. First adjust
-			// the path to the root, then start reinserts, to avoid complicated handling
+			// the path to the root, then start reinserts, to avoid complicated
+			// handling
 			// of changes to the same node from multiple insertions.
 			int cParent = ((Integer) pathBuffer.pop()).intValue();
 			Index p = (Index) m_pTree.readNode(cParent);
 			p.adjustTree(this, pathBuffer);
 
-			for (cIndex = 0; cIndex < lReinsert; cIndex++)
-			{
-				m_pTree.insertData_impl(reinsertdata[cIndex],
-																reinsertmbr[cIndex],
-																reinsertid[cIndex],
-																m_level, overflowTable);
+			for (cIndex = 0; cIndex < lReinsert; cIndex++) {
+				m_pTree.insertData_impl(reinsertdata[cIndex], reinsertmbr[cIndex], reinsertid[cIndex], level,
+						overflowTable);
 			}
 
 			return true;
-		}
-		else
-		{
+		} else {
 			Node[] nodes = split(pData, mbr, id);
 			Node n = nodes[0];
 			Node nn = nodes[1];
 
-			if (pathBuffer.empty())
-			{
-				n.m_identifier = -1;
-				nn.m_identifier = -1;
+			if (pathBuffer.empty()) {
+				n.identifier = -1;
+				nn.identifier = -1;
 				m_pTree.writeNode(n);
 				m_pTree.writeNode(nn);
 
-				Index r = new Index(m_pTree, m_pTree.rootID, m_level + 1);
+				Index r = new Index(m_pTree, m_pTree.rootID, level + 1);
 
-				r.insertEntry(null, (Region) n.m_nodeMBR.clone(), n.m_identifier);
-				r.insertEntry(null, (Region) nn.m_nodeMBR.clone(), nn.m_identifier);
+				r.insertEntry(null, (Region) n.m_nodeMBR.clone(), n.identifier);
+				r.insertEntry(null, (Region) nn.m_nodeMBR.clone(), nn.identifier);
 
 				m_pTree.writeNode(r);
 
-				m_pTree.stats.m_nodesInLevel.set(m_level, new Integer(2));
+				m_pTree.stats.m_nodesInLevel.set(level, new Integer(2));
 				m_pTree.stats.m_nodesInLevel.add(new Integer(1));
-				m_pTree.stats.m_treeHeight = m_level + 2;
-			}
-			else
-			{
-				n.m_identifier = m_identifier;
-				nn.m_identifier = -1;
+				m_pTree.stats.m_treeHeight = level + 2;
+			} else {
+				n.identifier = identifier;
+				nn.identifier = -1;
 
 				m_pTree.writeNode(n);
 				m_pTree.writeNode(nn);
@@ -341,26 +315,24 @@ abstract class Node implements INode
 		}
 	}
 
-	protected void reinsertData(byte[] pData, Region mbr, int id, ArrayList reinsert, ArrayList keep)
-	{
+	protected void reinsertData(byte[] pData, Region mbr, int id, ArrayList reinsert, ArrayList keep) {
 		ReinsertEntry[] v = new ReinsertEntry[m_capacity + 1];
 
-		m_pDataLength[m_children] = (pData != null) ? pData.length : 0;
-		m_pData[m_children] = pData;
-		m_pMBR[m_children] = mbr;
-		m_pIdentifier[m_children] = id;
+		m_pDataLength[children] = (pData != null) ? pData.length : 0;
+		m_pData[children] = pData;
+		pMBR[children] = mbr;
+		pIdentifiers[children] = id;
 
 		double[] nc = m_nodeMBR.getCenter();
 
-		for (int cChild = 0; cChild < m_capacity + 1; cChild++)
-		{
+		for (int cChild = 0; cChild < m_capacity + 1; cChild++) {
 			ReinsertEntry e = new ReinsertEntry(cChild, 0.0f);
 
-			double[] c = m_pMBR[cChild].getCenter();
+			double[] c = pMBR[cChild].getCenter();
 
-			// calculate relative distance of every entry from the node MBR (ignore square root.)
-			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
-			{
+			// calculate relative distance of every entry from the node MBR
+			// (ignore square root.)
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++) {
 				double d = nc[cDim] - c[cDim];
 				e.m_dist += d * d;
 			}
@@ -374,32 +346,31 @@ abstract class Node implements INode
 		int cReinsert = (int) Math.floor((m_capacity + 1) * m_pTree.reinsertFactor);
 		int cCount;
 
-		for (cCount = 0; cCount < cReinsert; cCount++)
-		{
+		for (cCount = 0; cCount < cReinsert; cCount++) {
 			reinsert.add(new Integer(v[cCount].m_id));
 		}
 
-		for (cCount = cReinsert; cCount < m_capacity + 1; cCount++)
-		{
+		for (cCount = cReinsert; cCount < m_capacity + 1; cCount++) {
 			keep.add(new Integer(v[cCount].m_id));
 		}
 	}
 
-	protected void rtreeSplit(byte[] pData, Region mbr, int id, ArrayList group1, ArrayList group2)
-	{
+	protected void rtreeSplit(byte[] pData, Region mbr, int id, ArrayList group1, ArrayList group2) {
 		int cChild;
 		int minimumLoad = (int) Math.floor(m_capacity * m_pTree.fillFactor);
 
 		// use this mask array for marking visited entries.
 		boolean[] mask = new boolean[m_capacity + 1];
-		for (cChild = 0; cChild < m_capacity + 1; cChild++) mask[cChild] = false;
+		for (cChild = 0; cChild < m_capacity + 1; cChild++)
+			mask[cChild] = false;
 
-		// insert new data in the node for easier manipulation. Data arrays are always
+		// insert new data in the node for easier manipulation. Data arrays are
+		// always
 		// by one larger than node capacity.
 		m_pDataLength[m_capacity] = (pData != null) ? pData.length : 0;
 		m_pData[m_capacity] = pData;
-		m_pMBR[m_capacity] = mbr;
-		m_pIdentifier[m_capacity] = id;
+		pMBR[m_capacity] = mbr;
+		pIdentifiers[m_capacity] = id;
 
 		// initialize each group with the seed entries.
 		int[] seeds = pickSeeds();
@@ -411,45 +382,40 @@ abstract class Node implements INode
 		mask[seeds[1]] = true;
 
 		// find MBR of each group.
-		Region mbr1 = (Region) m_pMBR[seeds[0]].clone();
-		Region mbr2 = (Region) m_pMBR[seeds[1]].clone();
+		Region mbr1 = (Region) pMBR[seeds[0]].clone();
+		Region mbr2 = (Region) pMBR[seeds[1]].clone();
 
 		// count how many entries are left unchecked (exclude the seeds here.)
 		int cRemaining = m_capacity + 1 - 2;
 
-		while (cRemaining > 0)
-		{
-			if (minimumLoad - group1.size() == cRemaining)
-			{
-				// all remaining entries must be assigned to group1 to comply with minimun load requirement.
-				for (cChild = 0; cChild < m_capacity + 1; cChild++)
-				{
-					if (mask[cChild] == false)
-					{
+		while (cRemaining > 0) {
+			if (minimumLoad - group1.size() == cRemaining) {
+				// all remaining entries must be assigned to group1 to comply
+				// with minimun load requirement.
+				for (cChild = 0; cChild < m_capacity + 1; cChild++) {
+					if (mask[cChild] == false) {
 						group1.add(new Integer(cChild));
 						mask[cChild] = true;
 						cRemaining--;
 					}
 				}
-			}
-			else if (minimumLoad - group2.size() == cRemaining)
-			{
-				// all remaining entries must be assigned to group2 to comply with minimun load requirement.
-				for (cChild = 0; cChild < m_capacity + 1; cChild++)
-				{
-					if (mask[cChild] == false)
-					{
+			} else if (minimumLoad - group2.size() == cRemaining) {
+				// all remaining entries must be assigned to group2 to comply
+				// with minimun load requirement.
+				for (cChild = 0; cChild < m_capacity + 1; cChild++) {
+					if (mask[cChild] == false) {
 						group2.add(new Integer(cChild));
 						mask[cChild] = true;
 						cRemaining--;
 					}
 				}
-			}
-			else
-			{
-				// For all remaining entries compute the difference of the cost of grouping an
-				// entry in either group. When done, choose the entry that yielded the maximum
-				// difference. In case of linear split, select any entry (e.g. the first one.)
+			} else {
+				// For all remaining entries compute the difference of the cost
+				// of grouping an
+				// entry in either group. When done, choose the entry that
+				// yielded the maximum
+				// difference. In case of linear split, select any entry (e.g.
+				// the first one.)
 				int sel = -1;
 				double md1 = 0.0, md2 = 0.0;
 				double m = Double.NEGATIVE_INFINITY;
@@ -457,22 +423,22 @@ abstract class Node implements INode
 				double a1 = mbr1.getArea();
 				double a2 = mbr2.getArea();
 
-				for (cChild = 0; cChild < m_capacity + 1; cChild++)
-				{
-					if (mask[cChild] == false)
-					{
-						Region a = mbr1.combinedRegion(m_pMBR[cChild]);
+				for (cChild = 0; cChild < m_capacity + 1; cChild++) {
+					if (mask[cChild] == false) {
+						Region a = mbr1.combinedRegion(pMBR[cChild]);
 						d1 = a.getArea() - a1;
-						Region b = mbr2.combinedRegion(m_pMBR[cChild]);
+						Region b = mbr2.combinedRegion(pMBR[cChild]);
 						d2 = b.getArea() - a2;
 						d = Math.abs(d1 - d2);
 
-						if (d > m)
-						{
+						if (d > m) {
 							m = d;
-							md1 = d1; md2 = d2;
+							md1 = d1;
+							md2 = d2;
 							sel = cChild;
-							if (m_pTree.treeVariant== SpatialIndex.RtreeVariantLinear || m_pTree.treeVariant == SpatialIndex.RtreeVariantRstar) break;
+							if (m_pTree.treeVariant == SpatialIndex.RtreeVariantLinear
+									|| m_pTree.treeVariant == SpatialIndex.RtreeVariantRstar)
+								break;
 						}
 					}
 				}
@@ -480,73 +446,57 @@ abstract class Node implements INode
 				// determine the group where we should add the new entry.
 				int group = -1;
 
-				if (md1 < md2)
-				{
+				if (md1 < md2) {
 					group1.add(new Integer(sel));
 					group = 1;
-				}
-				else if (md2 < md1)
-				{
+				} else if (md2 < md1) {
 					group2.add(new Integer(sel));
 					group = 2;
-				}
-				else if (a1 < a2)
-				{
+				} else if (a1 < a2) {
 					group1.add(new Integer(sel));
 					group = 1;
-				}
-				else if (a2 < a1)
-				{
+				} else if (a2 < a1) {
 					group2.add(new Integer(sel));
 					group = 2;
-				}
-				else if (group1.size() < group2.size())
-				{
+				} else if (group1.size() < group2.size()) {
 					group1.add(new Integer(sel));
 					group = 1;
-				}
-				else if (group2.size() < group1.size())
-				{
+				} else if (group2.size() < group1.size()) {
 					group2.add(new Integer(sel));
 					group = 2;
-				}
-				else
-				{
+				} else {
 					group1.add(new Integer(sel));
 					group = 1;
 				}
 				mask[sel] = true;
 				cRemaining--;
-				if (group == 1)
-				{
-					Region.combinedRegion(mbr1, m_pMBR[sel]);
-				}
-				else
-				{
-					Region.combinedRegion(mbr2, m_pMBR[sel]);
+				if (group == 1) {
+					Region.combinedRegion(mbr1, pMBR[sel]);
+				} else {
+					Region.combinedRegion(mbr2, pMBR[sel]);
 				}
 			}
 		}
 	}
 
-	protected void rstarSplit(byte[] pData, Region mbr, int id, ArrayList group1, ArrayList group2)
-	{
-		RstarSplitEntry[] dataLow = new RstarSplitEntry[m_capacity + 1];;
-		RstarSplitEntry[] dataHigh = new RstarSplitEntry[m_capacity + 1];;
+	protected void rstarSplit(byte[] pData, Region mbr, int id, ArrayList group1, ArrayList group2) {
+		RstarSplitEntry[] dataLow = new RstarSplitEntry[m_capacity + 1];
+		;
+		RstarSplitEntry[] dataHigh = new RstarSplitEntry[m_capacity + 1];
+		;
 
-		m_pDataLength[m_children] = (pData != null) ? pData.length : 0;
+		m_pDataLength[children] = (pData != null) ? pData.length : 0;
 		m_pData[m_capacity] = pData;
-		m_pMBR[m_capacity] = mbr;
-		m_pIdentifier[m_capacity] = id;
+		pMBR[m_capacity] = mbr;
+		pIdentifiers[m_capacity] = id;
 
 		int nodeSPF = (int) (Math.floor((m_capacity + 1) * m_pTree.splitDistributionFactor));
 		int splitDistribution = (m_capacity + 1) - (2 * nodeSPF) + 2;
 
 		int cChild, cDim, cIndex;
 
-		for (cChild = 0; cChild < m_capacity + 1; cChild++)
-		{
-			RstarSplitEntry e = new RstarSplitEntry(m_pMBR[cChild], cChild, 0);
+		for (cChild = 0; cChild < m_capacity + 1; cChild++) {
+			RstarSplitEntry e = new RstarSplitEntry(pMBR[cChild], cChild, 0);
 
 			dataLow[cChild] = e;
 			dataHigh[cChild] = e;
@@ -557,8 +507,7 @@ abstract class Node implements INode
 		int sortOrder = -1;
 
 		// chooseSplitAxis.
-		for (cDim = 0; cDim < m_pTree.dimension; cDim++)
-		{
+		for (cDim = 0; cDim < m_pTree.dimension; cDim++) {
 			Arrays.sort(dataLow, new RstarSplitEntryComparatorLow());
 			Arrays.sort(dataHigh, new RstarSplitEntryComparatorHigh());
 
@@ -566,15 +515,13 @@ abstract class Node implements INode
 			double marginl = 0.0f;
 			double marginh = 0.0f;
 
-			for (cChild = 1; cChild <= splitDistribution; cChild++)
-			{
+			for (cChild = 1; cChild <= splitDistribution; cChild++) {
 				int l = nodeSPF - 1 + cChild;
 
 				Region[] tl1 = new Region[l];
 				Region[] th1 = new Region[l];
 
-				for (cIndex = 0; cIndex < l; cIndex++)
-				{
+				for (cIndex = 0; cIndex < l; cIndex++) {
 					tl1[cIndex] = dataLow[cIndex].m_pRegion;
 					th1[cIndex] = dataHigh[cIndex].m_pRegion;
 				}
@@ -586,8 +533,7 @@ abstract class Node implements INode
 				Region[] th2 = new Region[m_capacity + 1 - l];
 
 				int tmpIndex = 0;
-				for (cIndex = l; cIndex < m_capacity + 1; cIndex++)
-				{
+				for (cIndex = l; cIndex < m_capacity + 1; cIndex++) {
 					tl2[tmpIndex] = dataLow[cIndex].m_pRegion;
 					th2[tmpIndex] = dataHigh[cIndex].m_pRegion;
 					tmpIndex++;
@@ -603,22 +549,20 @@ abstract class Node implements INode
 			double margin = Math.min(marginl, marginh);
 
 			// keep minimum margin as split axis.
-			if (margin < minimumMargin)
-			{
+			if (margin < minimumMargin) {
 				minimumMargin = margin;
 				splitAxis = cDim;
 				sortOrder = (marginl < marginh) ? 0 : 1;
 			}
 
-			// increase the dimension according to which the data entries should be sorted.
-			for (cChild = 0; cChild < m_capacity + 1; cChild++)
-			{
+			// increase the dimension according to which the data entries should
+			// be sorted.
+			for (cChild = 0; cChild < m_capacity + 1; cChild++) {
 				dataLow[cChild].m_sortDim = cDim + 1;
 			}
 		} // for (cDim)
 
-		for (cChild = 0; cChild < m_capacity + 1; cChild++)
-		{
+		for (cChild = 0; cChild < m_capacity + 1; cChild++) {
 			dataLow[cChild].m_sortDim = splitAxis;
 		}
 
@@ -631,14 +575,12 @@ abstract class Node implements INode
 		double mo = Double.POSITIVE_INFINITY;
 		int splitPoint = -1;
 
-		for (cChild = 1; cChild <= splitDistribution; cChild++)
-		{
+		for (cChild = 1; cChild <= splitDistribution; cChild++) {
 			int l = nodeSPF - 1 + cChild;
 
 			Region[] t1 = new Region[l];
 
-			for (cIndex = 0; cIndex < l; cIndex++)
-			{
+			for (cIndex = 0; cIndex < l; cIndex++) {
 				t1[cIndex] = dataLow[cIndex].m_pRegion;
 			}
 
@@ -647,8 +589,7 @@ abstract class Node implements INode
 			Region[] t2 = new Region[m_capacity + 1 - l];
 
 			int tmpIndex = 0;
-			for (cIndex = l; cIndex < m_capacity + 1; cIndex++)
-			{
+			for (cIndex = l; cIndex < m_capacity + 1; cIndex++) {
 				t2[tmpIndex] = dataLow[cIndex].m_pRegion;
 				tmpIndex++;
 			}
@@ -657,18 +598,14 @@ abstract class Node implements INode
 
 			double o = bb1.getIntersectingArea(bb2);
 
-			if (o < mo)
-			{
+			if (o < mo) {
 				splitPoint = cChild;
 				mo = o;
 				ma = bb1.getArea() + bb2.getArea();
-			}
-			else if (o == mo)
-			{
+			} else if (o == mo) {
 				double a = bb1.getArea() + bb2.getArea();
 
-				if (a < ma)
-				{
+				if (a < ma) {
 					splitPoint = cChild;
 					ma = a;
 				}
@@ -677,89 +614,81 @@ abstract class Node implements INode
 
 		int l1 = nodeSPF - 1 + splitPoint;
 
-		for (cIndex = 0; cIndex < l1; cIndex++)
-		{
+		for (cIndex = 0; cIndex < l1; cIndex++) {
 			group1.add(new Integer(dataLow[cIndex].m_id));
 		}
 
-		for (cIndex = l1; cIndex <= m_capacity; cIndex++)
-		{
+		for (cIndex = l1; cIndex <= m_capacity; cIndex++) {
 			group2.add(new Integer(dataLow[cIndex].m_id));
 		}
 	}
 
-	protected int[] pickSeeds()
-	{
+	protected int[] pickSeeds() {
 		double separation = Double.NEGATIVE_INFINITY;
 		double inefficiency = Double.NEGATIVE_INFINITY;
 		int cDim, cChild, cIndex, i1 = 0, i2 = 0;
 
-		switch (m_pTree.treeVariant)
-		{
-			case SpatialIndex.RtreeVariantLinear:
-			case SpatialIndex.RtreeVariantRstar:
-				for (cDim = 0; cDim < m_pTree.dimension; cDim++)
-				{
-					double leastLower = m_pMBR[0].m_pLow[cDim];
-					double greatestUpper = m_pMBR[0].m_pHigh[cDim];
-					int greatestLower = 0;
-					int leastUpper = 0;
-					double width;
+		switch (m_pTree.treeVariant) {
+		case SpatialIndex.RtreeVariantLinear:
+		case SpatialIndex.RtreeVariantRstar:
+			for (cDim = 0; cDim < m_pTree.dimension; cDim++) {
+				double leastLower = pMBR[0].m_pLow[cDim];
+				double greatestUpper = pMBR[0].m_pHigh[cDim];
+				int greatestLower = 0;
+				int leastUpper = 0;
+				double width;
 
-					for (cChild = 1; cChild < m_capacity + 1; cChild++)
-					{
-						if (m_pMBR[cChild].m_pLow[cDim] > m_pMBR[greatestLower].m_pLow[cDim]) greatestLower = cChild;
-						if (m_pMBR[cChild].m_pHigh[cDim] < m_pMBR[leastUpper].m_pHigh[cDim]) leastUpper = cChild;
+				for (cChild = 1; cChild < m_capacity + 1; cChild++) {
+					if (pMBR[cChild].m_pLow[cDim] > pMBR[greatestLower].m_pLow[cDim])
+						greatestLower = cChild;
+					if (pMBR[cChild].m_pHigh[cDim] < pMBR[leastUpper].m_pHigh[cDim])
+						leastUpper = cChild;
 
-						leastLower = Math.min(m_pMBR[cChild].m_pLow[cDim], leastLower);
-						greatestUpper = Math.max(m_pMBR[cChild].m_pHigh[cDim], greatestUpper);
-					}
-
-					width = greatestUpper - leastLower;
-					if (width <= 0) width = 1;
-
-					double f = (m_pMBR[greatestLower].m_pLow[cDim] - m_pMBR[leastUpper].m_pHigh[cDim]) / width;
-
-					if (f > separation)
-					{
-						i1 = leastUpper;
-						i2 = greatestLower;
-						separation = f;
-					}
-				}  // for (cDim)
-
-				if (i1 == i2)
-				{
-					i2 = (i2 != m_capacity) ? i2 + 1 : i2 - 1;
+					leastLower = Math.min(pMBR[cChild].m_pLow[cDim], leastLower);
+					greatestUpper = Math.max(pMBR[cChild].m_pHigh[cDim], greatestUpper);
 				}
 
-				break;
-			case SpatialIndex.RtreeVariantQuadratic:
-				// for each pair of Regions (account for overflow Region too!)
-				for (cChild = 0; cChild < m_capacity; cChild++)
-				{
-					double a = m_pMBR[cChild].getArea();
+				width = greatestUpper - leastLower;
+				if (width <= 0)
+					width = 1;
 
-					for (cIndex = cChild + 1; cIndex < m_capacity + 1; cIndex++)
-					{
-						// get the combined MBR of those two entries.
-						Region r = m_pMBR[cChild].combinedRegion(m_pMBR[cIndex]);
+				double f = (pMBR[greatestLower].m_pLow[cDim] - pMBR[leastUpper].m_pHigh[cDim]) / width;
 
-						// find the inefficiency of grouping these entries together.
-						double d = r.getArea() - a - m_pMBR[cIndex].getArea();
+				if (f > separation) {
+					i1 = leastUpper;
+					i2 = greatestLower;
+					separation = f;
+				}
+			} // for (cDim)
 
-						if (d > inefficiency)
-						{
-							inefficiency = d;
-							i1 = cChild;
-							i2 = cIndex;
-						}
-					}  // for (cIndex)
-				} // for (cChild)
+			if (i1 == i2) {
+				i2 = (i2 != m_capacity) ? i2 + 1 : i2 - 1;
+			}
 
-				break;
-			default:
-				throw new IllegalStateException("Unknown RTree variant.");
+			break;
+		case SpatialIndex.RtreeVariantQuadratic:
+			// for each pair of Regions (account for overflow Region too!)
+			for (cChild = 0; cChild < m_capacity; cChild++) {
+				double a = pMBR[cChild].getArea();
+
+				for (cIndex = cChild + 1; cIndex < m_capacity + 1; cIndex++) {
+					// get the combined MBR of those two entries.
+					Region r = pMBR[cChild].combinedRegion(pMBR[cIndex]);
+
+					// find the inefficiency of grouping these entries together.
+					double d = r.getArea() - a - pMBR[cIndex].getArea();
+
+					if (d > inefficiency) {
+						inefficiency = d;
+						i1 = cChild;
+						i2 = cIndex;
+					}
+				} // for (cIndex)
+			} // for (cChild)
+
+			break;
+		default:
+			throw new IllegalStateException("Unknown RTree variant.");
 		}
 
 		int[] ret = new int[2];
@@ -768,63 +697,58 @@ abstract class Node implements INode
 		return ret;
 	}
 
-	protected void condenseTree(Stack toReinsert, Stack pathBuffer)
-	{
+	protected void condenseTree(Stack toReinsert, Stack pathBuffer) {
 		int minimumLoad = (int) (Math.floor(m_capacity * m_pTree.fillFactor));
 
-		if (pathBuffer.empty())
-		{
+		if (pathBuffer.empty()) {
 			// eliminate root if it has only one child.
-			if (m_level != 0 && m_children == 1)
-			{
-				Node n = m_pTree.readNode(m_pIdentifier[0]);
+			if (level != 0 && children == 1) {
+				Node n = m_pTree.readNode(pIdentifiers[0]);
 				m_pTree.deleteNode(n);
-				n.m_identifier = m_pTree.rootID;
+				n.identifier = m_pTree.rootID;
 				m_pTree.writeNode(n);
 
 				m_pTree.stats.m_nodesInLevel.remove(m_pTree.stats.m_nodesInLevel.size() - 1);
 				m_pTree.stats.m_treeHeight -= 1;
-				// HACK: pending deleteNode for deleted child will decrease nodesInLevel, later on.
+				// HACK: pending deleteNode for deleted child will decrease
+				// nodesInLevel, later on.
 				m_pTree.stats.m_nodesInLevel.set(m_pTree.stats.m_treeHeight - 1, new Integer(2));
 			}
-		}
-		else
-		{
+		} else {
 			int cParent = ((Integer) pathBuffer.pop()).intValue();
 			Index p = (Index) m_pTree.readNode(cParent);
 
 			// find the entry in the parent, that points to this node.
 			int child;
 
-			for (child = 0; child != p.m_children; child++)
-			{
-				if (p.m_pIdentifier[child] == m_identifier) break;
+			for (child = 0; child != p.children; child++) {
+				if (p.pIdentifiers[child] == identifier)
+					break;
 			}
 
-			if (m_children < minimumLoad)
-			{
+			if (children < minimumLoad) {
 				// used space less than the minimum
-				// 1. eliminate node entry from the parent. deleteEntry will fix the parent's MBR.
+				// 1. eliminate node entry from the parent. deleteEntry will fix
+				// the parent's MBR.
 				p.deleteEntry(child);
-				// 2. add this node to the stack in order to reinsert its entries.
+				// 2. add this node to the stack in order to reinsert its
+				// entries.
 				toReinsert.push(this);
-			}
-			else
-			{
-				// adjust the entry in 'p' to contain the new bounding region of this node.
-				p.m_pMBR[child] = (Region) m_nodeMBR.clone();
+			} else {
+				// adjust the entry in 'p' to contain the new bounding region of
+				// this node.
+				p.pMBR[child] = (Region) m_nodeMBR.clone();
 
-				// global recalculation necessary since the MBR can only shrink in size,
+				// global recalculation necessary since the MBR can only shrink
+				// in size,
 				// due to data removal.
-				for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
-				{
+				for (int cDim = 0; cDim < m_pTree.dimension; cDim++) {
 					p.m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 					p.m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
 
-					for (int cChild = 0; cChild < p.m_children; cChild++)
-					{
-						p.m_nodeMBR.m_pLow[cDim] = Math.min(p.m_nodeMBR.m_pLow[cDim], p.m_pMBR[cChild].m_pLow[cDim]);
-						p.m_nodeMBR.m_pHigh[cDim] = Math.max(p.m_nodeMBR.m_pHigh[cDim], p.m_pMBR[cChild].m_pHigh[cDim]);
+					for (int cChild = 0; cChild < p.children; cChild++) {
+						p.m_nodeMBR.m_pLow[cDim] = Math.min(p.m_nodeMBR.m_pLow[cDim], p.pMBR[cChild].m_pLow[cDim]);
+						p.m_nodeMBR.m_pHigh[cDim] = Math.max(p.m_nodeMBR.m_pHigh[cDim], p.pMBR[cChild].m_pHigh[cDim]);
 					}
 				}
 			}
@@ -836,8 +760,7 @@ abstract class Node implements INode
 		}
 	}
 
-	protected void load(byte[] data) throws IOException
-	{
+	protected void load(byte[] data) throws IOException {
 		m_nodeMBR = (Region) m_pTree.infiniteRegion.clone();
 
 		DataInputStream ds = new DataInputStream(new ByteArrayInputStream(data));
@@ -845,118 +768,119 @@ abstract class Node implements INode
 		// skip the node type information, it is not needed.
 		ds.readInt();
 
-		m_level = ds.readInt();
-		m_children = ds.readInt();
+		level = ds.readInt();
+		children = ds.readInt();
 
-		for (int cChild = 0; cChild < m_children; cChild++)
-		{
-			m_pMBR[cChild] = new Region();
-			m_pMBR[cChild].m_pLow = new double[m_pTree.dimension];
-			m_pMBR[cChild].m_pHigh = new double[m_pTree.dimension];
+		for (int cChild = 0; cChild < children; cChild++) {
+			pMBR[cChild] = new Region();
+			pMBR[cChild].m_pLow = new double[m_pTree.dimension];
+			pMBR[cChild].m_pHigh = new double[m_pTree.dimension];
 
-			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
-			{
-				m_pMBR[cChild].m_pLow[cDim] = ds.readDouble();
-				m_pMBR[cChild].m_pHigh[cDim] = ds.readDouble();
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++) {
+				pMBR[cChild].m_pLow[cDim] = ds.readDouble();
+				pMBR[cChild].m_pHigh[cDim] = ds.readDouble();
 			}
 
-			m_pIdentifier[cChild] = ds.readInt();
+			pIdentifiers[cChild] = ds.readInt();
 
 			m_pDataLength[cChild] = ds.readInt();
-			if (m_pDataLength[cChild] > 0)
-			{
+			if (m_pDataLength[cChild] > 0) {
 				m_totalDataLength += m_pDataLength[cChild];
 				m_pData[cChild] = new byte[m_pDataLength[cChild]];
 				ds.read(m_pData[cChild]);
-			}
-			else
-			{
+			} else {
 				m_pData[cChild] = null;
 			}
 
-			Region.combinedRegion(m_nodeMBR, m_pMBR[cChild]);
+			Region.combinedRegion(m_nodeMBR, pMBR[cChild]);
 		}
 	}
 
-	protected byte[] store() throws IOException
-	{
+	protected byte[] store() throws IOException {
 		ByteArrayOutputStream bs = new ByteArrayOutputStream();
 		DataOutputStream ds = new DataOutputStream(bs);
 
 		int type;
-		if (m_level == 0) type = SpatialIndex.PersistentLeaf;
-		else type = SpatialIndex.PersistentIndex;
+		if (level == 0)
+			type = SpatialIndex.PersistentLeaf;
+		else
+			type = SpatialIndex.PersistentIndex;
 		ds.writeInt(type);
 
-		ds.writeInt(m_level);
-		ds.writeInt(m_children);
+		ds.writeInt(level);
+		ds.writeInt(children);
 
-		for (int cChild = 0; cChild < m_children; cChild++)
-		{
-			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
-			{
-				ds.writeDouble(m_pMBR[cChild].m_pLow[cDim]);
-				ds.writeDouble(m_pMBR[cChild].m_pHigh[cDim]);
+		for (int cChild = 0; cChild < children; cChild++) {
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++) {
+				ds.writeDouble(pMBR[cChild].m_pLow[cDim]);
+				ds.writeDouble(pMBR[cChild].m_pHigh[cDim]);
 			}
 
-			ds.writeInt(m_pIdentifier[cChild]);
+			ds.writeInt(pIdentifiers[cChild]);
 
 			ds.writeInt(m_pDataLength[cChild]);
-			if (m_pDataLength[cChild] > 0) ds.write(m_pData[cChild]);
+			if (m_pDataLength[cChild] > 0)
+				ds.write(m_pData[cChild]);
 		}
 
 		ds.flush();
 		return bs.toByteArray();
 	}
 
-	class ReinsertEntry
-	{
+	class ReinsertEntry {
 		int m_id;
 		double m_dist;
-		public ReinsertEntry(int id, double dist) { m_id = id; m_dist = dist; }
+
+		public ReinsertEntry(int id, double dist) {
+			m_id = id;
+			m_dist = dist;
+		}
 	} // ReinsertEntry
 
-	class ReinsertEntryComparator implements Comparator
-	{
-		public int compare(Object o1, Object o2)
-		{
-			if (((ReinsertEntry) o1).m_dist < ((ReinsertEntry) o2).m_dist) return -1;
-			if (((ReinsertEntry) o1).m_dist > ((ReinsertEntry) o2).m_dist) return 1;
+	class ReinsertEntryComparator implements Comparator {
+		public int compare(Object o1, Object o2) {
+			if (((ReinsertEntry) o1).m_dist < ((ReinsertEntry) o2).m_dist)
+				return -1;
+			if (((ReinsertEntry) o1).m_dist > ((ReinsertEntry) o2).m_dist)
+				return 1;
 			return 0;
 		}
 	} // ReinsertEntryComparator
 
-	class RstarSplitEntry
-	{
+	class RstarSplitEntry {
 		Region m_pRegion;
 		int m_id;
 		int m_sortDim;
 
-		RstarSplitEntry(Region r, int id, int dimension) { m_pRegion = r; m_id = id; m_sortDim = dimension; }
+		RstarSplitEntry(Region r, int id, int dimension) {
+			m_pRegion = r;
+			m_id = id;
+			m_sortDim = dimension;
+		}
 	}
 
-	class RstarSplitEntryComparatorLow implements Comparator
-	{
-		public int compare(Object o1, Object o2)
-		{
+	class RstarSplitEntryComparatorLow implements Comparator {
+		public int compare(Object o1, Object o2) {
 			RstarSplitEntry e1 = (RstarSplitEntry) o1;
 			RstarSplitEntry e2 = (RstarSplitEntry) o2;
 
-			if (e1.m_pRegion.m_pLow[e1.m_sortDim] < e2.m_pRegion.m_pLow[e2.m_sortDim]) return -1;
-			if (e1.m_pRegion.m_pLow[e1.m_sortDim] > e2.m_pRegion.m_pLow[e2.m_sortDim]) return 1;
+			if (e1.m_pRegion.m_pLow[e1.m_sortDim] < e2.m_pRegion.m_pLow[e2.m_sortDim])
+				return -1;
+			if (e1.m_pRegion.m_pLow[e1.m_sortDim] > e2.m_pRegion.m_pLow[e2.m_sortDim])
+				return 1;
 			return 0;
 		}
 	}
 
-	class RstarSplitEntryComparatorHigh implements Comparator
-	{
-		public int compare(Object o1, Object o2)
-		{
+	class RstarSplitEntryComparatorHigh implements Comparator {
+		public int compare(Object o1, Object o2) {
 			RstarSplitEntry e1 = (RstarSplitEntry) o1;
 			RstarSplitEntry e2 = (RstarSplitEntry) o2;
 
-			if (e1.m_pRegion.m_pHigh[e1.m_sortDim] < e2.m_pRegion.m_pHigh[e2.m_sortDim]) return -1;
-			if (e1.m_pRegion.m_pHigh[e1.m_sortDim] > e2.m_pRegion.m_pHigh[e2.m_sortDim]) return 1;
+			if (e1.m_pRegion.m_pHigh[e1.m_sortDim] < e2.m_pRegion.m_pHigh[e2.m_sortDim])
+				return -1;
+			if (e1.m_pRegion.m_pHigh[e1.m_sortDim] > e2.m_pRegion.m_pHigh[e2.m_sortDim])
+				return 1;
 			return 0;
 		}
 	}

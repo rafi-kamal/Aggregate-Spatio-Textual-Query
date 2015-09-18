@@ -47,9 +47,9 @@ public class Leaf extends Node
 
 	protected Leaf findLeaf(Region mbr, int id, Stack pathBuffer)
 	{
-		for (int cChild = 0; cChild < m_children; cChild++)
+		for (int cChild = 0; cChild < children; cChild++)
 		{
-			if (m_pIdentifier[cChild] == id && mbr.equals(m_pMBR[cChild])) return this;
+			if (pIdentifiers[cChild] == id && mbr.equals(pMBR[cChild])) return this;
 		}
 
 		return null;
@@ -82,7 +82,7 @@ public class Leaf extends Node
 		for (cIndex = 0; cIndex < g1.size(); cIndex++)
 		{
 			int i = ((Integer) g1.get(cIndex)).intValue();
-			left.insertEntry(m_pData[i], m_pMBR[i], m_pIdentifier[i]);
+			left.insertEntry(m_pData[i], pMBR[i], pIdentifiers[i]);
 
 			// we don't want to delete the data array from this node's destructor!
 			m_pData[i] = null;
@@ -91,7 +91,7 @@ public class Leaf extends Node
 		for (cIndex = 0; cIndex < g2.size(); cIndex++)
 		{
 			int i = ((Integer) g2.get(cIndex)).intValue();
-			right.insertEntry(m_pData[i], m_pMBR[i], m_pIdentifier[i]);
+			right.insertEntry(m_pData[i], pMBR[i], pIdentifiers[i]);
 
 			// we don't want to delete the data array from this node's destructor!
 			m_pData[i] = null;
@@ -106,9 +106,9 @@ public class Leaf extends Node
 	protected void deleteData(int id, Stack pathBuffer)
 	{
 		int child;
-		for (child = 0; child < m_children; child++)
+		for (child = 0; child < children; child++)
 		{
-			if (m_pIdentifier[child] == id) break;
+			if (pIdentifiers[child] == id) break;
 		}
 
 		deleteEntry(child);
@@ -123,15 +123,15 @@ public class Leaf extends Node
 			Node n = (Node) toReinsert.pop();
 			m_pTree.deleteNode(n);
 
-			for (int cChild = 0; cChild < n.m_children; cChild++)
+			for (int cChild = 0; cChild < n.children; cChild++)
 			{
 				// keep this in the for loop. The tree height might change after insertions.
 				boolean[] overflowTable = new boolean[m_pTree.stats.m_treeHeight];
 				for (int cLevel = 0; cLevel < m_pTree.stats.m_treeHeight; cLevel++) overflowTable[cLevel] = false;
 
 				m_pTree.insertData_impl(n.m_pData[cChild],
-																n.m_pMBR[cChild], n.m_pIdentifier[cChild],
-																n.m_level, overflowTable);
+																n.pMBR[cChild], n.pIdentifiers[cChild],
+																n.level, overflowTable);
 				n.m_pData[cChild] = null;
 			}
 		}

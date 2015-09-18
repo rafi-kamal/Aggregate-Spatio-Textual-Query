@@ -250,17 +250,17 @@ public class RTree implements ISpatialIndex {
 			while (queue.size() != 0) {
 				NNEntry first = (NNEntry) queue.remove(0);
 
-				if (first.m_pEntry instanceof Node) {
-					n = (Node) first.m_pEntry;
+				if (first.pEntry instanceof Node) {
+					n = (Node) first.pEntry;
 					v.visitNode((INode) n);
 
-					for (int cChild = 0; cChild < n.m_children; cChild++) {
+					for (int cChild = 0; cChild < n.children; cChild++) {
 						IEntry e;
 
-						if (n.m_level == 0) {
-							e = new Data(n.m_pData[cChild], n.m_pMBR[cChild], n.m_pIdentifier[cChild]);
+						if (n.level == 0) {
+							e = new Data(n.m_pData[cChild], n.pMBR[cChild], n.pIdentifiers[cChild]);
 						} else {
-							e = (IEntry) readNode(n.m_pIdentifier[cChild]);
+							e = (IEntry) readNode(n.pIdentifiers[cChild]);
 						}
 
 						NNEntry e2 = new NNEntry(e, nnc.getMinimumDistance(query, e));
@@ -278,13 +278,13 @@ public class RTree implements ISpatialIndex {
 					// (neighbors can be more than k, if many happen to have the
 					// same
 					// furthest distance).
-					if (count >= k && first.m_minDist > knearest)
+					if (count >= k && first.minDist > knearest)
 						break;
 
-					v.visitData((IData) first.m_pEntry);
+					v.visitData((IData) first.pEntry);
 					stats.m_queryResults++;
 					count++;
-					knearest = first.m_minDist;
+					knearest = first.minDist;
 				}
 			}
 		} finally {
@@ -364,13 +364,13 @@ public class RTree implements ISpatialIndex {
 		Stack<ValidateEntry> st = new Stack<ValidateEntry>();
 		Node root = readNode(rootID);
 
-		if (root.m_level != stats.m_treeHeight - 1) {
+		if (root.level != stats.m_treeHeight - 1) {
 			System.err.println("Invalid tree height");
 			return false;
 		}
 
 		HashMap<Integer, Integer> nodesInLevel = new HashMap<Integer, Integer>();
-		nodesInLevel.put(new Integer(root.m_level), new Integer(1));
+		nodesInLevel.put(new Integer(root.level), new Integer(1));
 
 		ValidateEntry e = new ValidateEntry(root.m_nodeMBR, root);
 		st.push(e);
@@ -384,9 +384,9 @@ public class RTree implements ISpatialIndex {
 				tmpRegion.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 				tmpRegion.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
 
-				for (int cChild = 0; cChild < e.m_pNode.m_children; cChild++) {
-					tmpRegion.m_pLow[cDim] = Math.min(tmpRegion.m_pLow[cDim], e.m_pNode.m_pMBR[cChild].m_pLow[cDim]);
-					tmpRegion.m_pHigh[cDim] = Math.max(tmpRegion.m_pHigh[cDim], e.m_pNode.m_pMBR[cChild].m_pHigh[cDim]);
+				for (int cChild = 0; cChild < e.m_pNode.children; cChild++) {
+					tmpRegion.m_pLow[cDim] = Math.min(tmpRegion.m_pLow[cDim], e.m_pNode.pMBR[cChild].m_pLow[cDim]);
+					tmpRegion.m_pHigh[cDim] = Math.max(tmpRegion.m_pHigh[cDim], e.m_pNode.pMBR[cChild].m_pHigh[cDim]);
 				}
 			}
 
@@ -398,16 +398,16 @@ public class RTree implements ISpatialIndex {
 				ret = false;
 			}
 
-			if (e.m_pNode.m_level != 0) {
-				for (int cChild = 0; cChild < e.m_pNode.m_children; cChild++) {
-					ValidateEntry tmpEntry = new ValidateEntry(e.m_pNode.m_pMBR[cChild],
-							readNode(e.m_pNode.m_pIdentifier[cChild]));
+			if (e.m_pNode.level != 0) {
+				for (int cChild = 0; cChild < e.m_pNode.children; cChild++) {
+					ValidateEntry tmpEntry = new ValidateEntry(e.m_pNode.pMBR[cChild],
+							readNode(e.m_pNode.pIdentifiers[cChild]));
 
-					if (!nodesInLevel.containsKey(new Integer(tmpEntry.m_pNode.m_level))) {
-						nodesInLevel.put(new Integer(tmpEntry.m_pNode.m_level), new Integer(1));
+					if (!nodesInLevel.containsKey(new Integer(tmpEntry.m_pNode.level))) {
+						nodesInLevel.put(new Integer(tmpEntry.m_pNode.level), new Integer(1));
 					} else {
-						int i = ((Integer) nodesInLevel.get(new Integer(tmpEntry.m_pNode.m_level))).intValue();
-						nodesInLevel.put(new Integer(tmpEntry.m_pNode.m_level), new Integer(i + 1));
+						int i = ((Integer) nodesInLevel.get(new Integer(tmpEntry.m_pNode.level))).intValue();
+						nodesInLevel.put(new Integer(tmpEntry.m_pNode.level), new Integer(i + 1));
 					}
 
 					st.push(tmpEntry);
@@ -706,8 +706,8 @@ public class RTree implements ISpatialIndex {
 
 		Node root = readNode(rootID);
 
-		overflowTable = new boolean[root.m_level];
-		for (int cLevel = 0; cLevel < root.m_level; cLevel++)
+		overflowTable = new boolean[root.level];
+		for (int cLevel = 0; cLevel < root.level; cLevel++)
 			overflowTable[cLevel] = false;
 
 		Node l = root.chooseSubtree(mbr, 0, pathBuffer);
@@ -756,10 +756,10 @@ public class RTree implements ISpatialIndex {
 		}
 
 		int page;
-		if (n.m_identifier < 0)
+		if (n.identifier < 0)
 			page = IStorageManager.NewPage;
 		else
-			page = n.m_identifier;
+			page = n.identifier;
 
 		try {
 			page = m_pStorageManager.storeByteArray(page, buffer);
@@ -768,11 +768,11 @@ public class RTree implements ISpatialIndex {
 			throw new IllegalStateException("writeNode failed with InvalidPageException");
 		}
 
-		if (n.m_identifier < 0) {
-			n.m_identifier = page;
+		if (n.identifier < 0) {
+			n.identifier = page;
 			stats.m_nodes++;
-			int i = ((Integer) stats.m_nodesInLevel.get(n.m_level)).intValue();
-			stats.m_nodesInLevel.set(n.m_level, new Integer(i + 1));
+			int i = ((Integer) stats.m_nodesInLevel.get(n.level)).intValue();
+			stats.m_nodesInLevel.set(n.level, new Integer(i + 1));
 		}
 
 		stats.m_writes++;
@@ -803,7 +803,7 @@ public class RTree implements ISpatialIndex {
 				throw new IllegalStateException("readNode failed reading the correct node type information");
 
 			n.m_pTree = this;
-			n.m_identifier = id;
+			n.identifier = id;
 			n.load(buffer);
 
 			stats.m_reads++;
@@ -824,15 +824,15 @@ public class RTree implements ISpatialIndex {
 
 	protected void deleteNode(Node n) {
 		try {
-			m_pStorageManager.deleteByteArray(n.m_identifier);
+			m_pStorageManager.deleteByteArray(n.identifier);
 		} catch (InvalidPageException e) {
 			System.err.println(e);
 			throw new IllegalStateException("deleteNode failed with InvalidPageException");
 		}
 
 		stats.m_nodes--;
-		int i = ((Integer) stats.m_nodesInLevel.get(n.m_level)).intValue();
-		stats.m_nodesInLevel.set(n.m_level, new Integer(i - 1));
+		int i = ((Integer) stats.m_nodesInLevel.get(n.level)).intValue();
+		stats.m_nodesInLevel.set(n.level, new Integer(i - 1));
 
 		for (int cIndex = 0; cIndex < deleteNodeCommands.size(); cIndex++) {
 			((INodeCommand) deleteNodeCommands.get(cIndex)).execute(n);
@@ -846,24 +846,24 @@ public class RTree implements ISpatialIndex {
 			Stack<Node> st = new Stack<Node>();
 			Node root = readNode(rootID);
 
-			if (root.m_children > 0 && query.intersects(root.m_nodeMBR))
+			if (root.children > 0 && query.intersects(root.m_nodeMBR))
 				st.push(root);
 
 			while (!st.empty()) {
 				Node n = (Node) st.pop();
 
-				if (n.m_level == 0) {
+				if (n.level == 0) {
 					v.visitNode((INode) n);
 
-					for (int cChild = 0; cChild < n.m_children; cChild++) {
+					for (int cChild = 0; cChild < n.children; cChild++) {
 						boolean b;
 						if (type == SpatialIndex.ContainmentQuery)
-							b = query.contains(n.m_pMBR[cChild]);
+							b = query.contains(n.pMBR[cChild]);
 						else
-							b = query.intersects(n.m_pMBR[cChild]);
+							b = query.intersects(n.pMBR[cChild]);
 
 						if (b) {
-							Data data = new Data(n.m_pData[cChild], n.m_pMBR[cChild], n.m_pIdentifier[cChild]);
+							Data data = new Data(n.m_pData[cChild], n.pMBR[cChild], n.pIdentifiers[cChild]);
 							v.visitData(data);
 							stats.m_queryResults++;
 						}
@@ -871,9 +871,9 @@ public class RTree implements ISpatialIndex {
 				} else {
 					v.visitNode((INode) n);
 
-					for (int cChild = 0; cChild < n.m_children; cChild++) {
-						if (query.intersects(n.m_pMBR[cChild])) {
-							st.push(readNode(n.m_pIdentifier[cChild]));
+					for (int cChild = 0; cChild < n.children; cChild++) {
+						if (query.intersects(n.pMBR[cChild])) {
+							st.push(readNode(n.pIdentifiers[cChild]));
 						}
 					}
 				}
@@ -951,47 +951,47 @@ public class RTree implements ISpatialIndex {
 
 	private Vector<?> ir_traversal(DocumentStore ds, InvertedFile invertedFile, Node n) throws Exception {
 
-		if (n.m_level == 0) {
+		if (n.level == 0) {
 
-			invertedFile.create(n.m_identifier);
+			invertedFile.create(n.identifier);
 
 			int child;
-			for (child = 0; child < n.m_children; child++) {
-				int docID = n.m_pIdentifier[child];
+			for (child = 0; child < n.children; child++) {
+				int docID = n.pIdentifiers[child];
 
 				Vector<?> document = ds.read(docID);
 				if (document == null) {
 					System.out.println("Can't find document " + docID);
 					System.exit(-1);
 				}
-				invertedFile.addDocument(n.m_identifier, docID, document);
+				invertedFile.addDocument(n.identifier, docID, document);
 			}
 
-			Vector<?> pseudoDoc = invertedFile.store(n.m_identifier);
+			Vector<?> pseudoDoc = invertedFile.store(n.identifier);
 
 			return pseudoDoc;
 
 		} else {
 
-			invertedFile.create(n.m_identifier);
-			System.out.println("processing index node " + n.m_identifier);
+			invertedFile.create(n.identifier);
+			System.out.println("processing index node " + n.identifier);
 
 			int child;
-			for (child = 0; child < n.m_children; child++) {
-				Node nn = readNode(n.m_pIdentifier[child]);
+			for (child = 0; child < n.children; child++) {
+				Node nn = readNode(n.pIdentifiers[child]);
 				Vector<?> pseudoDoc = ir_traversal(ds, invertedFile, nn);
-				int docID = n.m_pIdentifier[child];
+				int docID = n.pIdentifiers[child];
 
 				if (pseudoDoc == null) {
 					System.out.println("Can't find document " + docID);
 					System.exit(-1);
 
 				}
-				invertedFile.addDocument(n.m_identifier, docID, pseudoDoc);
+				invertedFile.addDocument(n.identifier, docID, pseudoDoc);
 
 			}
 
-			Vector<?> pseudoDoc = invertedFile.store(n.m_identifier);
+			Vector<?> pseudoDoc = invertedFile.store(n.identifier);
 
 			return pseudoDoc;
 
@@ -1005,12 +1005,12 @@ public class RTree implements ISpatialIndex {
 
 	private Vector[] cluster_traversal(BTree clustertree, DocumentStore ds, InvertedFile invertedFile, Node n)
 			throws Exception {
-		if (n.m_level == 0) {
-			invertedFile.create(n.m_identifier);
+		if (n.level == 0) {
+			invertedFile.create(n.identifier);
 
 			int child;
-			for (child = 0; child < n.m_children; child++) {
-				int docID = n.m_pIdentifier[child];
+			for (child = 0; child < n.children; child++) {
+				int docID = n.pIdentifiers[child];
 
 				Vector<?> document = ds.read(docID);
 				if (document == null) {
@@ -1024,19 +1024,19 @@ public class RTree implements ISpatialIndex {
 					System.exit(-1);
 				}
 				int cluster = (Integer) var;
-				invertedFile.addDocument(n.m_identifier, docID, document, cluster);
+				invertedFile.addDocument(n.identifier, docID, document, cluster);
 			}
-			Vector[] pseudoDoc = invertedFile.storeClusterEnhance(n.m_identifier);
+			Vector[] pseudoDoc = invertedFile.storeClusterEnhance(n.identifier);
 
 			return pseudoDoc;
 		} else {
-			invertedFile.create(n.m_identifier);
-			System.out.println("processing index node " + n.m_identifier);
+			invertedFile.create(n.identifier);
+			System.out.println("processing index node " + n.identifier);
 			int child;
-			for (child = 0; child < n.m_children; child++) {
-				Node nn = readNode(n.m_pIdentifier[child]);
+			for (child = 0; child < n.children; child++) {
+				Node nn = readNode(n.pIdentifiers[child]);
 				Vector[] pseudoDoc = cluster_traversal(clustertree, ds, invertedFile, nn);
-				int docID = n.m_pIdentifier[child];
+				int docID = n.pIdentifiers[child];
 				if (pseudoDoc == null) {
 					System.out.println("Couldn't find document " + docID);
 					System.exit(-1);
@@ -1045,10 +1045,10 @@ public class RTree implements ISpatialIndex {
 				for (int i = 0; i < pseudoDoc.length; i++) {
 					if (pseudoDoc[i].size() == 0)
 						continue;
-					invertedFile.addDocument(n.m_identifier, docID, pseudoDoc[i], i);
+					invertedFile.addDocument(n.identifier, docID, pseudoDoc[i], i);
 				}
 			}
-			Vector[] pseudoDoc = invertedFile.storeClusterEnhance(n.m_identifier);
+			Vector[] pseudoDoc = invertedFile.storeClusterEnhance(n.identifier);
 
 			return pseudoDoc;
 		}
@@ -1063,39 +1063,39 @@ public class RTree implements ISpatialIndex {
 		int count = 0;
 		double knearest = 0.0;
 		while (queue.size() != 0) {
-			NNEntry first = (NNEntry) queue.poll();
-			e = (RtreeEntry) first.m_pEntry;
+			NNEntry first = queue.poll();
+			e = (RtreeEntry) first.pEntry;
 
 			if (e.isLeafEntry) {
-				if (count >= topk && first.m_minDist > knearest)
+				if (count >= topk && first.minDist > knearest)
 					break;
 
 				count++;
-				System.out.println(e.getIdentifier() + "," + first.m_minDist);
-				knearest = first.m_minDist;
+				System.out.println(e.getIdentifier() + "," + first.minDist);
+				knearest = first.minDist;
 			} else {
 				Node n = readNode(e.getIdentifier());
 
-				Hashtable<?, ?> filter;
+				Hashtable<Integer, Double> filter;
 				if (numOfClusters != 0)
-					filter = invertedFile.ranking_sum_clusterEnhance(n.m_identifier, q.keywords);
+					filter = invertedFile.ranking_sum_clusterEnhance(n.identifier, q.keywords);
 				else
-					filter = invertedFile.ranking_sum(n.m_identifier, q.keywords);
+					filter = invertedFile.ranking_sum(n.identifier, q.keywords);
 
-				for (int cChild = 0; cChild < n.m_children; cChild++) {
+				for (int child = 0; child < n.children; child++) {
 					double irscore;
-					Object var = filter.get(n.m_pIdentifier[cChild]);
+					Object var = filter.get(n.pIdentifiers[child]);
 					if (var == null)
 						continue;
 					else
 						irscore = (Double) var;
 
-					if (n.m_level == 0) {
-						e = new RtreeEntry(n.m_pIdentifier[cChild], true);
+					if (n.level == 0) {
+						e = new RtreeEntry(n.pIdentifiers[child], true);
 					} else {
-						e = new RtreeEntry(n.m_pIdentifier[cChild], false);
+						e = new RtreeEntry(n.pIdentifiers[child], false);
 					}
-					double mind = combinedScore(n.m_pMBR[cChild].getMinimumDistance(q.location), irscore);
+					double mind = combinedScore(n.pMBR[child].getMinimumDistance(q.location), irscore);
 
 					queue.add(new NNEntry(e, mind));
 
