@@ -59,7 +59,7 @@ public class Weightcompute {
 					Entry<String, Integer> entry = (Entry<String, Integer>) iter.next();
 					String word = entry.getKey();
 					double documentFrequency = entry.getValue();	// Term frequency in this document
-					double totalFrequency = dic.get(word);		// Term frequency in all documents
+					double totalFrequency = dic.get(word);			// Term frequency in all documents
 
 					double weight = (1 - lmd) * documentFrequency / (cols.length - 1)
 							+ lmd * totalFrequency / totalLength;
