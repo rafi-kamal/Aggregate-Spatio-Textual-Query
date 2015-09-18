@@ -1080,9 +1080,9 @@ public class RTree implements ISpatialIndex {
 
 				Hashtable<?, ?> filter;
 				if (numOfClusters != 0)
-					filter = invertedFile.ranking_sum_clusterEnhance(n.m_identifier, q.qwords);
+					filter = invertedFile.ranking_sum_clusterEnhance(n.m_identifier, q.keywords);
 				else
-					filter = invertedFile.ranking_sum(n.m_identifier, q.qwords);
+					filter = invertedFile.ranking_sum(n.m_identifier, q.keywords);
 
 				for (int cChild = 0; cChild < n.m_children; cChild++) {
 					double irscore;
@@ -1097,7 +1097,7 @@ public class RTree implements ISpatialIndex {
 					} else {
 						e = new RtreeEntry(n.m_pIdentifier[cChild], false);
 					}
-					double mind = combinedScore(n.m_pMBR[cChild].getMinimumDistance(q.qpoint), irscore);
+					double mind = combinedScore(n.m_pMBR[cChild].getMinimumDistance(q.location), irscore);
 
 					queue.add(new NNEntry(e, mind));
 

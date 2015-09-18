@@ -7,12 +7,22 @@ import spatialindex.spatialindex.Point;
 
 public class Query {
 	public int id;
-	public List<Integer> qwords;
-	public Point qpoint;
+	public Point location;
+	public List<Integer> keywords;
 
 	public Query(int id) {
 		this.id = id;
-		this.qwords = new ArrayList<Integer>();
+		this.keywords = new ArrayList<Integer>();
 	}
 
+	public Query(int id, Point location, List<Integer> keywords) {
+		this.id = id;
+		this.location = location;
+		this.keywords = keywords;
+	}
+
+	@Override
+	public String toString() {
+		return "Query [id=" + id + ", location=" + location + ", keywords=" + keywords + "]";
+	}
 }

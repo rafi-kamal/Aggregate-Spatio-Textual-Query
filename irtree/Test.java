@@ -53,9 +53,9 @@ public class Test {
 			
 			Query q = new Query(id);
 			for(int j = 3; j < temp.length; j++){
-				q.qwords.add(Integer.parseInt(temp[j]));
+				q.keywords.add(Integer.parseInt(temp[j]));
 			}
-			q.qpoint = new Point(f);
+			q.location = new Point(f);
 			
 			System.out.println("query " + q.id);
 			
@@ -76,13 +76,13 @@ public class Test {
 				}
 				
 				double ir = 0;
-				for(int i = 0; i < q.qwords.size(); i++){
-					int word = (Integer)q.qwords.get(i);
+				for(int i = 0; i < q.keywords.size(); i++){
+					int word = (Integer)q.keywords.get(i);
 					if(words.containsKey(word))
 						ir += (Double)words.get(word);
 				}
 				
-				double d = q.qpoint.getMinimumDistance(point);
+				double d = q.location.getMinimumDistance(point);
 				double score = RTree.combinedScore(d, ir);
 				
 				RtreeEntry e = new RtreeEntry(id, false);
