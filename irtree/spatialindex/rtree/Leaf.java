@@ -37,7 +37,7 @@ public class Leaf extends Node
 {
 	public Leaf(RTree pTree, int id)
 	{
-		super(pTree, id, 0, pTree.m_leafCapacity);
+		super(pTree, id, 0, pTree.leafCapacity);
 	}
 
 	protected Node chooseSubtree(Region mbr, int level, Stack pathBuffer)
@@ -57,11 +57,11 @@ public class Leaf extends Node
 
 	protected Node[] split(byte[] pData, Region mbr, int id)
 	{
-		m_pTree.m_stats.m_splits++;
+		m_pTree.stats.m_splits++;
 
 		ArrayList g1 = new ArrayList(), g2 = new ArrayList();
 
-		switch (m_pTree.m_treeVariant)
+		switch (m_pTree.treeVariant)
 		{
 			case SpatialIndex.RtreeVariantLinear:
 			case SpatialIndex.RtreeVariantQuadratic:
@@ -126,8 +126,8 @@ public class Leaf extends Node
 			for (int cChild = 0; cChild < n.m_children; cChild++)
 			{
 				// keep this in the for loop. The tree height might change after insertions.
-				boolean[] overflowTable = new boolean[m_pTree.m_stats.m_treeHeight];
-				for (int cLevel = 0; cLevel < m_pTree.m_stats.m_treeHeight; cLevel++) overflowTable[cLevel] = false;
+				boolean[] overflowTable = new boolean[m_pTree.stats.m_treeHeight];
+				for (int cLevel = 0; cLevel < m_pTree.stats.m_treeHeight; cLevel++) overflowTable[cLevel] = false;
 
 				m_pTree.insertData_impl(n.m_pData[cChild],
 																n.m_pMBR[cChild], n.m_pIdentifier[cChild],

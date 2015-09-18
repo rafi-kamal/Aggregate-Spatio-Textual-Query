@@ -37,7 +37,7 @@ public class Index extends Node
 {
 	public Index(RTree pTree, int id, int level)
 	{
-		super(pTree, id, level, pTree.m_indexCapacity);
+		super(pTree, id, level, pTree.indexCapacity);
 	}
 
 	protected Node chooseSubtree(Region mbr, int level, Stack pathBuffer)
@@ -48,7 +48,7 @@ public class Index extends Node
 
 		int child = 0;
 
-		switch (m_pTree.m_treeVariant)
+		switch (m_pTree.treeVariant)
 		{
 			case SpatialIndex.RtreeVariantLinear:
 			case SpatialIndex.RtreeVariantQuadratic:
@@ -96,11 +96,11 @@ public class Index extends Node
 
 	protected Node[] split(byte[] pData, Region mbr, int id)
 	{
-		m_pTree.m_stats.m_splits++;
+		m_pTree.stats.m_splits++;
 
 		ArrayList g1 = new ArrayList(), g2 = new ArrayList();
 
-		switch (m_pTree.m_treeVariant)
+		switch (m_pTree.treeVariant)
 		{
 			case SpatialIndex.RtreeVariantLinear:
 			case SpatialIndex.RtreeVariantQuadratic:
@@ -198,11 +198,11 @@ public class Index extends Node
 		{
 			int cIterations;
 
-			if (m_children > m_pTree.m_nearMinimumOverlapFactor)
+			if (m_children > m_pTree.nearMinimumOverlapFactor)
 			{
 				// sort entries in increasing order of enlargement.
 				Arrays.sort(entries, new OverlapEntryComparator());
-				cIterations = m_pTree.m_nearMinimumOverlapFactor;
+				cIterations = m_pTree.nearMinimumOverlapFactor;
 			}
 			else
 			{
@@ -250,7 +250,7 @@ public class Index extends Node
 
 	protected void adjustTree(Node n, Stack pathBuffer)
 	{
-		m_pTree.m_stats.m_adjustments++;
+		m_pTree.stats.m_adjustments++;
 
 		// find entry pointing to old node;
 		int child;
@@ -269,7 +269,7 @@ public class Index extends Node
 
 		if (recalc)
 		{
-			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
 			{
 				m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 				m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
@@ -294,7 +294,7 @@ public class Index extends Node
 
 	protected void adjustTree(Node n1, Node n2, Stack pathBuffer, boolean[] overflowTable)
 	{
-		m_pTree.m_stats.m_adjustments++;
+		m_pTree.stats.m_adjustments++;
 
 		// find entry pointing to old node;
 		int child;
@@ -313,7 +313,7 @@ public class Index extends Node
 
 		if (recalc)
 		{
-			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
 			{
 				m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 				m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;

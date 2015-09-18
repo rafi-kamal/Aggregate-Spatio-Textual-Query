@@ -138,7 +138,7 @@ abstract class Node implements INode
 		m_level = level;
 		m_identifier = id;
 		m_capacity = capacity;
-		m_nodeMBR = (Region) pTree.m_infiniteRegion.clone();
+		m_nodeMBR = (Region) pTree.infiniteRegion.clone();
 
 		m_pDataLength = new int[m_capacity + 1];
 		m_pData = new byte[m_capacity + 1][];
@@ -184,11 +184,11 @@ abstract class Node implements INode
 
 		if (m_children == 0)
 		{
-			m_nodeMBR = (Region) m_pTree.m_infiniteRegion.clone();
+			m_nodeMBR = (Region) m_pTree.infiniteRegion.clone();
 		}
 		else if (touches)
 		{
-			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
 			{
 				m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 				m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
@@ -222,7 +222,7 @@ abstract class Node implements INode
 
 			return adjusted;
 		}
-		else if (m_pTree.m_treeVariant == SpatialIndex.RtreeVariantRstar && ! pathBuffer.empty() && overflowTable[m_level] == false)
+		else if (m_pTree.treeVariant == SpatialIndex.RtreeVariantRstar && ! pathBuffer.empty() && overflowTable[m_level] == false)
 		{
 			overflowTable[m_level] = true;
 
@@ -269,7 +269,7 @@ abstract class Node implements INode
 			m_totalDataLength = 0;
 			for (int cChild = 0; cChild < m_children; cChild++) m_totalDataLength += m_pDataLength[cChild];
 
-			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
 			{
 				m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 				m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
@@ -313,16 +313,16 @@ abstract class Node implements INode
 				m_pTree.writeNode(n);
 				m_pTree.writeNode(nn);
 
-				Index r = new Index(m_pTree, m_pTree.m_rootID, m_level + 1);
+				Index r = new Index(m_pTree, m_pTree.rootID, m_level + 1);
 
 				r.insertEntry(null, (Region) n.m_nodeMBR.clone(), n.m_identifier);
 				r.insertEntry(null, (Region) nn.m_nodeMBR.clone(), nn.m_identifier);
 
 				m_pTree.writeNode(r);
 
-				m_pTree.m_stats.m_nodesInLevel.set(m_level, new Integer(2));
-				m_pTree.m_stats.m_nodesInLevel.add(new Integer(1));
-				m_pTree.m_stats.m_treeHeight = m_level + 2;
+				m_pTree.stats.m_nodesInLevel.set(m_level, new Integer(2));
+				m_pTree.stats.m_nodesInLevel.add(new Integer(1));
+				m_pTree.stats.m_treeHeight = m_level + 2;
 			}
 			else
 			{
@@ -359,7 +359,7 @@ abstract class Node implements INode
 			double[] c = m_pMBR[cChild].getCenter();
 
 			// calculate relative distance of every entry from the node MBR (ignore square root.)
-			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
 			{
 				double d = nc[cDim] - c[cDim];
 				e.m_dist += d * d;
@@ -371,7 +371,7 @@ abstract class Node implements INode
 		// sort by increasing order of distances.
 		Arrays.sort(v, new ReinsertEntryComparator());
 
-		int cReinsert = (int) Math.floor((m_capacity + 1) * m_pTree.m_reinsertFactor);
+		int cReinsert = (int) Math.floor((m_capacity + 1) * m_pTree.reinsertFactor);
 		int cCount;
 
 		for (cCount = 0; cCount < cReinsert; cCount++)
@@ -388,7 +388,7 @@ abstract class Node implements INode
 	protected void rtreeSplit(byte[] pData, Region mbr, int id, ArrayList group1, ArrayList group2)
 	{
 		int cChild;
-		int minimumLoad = (int) Math.floor(m_capacity * m_pTree.m_fillFactor);
+		int minimumLoad = (int) Math.floor(m_capacity * m_pTree.fillFactor);
 
 		// use this mask array for marking visited entries.
 		boolean[] mask = new boolean[m_capacity + 1];
@@ -472,7 +472,7 @@ abstract class Node implements INode
 							m = d;
 							md1 = d1; md2 = d2;
 							sel = cChild;
-							if (m_pTree.m_treeVariant== SpatialIndex.RtreeVariantLinear || m_pTree.m_treeVariant == SpatialIndex.RtreeVariantRstar) break;
+							if (m_pTree.treeVariant== SpatialIndex.RtreeVariantLinear || m_pTree.treeVariant == SpatialIndex.RtreeVariantRstar) break;
 						}
 					}
 				}
@@ -539,7 +539,7 @@ abstract class Node implements INode
 		m_pMBR[m_capacity] = mbr;
 		m_pIdentifier[m_capacity] = id;
 
-		int nodeSPF = (int) (Math.floor((m_capacity + 1) * m_pTree.m_splitDistributionFactor));
+		int nodeSPF = (int) (Math.floor((m_capacity + 1) * m_pTree.splitDistributionFactor));
 		int splitDistribution = (m_capacity + 1) - (2 * nodeSPF) + 2;
 
 		int cChild, cDim, cIndex;
@@ -557,7 +557,7 @@ abstract class Node implements INode
 		int sortOrder = -1;
 
 		// chooseSplitAxis.
-		for (cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+		for (cDim = 0; cDim < m_pTree.dimension; cDim++)
 		{
 			Arrays.sort(dataLow, new RstarSplitEntryComparatorLow());
 			Arrays.sort(dataHigh, new RstarSplitEntryComparatorHigh());
@@ -694,11 +694,11 @@ abstract class Node implements INode
 		double inefficiency = Double.NEGATIVE_INFINITY;
 		int cDim, cChild, cIndex, i1 = 0, i2 = 0;
 
-		switch (m_pTree.m_treeVariant)
+		switch (m_pTree.treeVariant)
 		{
 			case SpatialIndex.RtreeVariantLinear:
 			case SpatialIndex.RtreeVariantRstar:
-				for (cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+				for (cDim = 0; cDim < m_pTree.dimension; cDim++)
 				{
 					double leastLower = m_pMBR[0].m_pLow[cDim];
 					double greatestUpper = m_pMBR[0].m_pHigh[cDim];
@@ -770,7 +770,7 @@ abstract class Node implements INode
 
 	protected void condenseTree(Stack toReinsert, Stack pathBuffer)
 	{
-		int minimumLoad = (int) (Math.floor(m_capacity * m_pTree.m_fillFactor));
+		int minimumLoad = (int) (Math.floor(m_capacity * m_pTree.fillFactor));
 
 		if (pathBuffer.empty())
 		{
@@ -779,13 +779,13 @@ abstract class Node implements INode
 			{
 				Node n = m_pTree.readNode(m_pIdentifier[0]);
 				m_pTree.deleteNode(n);
-				n.m_identifier = m_pTree.m_rootID;
+				n.m_identifier = m_pTree.rootID;
 				m_pTree.writeNode(n);
 
-				m_pTree.m_stats.m_nodesInLevel.remove(m_pTree.m_stats.m_nodesInLevel.size() - 1);
-				m_pTree.m_stats.m_treeHeight -= 1;
+				m_pTree.stats.m_nodesInLevel.remove(m_pTree.stats.m_nodesInLevel.size() - 1);
+				m_pTree.stats.m_treeHeight -= 1;
 				// HACK: pending deleteNode for deleted child will decrease nodesInLevel, later on.
-				m_pTree.m_stats.m_nodesInLevel.set(m_pTree.m_stats.m_treeHeight - 1, new Integer(2));
+				m_pTree.stats.m_nodesInLevel.set(m_pTree.stats.m_treeHeight - 1, new Integer(2));
 			}
 		}
 		else
@@ -816,7 +816,7 @@ abstract class Node implements INode
 
 				// global recalculation necessary since the MBR can only shrink in size,
 				// due to data removal.
-				for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+				for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
 				{
 					p.m_nodeMBR.m_pLow[cDim] = Double.POSITIVE_INFINITY;
 					p.m_nodeMBR.m_pHigh[cDim] = Double.NEGATIVE_INFINITY;
@@ -838,7 +838,7 @@ abstract class Node implements INode
 
 	protected void load(byte[] data) throws IOException
 	{
-		m_nodeMBR = (Region) m_pTree.m_infiniteRegion.clone();
+		m_nodeMBR = (Region) m_pTree.infiniteRegion.clone();
 
 		DataInputStream ds = new DataInputStream(new ByteArrayInputStream(data));
 
@@ -851,10 +851,10 @@ abstract class Node implements INode
 		for (int cChild = 0; cChild < m_children; cChild++)
 		{
 			m_pMBR[cChild] = new Region();
-			m_pMBR[cChild].m_pLow = new double[m_pTree.m_dimension];
-			m_pMBR[cChild].m_pHigh = new double[m_pTree.m_dimension];
+			m_pMBR[cChild].m_pLow = new double[m_pTree.dimension];
+			m_pMBR[cChild].m_pHigh = new double[m_pTree.dimension];
 
-			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
 			{
 				m_pMBR[cChild].m_pLow[cDim] = ds.readDouble();
 				m_pMBR[cChild].m_pHigh[cDim] = ds.readDouble();
@@ -893,7 +893,7 @@ abstract class Node implements INode
 
 		for (int cChild = 0; cChild < m_children; cChild++)
 		{
-			for (int cDim = 0; cDim < m_pTree.m_dimension; cDim++)
+			for (int cDim = 0; cDim < m_pTree.dimension; cDim++)
 			{
 				ds.writeDouble(m_pMBR[cChild].m_pLow[cDim]);
 				ds.writeDouble(m_pMBR[cChild].m_pHigh[cDim]);

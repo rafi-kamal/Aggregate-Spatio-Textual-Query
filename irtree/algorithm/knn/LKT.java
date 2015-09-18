@@ -80,7 +80,7 @@ public class LKT {
 			System.out.println("query " + count);
 			count++;
 
-			invertedFile.resetIO();
+			//invertedFile.resetIO();
 
 			start = System.currentTimeMillis();
 
