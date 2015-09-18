@@ -44,7 +44,7 @@ public class Statistics implements IStatistics, Cloneable
 	protected long m_queryResults;
 	protected long m_data;
 	protected int m_treeHeight;
-	protected ArrayList m_nodesInLevel = new ArrayList();
+	protected ArrayList<Integer> m_nodesInLevel = new ArrayList<Integer>();
 
 	public Statistics()
 	{
