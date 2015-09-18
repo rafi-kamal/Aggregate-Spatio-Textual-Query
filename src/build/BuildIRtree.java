@@ -1,11 +1,13 @@
 package build;
 
-import documentindex.InvertedFile;
 import spatialindex.rtree.RTree;
 import spatialindex.storagemanager.DiskStorageManager;
+import spatialindex.storagemanager.IBuffer;
 import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.PropertySet;
+import spatialindex.storagemanager.RandomEvictionsBuffer;
 import storage.DocumentStore;
+import documentindex.InvertedFile;
 
 public class BuildIRtree {
 
@@ -24,12 +26,11 @@ public class BuildIRtree {
 		
 		PropertySet ps = new PropertySet();
 		ps.setProperty("FileName", index_file + ".rtree");
-		ps.setProperty("PageSize", pagesize);
 		IStorageManager diskfile = new DiskStorageManager(ps);
 		
 		PropertySet ps2 = new PropertySet();
-//		Integer i = new Integer(1); // INDEX_IDENTIFIER_GOES_HERE (suppose I know that in this case it is equal to 1);
-//		ps2.setProperty("IndexIdentifier", i);
+		Integer i = new Integer(1); // INDEX_IDENTIFIER_GOES_HERE (suppose I know that in this case it is equal to 1);
+		ps2.setProperty("IndexIdentifier", i);
 		
 		RTree tree = new RTree(ps2, diskfile);
 		

@@ -27,7 +27,6 @@ public class StoreDocument {
 		ds.create(0);
 		LineNumberReader lr = new LineNumberReader(new FileReader(args[0]));
 		load(lr, ds);
-		ds.flush();
 	}
 	
 	public static void load(LineNumberReader lr, storage.DocumentStore ds) throws Exception{

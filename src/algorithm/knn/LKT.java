@@ -4,13 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
-import documentindex.InvertedFile;
 import query.Query;
 import spatialindex.rtree.RTree;
 import spatialindex.spatialindex.Point;
 import spatialindex.storagemanager.DiskStorageManager;
 import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.PropertySet;
+import storage.DocumentStore;
+import documentindex.InvertedFile;
 
 public class LKT {
 
@@ -70,9 +71,9 @@ public class LKT {
 			
 			Query q = new Query(id);
 			for(int j = 3; j < temp.length; j++){
-				q.keywords.add(Integer.parseInt(temp[j]));
+				q.qwords.add(Integer.parseInt(temp[j]));
 			}
-			q.point = new Point(f);
+			q.qpoint = new Point(f);
 			
 			System.out.println("query " + count);
 			count++;

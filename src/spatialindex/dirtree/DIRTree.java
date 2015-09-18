@@ -101,7 +101,7 @@ public class DIRTree implements ISpatialIndex
 
 	public DIRTree(PropertySet ps, IStorageManager sm, double beta_area)throws Exception
 	{
-		DIRTree.beta_area = beta_area;
+		this.beta_area = beta_area;
 		m_rwLock = new RWLock();
 		m_pStorageManager = sm;
 		m_rootID = IStorageManager.NewPage;
@@ -152,6 +152,7 @@ public class DIRTree implements ISpatialIndex
 	//
 	// ISpatialIndex interface
 	//
+
 	public void insertData(final byte[] data, final IShape shape, int id){
 		System.err.println("insertData is not implemented");
 	}
@@ -296,8 +297,7 @@ public class DIRTree implements ISpatialIndex
 
 	public void nearestNeighborQuery(int k, final IShape query, final IVisitor v)
 	{
-		if (query.getDimension() != m_dimension) 
-			throw new IllegalArgumentException("nearestNeighborQuery: Shape has the wrong number of dimensions.");
+		if (query.getDimension() != m_dimension) throw new IllegalArgumentException("nearestNeighborQuery: Shape has the wrong number of dimensions.");
 		NNComparator nnc = new NNComparator();
 		nearestNeighborQuery(k, query, v, nnc);
 	}
@@ -484,6 +484,7 @@ public class DIRTree implements ISpatialIndex
 	//
 	// Internals
 	//
+
 	private void initNew(PropertySet ps) throws Exception
 	{
 		Object var;
@@ -526,6 +527,8 @@ public class DIRTree implements ISpatialIndex
 				} catch ( Exception except ) {
 		            except.printStackTrace();
 		        }
+
+				
 			}
 			else
 			{
@@ -841,6 +844,10 @@ public class DIRTree implements ISpatialIndex
 		m_stats.m_data++;
 	}
 
+
+
+
+
 	protected int writeNode(Node n) throws IllegalStateException
 	{
 		byte[] buffer = null;
@@ -887,7 +894,7 @@ public class DIRTree implements ISpatialIndex
 		return page;
 	}
 
-	public Node readNode(int id)
+	protected Node readNode(int id)
 	{
 		byte[] buffer;
 		DataInputStream ds = null;
