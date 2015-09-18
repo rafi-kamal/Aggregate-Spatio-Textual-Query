@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import spatialindex.rtree.RTree;
@@ -149,9 +150,7 @@ public class InvertedFile {
 	}
 
 	public void flush() throws Exception {
-
 		store.flush();
-
 	}
 
 	public synchronized Vector read(int word) throws Exception {
@@ -175,7 +174,7 @@ public class InvertedFile {
 		store.resetIO();
 	}
 
-	public Hashtable<Integer, Double> ranking_sum(int treeid, Vector words) throws Exception {
+	public Hashtable<Integer, Double> ranking_sum(int treeid, List<Integer> words) throws Exception {
 
 		Hashtable<Integer, Double> filter = new Hashtable<Integer, Double>();
 		load(treeid);
@@ -200,7 +199,7 @@ public class InvertedFile {
 		return filter;
 	}
 
-	public Hashtable ranking_sum_clusterEnhance(int treeid, Vector words) throws Exception {
+	public Hashtable ranking_sum_clusterEnhance(int treeid, List<Integer> words) throws Exception {
 		Hashtable filter = new Hashtable();
 		Hashtable filterfinal = new Hashtable();
 		load(treeid);

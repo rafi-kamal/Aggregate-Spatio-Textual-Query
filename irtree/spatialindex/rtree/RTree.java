@@ -45,6 +45,7 @@ import java.util.Vector;
 import jdbm.btree.BTree;
 
 import query.Query;
+import spatialindex.rtree.RTree.ValidateEntry;
 import spatialindex.spatialindex.IData;
 import spatialindex.spatialindex.IEntry;
 import spatialindex.spatialindex.INearestNeighborComparator;
@@ -114,9 +115,9 @@ public class RTree implements ISpatialIndex {
 
 	Statistics m_stats;
 
-	ArrayList m_writeNodeCommands = new ArrayList();
-	ArrayList m_readNodeCommands = new ArrayList();
-	ArrayList m_deleteNodeCommands = new ArrayList();
+	ArrayList<INodeCommand> m_writeNodeCommands = new ArrayList<INodeCommand>();
+	ArrayList<INodeCommand> m_readNodeCommands = new ArrayList<INodeCommand>();
+	ArrayList<INodeCommand> m_deleteNodeCommands = new ArrayList<INodeCommand>();
 
 	public RTree(PropertySet ps, IStorageManager sm) {
 		m_rwLock = new RWLock();
@@ -241,7 +242,7 @@ public class RTree implements ISpatialIndex {
 			// distances will be unique. TreeMap
 			// also sorts unique keys. Thus, I am simulating a priority queue
 			// using an ArrayList and binarySearch.
-			ArrayList queue = new ArrayList();
+			ArrayList<NNEntry> queue = new ArrayList<NNEntry>();
 
 			Node n = readNode(m_rootID);
 			queue.add(new NNEntry(n, 0.0));
@@ -363,7 +364,7 @@ public class RTree implements ISpatialIndex {
 
 	public boolean isIndexValid() {
 		boolean ret = true;
-		Stack st = new Stack();
+		Stack<ValidateEntry> st = new Stack<ValidateEntry>();
 		Node root = readNode(m_rootID);
 
 		if (root.m_level != m_stats.m_treeHeight - 1) {
@@ -371,7 +372,7 @@ public class RTree implements ISpatialIndex {
 			return false;
 		}
 
-		HashMap nodesInLevel = new HashMap();
+		HashMap<Integer, Integer> nodesInLevel = new HashMap<Integer, Integer>();
 		nodesInLevel.put(new Integer(root.m_level), new Integer(1));
 
 		ValidateEntry e = new ValidateEntry(root.m_nodeMBR, root);
@@ -704,7 +705,7 @@ public class RTree implements ISpatialIndex {
 
 		boolean[] overflowTable;
 
-		Stack pathBuffer = new Stack();
+		Stack<?> pathBuffer = new Stack<Object>();
 
 		Node root = readNode(m_rootID);
 
@@ -721,7 +722,7 @@ public class RTree implements ISpatialIndex {
 	protected void insertData_impl(byte[] pData, Region mbr, int id, int level, boolean[] overflowTable) {
 		assert mbr.getDimension() == m_dimension;
 
-		Stack pathBuffer = new Stack();
+		Stack<?> pathBuffer = new Stack<Object>();
 
 		Node root = readNode(m_rootID);
 		Node n = root.chooseSubtree(mbr, level, pathBuffer);
@@ -733,7 +734,7 @@ public class RTree implements ISpatialIndex {
 
 		boolean bRet = false;
 
-		Stack pathBuffer = new Stack();
+		Stack<?> pathBuffer = new Stack<Object>();
 
 		Node root = readNode(m_rootID);
 		Leaf l = root.findLeaf(mbr, id, pathBuffer);
@@ -845,7 +846,7 @@ public class RTree implements ISpatialIndex {
 		m_rwLock.read_lock();
 
 		try {
-			Stack st = new Stack();
+			Stack<Node> st = new Stack<Node>();
 			Node root = readNode(m_rootID);
 
 			if (root.m_children > 0 && query.intersects(root.m_nodeMBR))
@@ -951,7 +952,7 @@ public class RTree implements ISpatialIndex {
 
 	}
 
-	private Vector ir_traversal(DocumentStore ds, InvertedFile invertedFile, Node n) throws Exception {
+	private Vector<?> ir_traversal(DocumentStore ds, InvertedFile invertedFile, Node n) throws Exception {
 
 		if (n.m_level == 0) {
 
@@ -961,7 +962,7 @@ public class RTree implements ISpatialIndex {
 			for (child = 0; child < n.m_children; child++) {
 				int docID = n.m_pIdentifier[child];
 
-				Vector document = ds.read(docID);
+				Vector<?> document = ds.read(docID);
 				if (document == null) {
 					System.out.println("Can't find document " + docID);
 					System.exit(-1);
@@ -969,7 +970,7 @@ public class RTree implements ISpatialIndex {
 				invertedFile.addDocument(n.m_identifier, docID, document);
 			}
 
-			Vector pseudoDoc = invertedFile.store(n.m_identifier);
+			Vector<?> pseudoDoc = invertedFile.store(n.m_identifier);
 
 			return pseudoDoc;
 
@@ -981,7 +982,7 @@ public class RTree implements ISpatialIndex {
 			int child;
 			for (child = 0; child < n.m_children; child++) {
 				Node nn = readNode(n.m_pIdentifier[child]);
-				Vector pseudoDoc = ir_traversal(ds, invertedFile, nn);
+				Vector<?> pseudoDoc = ir_traversal(ds, invertedFile, nn);
 				int docID = n.m_pIdentifier[child];
 
 				if (pseudoDoc == null) {
@@ -993,7 +994,7 @@ public class RTree implements ISpatialIndex {
 
 			}
 
-			Vector pseudoDoc = invertedFile.store(n.m_identifier);
+			Vector<?> pseudoDoc = invertedFile.store(n.m_identifier);
 
 			return pseudoDoc;
 
@@ -1014,7 +1015,7 @@ public class RTree implements ISpatialIndex {
 			for (child = 0; child < n.m_children; child++) {
 				int docID = n.m_pIdentifier[child];
 
-				Vector document = ds.read(docID);
+				Vector<?> document = ds.read(docID);
 				if (document == null) {
 					System.out.println("Couldn't find document " + docID);
 					System.exit(-1);
@@ -1077,7 +1078,7 @@ public class RTree implements ISpatialIndex {
 			} else {
 				Node n = readNode(e.getIdentifier());
 
-				Hashtable filter;
+				Hashtable<?, ?> filter;
 				if (numOfClusters != 0)
 					filter = invertedFile.ranking_sum_clusterEnhance(n.m_identifier, q.qwords);
 				else

@@ -1,22 +1,18 @@
 package query;
 
-import java.util.HashSet;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import spatialindex.spatialindex.Point;
 
-
 public class Query {
 	public int id;
-	public Vector qwords;
+	public List<Integer> qwords;
 	public Point qpoint;
 
-	
-	public Query(int id){
+	public Query(int id) {
 		this.id = id;
-		this.qwords = new Vector();
-		
+		this.qwords = new ArrayList<Integer>();
 	}
-	
-	
+
 }
