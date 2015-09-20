@@ -1,5 +1,8 @@
 package spatialindex.spatialindex;
 
+/**
+ * A holder class for R-tree node and corresponding cost.
+ */
 public class NNEntry implements Comparable<NNEntry> {
 
 	public IEntry node;

@@ -179,7 +179,7 @@ public class InvertedFile {
 	}
 
 	/**
-	 * Calculates the total similarity of each document (leaf node), where weights are
+	 * Calculates the total similarity of each document (node), where weights are
 	 * calculated summing over the weight of the terms that matches the query keywords
 	 * 
 	 * @return A map of (document ID, similarity) pairs
