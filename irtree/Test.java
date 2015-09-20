@@ -92,7 +92,7 @@ public class Test {
 			while(!queue.isEmpty() && topk > 0){
 				topk--;
 				NNEntry first = (NNEntry)queue.poll();
-				System.out.println(first.pEntry.getIdentifier() + "," + first.minDist);
+				System.out.println(first.node.getIdentifier() + "," + first.cost);
 			}
 		}
 		locationfile.close();

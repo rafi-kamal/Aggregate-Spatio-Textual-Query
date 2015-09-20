@@ -77,7 +77,7 @@ public class RTree implements ISpatialIndex {
 
 	IStorageManager m_pStorageManager;
 
-	int rootID;
+	protected int rootID;
 	int headerID;
 
 	int treeVariant;
@@ -250,8 +250,8 @@ public class RTree implements ISpatialIndex {
 			while (queue.size() != 0) {
 				NNEntry first = (NNEntry) queue.remove(0);
 
-				if (first.pEntry instanceof Node) {
-					n = (Node) first.pEntry;
+				if (first.node instanceof Node) {
+					n = (Node) first.node;
 					v.visitNode((INode) n);
 
 					for (int cChild = 0; cChild < n.children; cChild++) {
@@ -278,13 +278,13 @@ public class RTree implements ISpatialIndex {
 					// (neighbors can be more than k, if many happen to have the
 					// same
 					// furthest distance).
-					if (count >= k && first.minDist > knearest)
+					if (count >= k && first.cost > knearest)
 						break;
 
-					v.visitData((IData) first.pEntry);
+					v.visitData((IData) first.node);
 					stats.m_queryResults++;
 					count++;
-					knearest = first.minDist;
+					knearest = first.cost;
 				}
 			}
 		} finally {
@@ -1064,23 +1064,23 @@ public class RTree implements ISpatialIndex {
 		double knearest = 0.0;
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
-			e = (RtreeEntry) first.pEntry;
+			e = (RtreeEntry) first.node;
 
 			if (e.isLeafEntry) {
-				if (count >= topk && first.minDist > knearest)
+				if (count >= topk && first.cost > knearest)
 					break;
 
 				count++;
-				System.out.println(e.getIdentifier() + "," + first.minDist);
-				knearest = first.minDist;
+				System.out.println(e.getIdentifier() + "," + first.cost);
+				knearest = first.cost;
 			} else {
 				Node n = readNode(e.getIdentifier());
 
-				Hashtable<Integer, Double> filter;
+				HashMap<Integer, Double> filter;
 				if (numOfClusters != 0)
-					filter = invertedFile.ranking_sum_clusterEnhance(n.identifier, q.keywords);
+					filter = invertedFile.rankingSumClusterEnhance(n.identifier, q.keywords);
 				else
-					filter = invertedFile.ranking_sum(n.identifier, q.keywords);
+					filter = invertedFile.rankingSum(n.identifier, q.keywords);
 
 				for (int child = 0; child < n.children; child++) {
 					double irscore;

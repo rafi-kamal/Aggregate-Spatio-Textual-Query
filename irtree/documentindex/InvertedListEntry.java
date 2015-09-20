@@ -19,7 +19,7 @@ public class InvertedListEntry {
 	
 
 	
-	public void add(PLEntry ple){
+	public void add(PlEntry ple){
 		pl.add(ple);
 	}
 	

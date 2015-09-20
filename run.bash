@@ -8,7 +8,7 @@ fi
 cd data
 
 # Delete all generated files
-find . -type f -not -name '*.txt' | xargs rm
+#find . -type f -not -name '*.txt' | xargs rm
 
 runjava="java -ea -Dfile.encoding=UTF-8 -classpath ../bin:../lib/jdbm-1.0.jar"
 

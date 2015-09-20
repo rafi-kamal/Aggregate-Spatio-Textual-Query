@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -45,10 +46,10 @@ public class InvertedFile {
 			int loc = Collections.binarySearch(InvertedList, ie, new InvertedListEntryComparator());
 			if (loc >= 0) {
 				ie = (InvertedListEntry) InvertedList.get(loc);
-				PLEntry ple = new PLEntry(id, de.weight);
+				PlEntry ple = new PlEntry(id, de.weight);
 				ie.add(ple);
 			} else {
-				PLEntry ple = new PLEntry(id, de.weight);
+				PlEntry ple = new PlEntry(id, de.weight);
 				ie.add(ple);
 				InvertedList.add((-loc - 1), ie);
 			}
@@ -66,10 +67,10 @@ public class InvertedFile {
 			int loc = Collections.binarySearch(InvertedList, ie, new InvertedListEntryComparator());
 			if (loc >= 0) {
 				ie = (InvertedListEntry) InvertedList.get(loc);
-				PLEntry ple = new PLEntry(id, de.weight, cluster);
+				PlEntry ple = new PlEntry(id, de.weight, cluster);
 				ie.add(ple);
 			} else {
-				PLEntry ple = new PLEntry(id, de.weight, cluster);
+				PlEntry ple = new PlEntry(id, de.weight, cluster);
 				ie.add(ple);
 				InvertedList.add((-loc - 1), ie);
 			}
@@ -95,7 +96,7 @@ public class InvertedFile {
 
 			double maxweight = Double.NEGATIVE_INFINITY;
 			for (int j = 0; j < ie.pl.size(); j++) {
-				PLEntry ple = (PLEntry) ie.pl.get(j);
+				PlEntry ple = (PlEntry) ie.pl.get(j);
 				maxweight = Math.max(maxweight, ple.weight);
 			}
 			WeightEntry de = new WeightEntry(ie.term, maxweight);
@@ -131,7 +132,7 @@ public class InvertedFile {
 			}
 
 			for (int j = 0; j < ie.pl.size(); j++) {
-				PLEntry ple = (PLEntry) ie.pl.get(j);
+				PlEntry ple = (PlEntry) ie.pl.get(j);
 				maxweight[ple.cluster] = Math.max(maxweight[ple.cluster], ple.weight);
 			}
 
@@ -153,15 +154,18 @@ public class InvertedFile {
 		store.flush();
 	}
 
-	public synchronized Vector read(int word) throws Exception {
+	/**
+	 * Read the posting list of this keyword i.e. the documents which contains this keyword 
+	 */
+	public synchronized Vector<PlEntry> read(int keyword) throws Exception {
 
-		Vector doclist = null;
+		Vector<PlEntry> doclist = null;
 
-		byte[] data = store.read(word);
+		byte[] data = store.read(keyword);
 		if (data == null)
 			return null;
 		ObjectInputStream ds = new ObjectInputStream(new ByteArrayInputStream(data));
-		doclist = (Vector) ds.readObject();
+		doclist = (Vector<PlEntry>) ds.readObject();
 
 		return doclist;
 	}
@@ -174,34 +178,41 @@ public class InvertedFile {
 		store.resetIO();
 	}
 
-	public Hashtable<Integer, Double> ranking_sum(int treeid, List<Integer> words) throws Exception {
+	/**
+	 * Calculates the total similarity of each document (leaf node), where weights are
+	 * calculated summing over the weight of the terms that matches the query keywords
+	 * 
+	 * @return A map of (document ID, similarity) pairs
+	 */
+	public HashMap<Integer, Double> rankingSum(int treeid, List<Integer> keywords) throws Exception {
 
-		Hashtable<Integer, Double> filter = new Hashtable<Integer, Double>();
+		HashMap<Integer, Double> filter = new HashMap<Integer, Double>();
 		load(treeid);
 
-		for (int j = 0; j < words.size(); j++) {
-			int word = (Integer) words.get(j);
-			Vector doclist = read(word);
+		for (int j = 0; j < keywords.size(); j++) {
+			int keyword = keywords.get(j);
+			
+			Vector<PlEntry> doclist = read(keyword);
 			if (doclist == null)
 				continue;
 			for (int k = 0; k < doclist.size(); k++) {
-				PLEntry ple = (PLEntry) doclist.get(k);
+				PlEntry ple = doclist.get(k);
 
-				if (filter.containsKey(ple.docid)) {
-					double w = (Double) filter.get(ple.docid);
-					w = w + ple.weight;
-					filter.put(ple.docid, w);
+				if (filter.containsKey(ple.documentId)) {
+					double similarity = (Double) filter.get(ple.documentId);
+					similarity = similarity + ple.weight;
+					filter.put(ple.documentId, similarity);
 				} else
-					filter.put(ple.docid, ple.weight);
+					filter.put(ple.documentId, ple.weight);
 			}
 		}
 
 		return filter;
 	}
 
-	public Hashtable ranking_sum_clusterEnhance(int treeid, List<Integer> words) throws Exception {
-		Hashtable filter = new Hashtable();
-		Hashtable filterfinal = new Hashtable();
+	public HashMap rankingSumClusterEnhance(int treeid, List<Integer> words) throws Exception {
+		HashMap filter = new HashMap();
+		HashMap filterfinal = new HashMap();
 		load(treeid);
 		for (int j = 0; j < words.size(); j++) {
 			int word = (Integer) words.get(j);
@@ -209,8 +220,8 @@ public class InvertedFile {
 			if (doclist == null)
 				continue;
 			for (int k = 0; k < doclist.size(); k++) {
-				PLEntry ple = (PLEntry) doclist.get(k);
-				String key = ple.docid + "," + ple.cluster;
+				PlEntry ple = (PlEntry) doclist.get(k);
+				String key = ple.documentId + "," + ple.cluster;
 				if (filter.containsKey(key)) {
 					double w = (Double) filter.get(key);
 					w = w + ple.weight;

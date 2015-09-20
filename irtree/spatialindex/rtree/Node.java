@@ -34,18 +34,18 @@ import java.io.*;
 
 import spatialindex.spatialindex.*;
 
-abstract class Node implements INode {
+public abstract class Node implements INode {
 	protected RTree m_pTree = null;
 	// Parent of all nodes.
 
-	protected int level = -1;
+	public int level = -1;
 	// The level of the node in the tree.
 	// Leaves are always at level 0.
 
-	protected int identifier = -1;
+	public int identifier = -1;
 	// The unique ID of this node.
 
-	protected int children = 0;
+	public int children = 0;
 	// The number of children pointed by this node.
 
 	protected int m_capacity = -1;
@@ -57,10 +57,10 @@ abstract class Node implements INode {
 	protected byte[][] m_pData = null;
 	// The data stored in the node.
 
-	protected Region[] pMBR = null;
+	public Region[] pMBR = null;
 	// The corresponding data MBRs.
 
-	protected int[] pIdentifiers = null;
+	public int[] pIdentifiers = null;
 	// The corresponding data identifiers.
 
 	protected int[] m_pDataLength = null;
