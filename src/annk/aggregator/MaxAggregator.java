@@ -9,5 +9,10 @@ public class MaxAggregator implements IAggregator {
 	public double getAggregateValue(List<Double> values) {
 		return Collections.max(values);
 	}
+
+	@Override
+	public String getName() {
+		return "MAX";
+	}
 	
 }

@@ -12,5 +12,10 @@ public class SumAggregator implements IAggregator {
 		}
 		return aggregateValue;
 	}
+
+	@Override
+	public String getName() {
+		return "SUM";
+	}
 	
 }
