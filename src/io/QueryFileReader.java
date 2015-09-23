@@ -26,12 +26,12 @@ public class QueryFileReader {
 		try (Scanner scanner = new Scanner(queryFile)) {
 			List<GNNKQuery> gnnkQueries = new ArrayList<>();
 			
-			int noOfTestCases = scanner.nextInt();
+			int noOfTestCases = Integer.parseInt(scanner.nextLine());
 			for (int i = 0; i < noOfTestCases; i++) {
-				int noOfQueries = scanner.nextInt();
 				String aggregatorName = scanner.nextLine();
 				IAggregator aggregator = AggregatorFactory.getAggregator(aggregatorName);
 				
+				int noOfQueries = Integer.parseInt(scanner.nextLine());
 				List<Query> queries = new ArrayList<>();
 				for (int j = 0; j < noOfQueries; j++) {
 					String queryLine = scanner.nextLine();

@@ -1,6 +1,7 @@
 package annk.spatialindex;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -63,6 +64,8 @@ public class IRTree extends RTree {
 				for (int child = 0; child < n.children; child++) {
 					costs.put(child, new ArrayList<Double>());
 				}
+//				int[] children = Arrays.copyOfRange(n.pIdentifiers, 0, n.children);
+//				System.out.println(n.identifier + ", " + n.level + ": " + Arrays.toString(children));
 				
 				for (Query q : gnnkQuery.queries) {
 					HashMap<Integer, Double> similarities = invertedFile.rankingSum(n.identifier, q.keywords);
@@ -73,7 +76,8 @@ public class IRTree extends RTree {
 						if (similarities.containsKey(childId)) 
 							irScore = similarities.get(childId);
 						
-						double queryCost = combinedScore(n.pMBR[child].getMinimumDistance(q.location), irScore);
+						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
+						double queryCost = combinedScore(spatialCost, irScore);
 						costs.get(child).add(queryCost);
 					}
 				}

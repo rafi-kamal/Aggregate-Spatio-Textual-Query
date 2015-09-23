@@ -35,6 +35,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -939,6 +940,12 @@ public class RTree implements ISpatialIndex {
 			System.arraycopy(m_pData, 0, data, 0, m_pData.length);
 			return data;
 		}
+
+		@Override
+		public String toString() {
+			return "Data [m_id=" + m_id + ", m_shape=" + m_shape + ", m_pData=" + Arrays.toString(m_pData) + "]";
+		}
+		
 	}
 
 	public void ir(DocumentStore ds, InvertedFile invertedFile) throws Exception {

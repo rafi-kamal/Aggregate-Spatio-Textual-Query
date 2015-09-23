@@ -20,4 +20,10 @@ public class NNEntry implements Comparable<NNEntry> {
 			return 1;
 		return 0;
 	}
+
+	@Override
+	public String toString() {
+		return "NNEntry [node=" + node + ", cost=" + cost + "]";
+	}
+	
 }

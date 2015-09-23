@@ -50,4 +50,12 @@ public class RtreeEntry implements IEntry {
 	public void setIdentifier(int id) {
 		this.id = id;
 	}
+
+	@Override
+	public String toString() {
+		return "RtreeEntry [id=" + id + ", irscore=" + irscore + ", isLeafEntry=" + isLeafEntry + ", treeid=" + treeid
+				+ ", wordhit=" + wordhit + ", distmap=" + distmap + ", mbr=" + mbr + "]";
+	}
+	
+	
 }

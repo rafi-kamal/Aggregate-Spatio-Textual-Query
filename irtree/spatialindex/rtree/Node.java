@@ -884,4 +884,13 @@ public abstract class Node implements INode {
 			return 0;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "Node [identifier=" + identifier + ", pIdentifiers=" + Arrays.toString(pIdentifiers) + ", m_pTree="
+				+ m_pTree + ", level=" + level + ", children=" + children + ", m_capacity=" + m_capacity
+				+ ", m_nodeMBR=" + m_nodeMBR + ", m_pData=" + Arrays.toString(m_pData) + ", pMBR="
+				+ Arrays.toString(pMBR) + ", m_pDataLength=" + Arrays.toString(m_pDataLength) + ", m_totalDataLength="
+				+ m_totalDataLength + "]";
+	}
 }
