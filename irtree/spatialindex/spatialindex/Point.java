@@ -29,34 +29,30 @@
 
 package spatialindex.spatialindex;
 
-public class Point implements IShape, Cloneable
-{
+public class Point implements IShape, Cloneable {
 	public double[] m_pCoords = null;
 
-	public Point(double[] pCoords)
-	{
+	public Point(double[] pCoords) {
 		m_pCoords = new double[pCoords.length];
 		System.arraycopy(pCoords, 0, m_pCoords, 0, pCoords.length);
 	}
 
-	public Point(final Point pt)
-	{
+	public Point(final Point pt) {
 		m_pCoords = new double[pt.m_pCoords.length];
 		System.arraycopy(pt.m_pCoords, 0, m_pCoords, 0, pt.m_pCoords.length);
 	}
 
-	public boolean equals(Object o)
-	{
-		if (o instanceof Point)
-		{
+	public boolean equals(Object o) {
+		if (o instanceof Point) {
 			Point pt = (Point) o;
 
-			if (pt.m_pCoords.length != m_pCoords.length) return false;
+			if (pt.m_pCoords.length != m_pCoords.length)
+				return false;
 
-			for (int cIndex = 0; cIndex < m_pCoords.length; cIndex++)
-			{
-				if (m_pCoords[cIndex] < pt.m_pCoords[cIndex] - SpatialIndex.EPSILON ||
-						m_pCoords[cIndex] > pt.m_pCoords[cIndex] + SpatialIndex.EPSILON) return false;
+			for (int cIndex = 0; cIndex < m_pCoords.length; cIndex++) {
+				if (m_pCoords[cIndex] < pt.m_pCoords[cIndex] - SpatialIndex.EPSILON
+						|| m_pCoords[cIndex] > pt.m_pCoords[cIndex] + SpatialIndex.EPSILON)
+					return false;
 			}
 
 			return true;
@@ -69,8 +65,7 @@ public class Point implements IShape, Cloneable
 	// Cloneable interface
 	//
 
-	public Object clone()
-	{
+	public Object clone() {
 		return new Point(m_pCoords);
 	}
 
@@ -78,75 +73,76 @@ public class Point implements IShape, Cloneable
 	// IShape interface
 	//
 
-	public boolean intersects(final IShape s)
-	{
-		if (s instanceof Region) return ((Region) s).contains(this);
+	public boolean intersects(final IShape s) {
+		if (s instanceof Region)
+			return ((Region) s).contains(this);
 
 		return false;
 	}
 
-	public boolean contains(final IShape s)
-	{
+	public boolean contains(final IShape s) {
 		return false;
 	}
 
-	public boolean touches(final IShape s)
-	{
-		if (s instanceof Point && this.equals(s)) return true;
+	public boolean touches(final IShape s) {
+		if (s instanceof Point && this.equals(s))
+			return true;
 
-		if (s instanceof Region) return ((Region) s).touches(this);
+		if (s instanceof Region)
+			return ((Region) s).touches(this);
 
 		return false;
 	}
 
-	public double[] getCenter()
-	{
+	public double[] getCenter() {
 		double[] pCoords = new double[m_pCoords.length];
 		System.arraycopy(m_pCoords, 0, pCoords, 0, m_pCoords.length);
 		return pCoords;
 	}
 
-	public long getDimension()
-	{
+	public long getDimension() {
 		return m_pCoords.length;
 	}
 
-	public Region getMBR()
-	{
+	public Region getMBR() {
 		return new Region(m_pCoords, m_pCoords);
 	}
 
-	public double getArea()
-	{
+	public double getArea() {
 		return 0.0;
 	}
 
-	public double getMinimumDistance(final IShape s)
-	{
-		if (s instanceof Region) return ((Region) s).getMinimumDistance(this);
+	public double getMinimumDistance(final IShape s) {
+		if (s instanceof Region)
+			return ((Region) s).getMinimumDistance(this);
 
-		if (s instanceof Point) return getMinimumDistance((Point) s);
+		if (s instanceof Point)
+			return getMinimumDistance((Point) s);
 
 		throw new IllegalStateException("getMinimumDistance: Not implemented yet!");
 	}
 
-	double getMinimumDistance(final Point p)
-	{
-		if (m_pCoords.length != p.m_pCoords.length) throw new IllegalArgumentException("getMinimumDistance: Shape has the wrong number of dimensions.");
+	double getMinimumDistance(final Point p) {
+		if (m_pCoords.length != p.m_pCoords.length)
+			throw new IllegalArgumentException("getMinimumDistance: Shape has the wrong number of dimensions.");
 
 		double ret = 0.0f;
 
-		for (int cIndex = 0; cIndex < m_pCoords.length; cIndex++)
-		{
+		for (int cIndex = 0; cIndex < m_pCoords.length; cIndex++) {
 			ret += Math.pow(m_pCoords[cIndex] - p.m_pCoords[cIndex], 2.0);
 		}
 
 		return Math.sqrt(ret);
 	}
 
-	public double getCoord(int index) throws IndexOutOfBoundsException
-	{
-		if (index >= m_pCoords.length) throw new IndexOutOfBoundsException("" + index);
+	public double getCoord(int index) throws IndexOutOfBoundsException {
+		if (index >= m_pCoords.length)
+			throw new IndexOutOfBoundsException("" + index);
 		return m_pCoords[index];
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + (int) m_pCoords[0] + ", " + (int) m_pCoords[1] + ")";
 	}
 }

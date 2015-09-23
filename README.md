@@ -6,7 +6,7 @@
 	* Y Coordinate: Double
 	* Query keywords: A series of integers
 
-	Example: 1, 5.2, 3.5, 4, 5, 9
+	Example: 1,5.2,3.5,4,5,9
 
 + **Location file**: Data file containing the a spatial location in each line. Each location contains the following comma-seperated values:
 	* Id: Integer
@@ -22,3 +22,9 @@ The keywords corresponding to each spatio-textual object is stored in the *text 
 	Id, wordId1 weight1, wordId2 weight2, ....
 
 Where wordId should be an integer and weight should be a double.
+
+If you have a file of the following format
+
+	Id, wordId1, wordId2, ....
+
+You can calculate the weights using the `WeightCompute` class.

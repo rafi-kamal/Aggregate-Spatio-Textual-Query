@@ -2,15 +2,18 @@ package annk.domain;
 
 import java.util.List;
 
+import annk.aggregator.IAggregator;
 import query.Query;
 
 public class SGNNKQuery {
 	public List<Query> queries;
 	public int subGroupSize;
+	public IAggregator aggregator;
 
-	public SGNNKQuery(List<Query> queries, int subGroupSize) {
+	public SGNNKQuery(List<Query> queries, int subGroupSize, IAggregator aggregator) {
 		this.queries = queries;
 		this.subGroupSize = subGroupSize;
+		this.aggregator = aggregator;
 		
 		assert subGroupSize <= queries.size() : 
 			"Sub-group size must be less then the number of queries";
@@ -18,7 +21,8 @@ public class SGNNKQuery {
 
 	@Override
 	public String toString() {
-		return "SGNNKQuery [queries=" + queries + ", subGroupSize=" + subGroupSize + "]";
+		return "SGNNKQuery [" + aggregator.getName() 
+			+ ", queries=" + queries + ", subGroupSize=" + subGroupSize + "]";
 	}
 	
 }

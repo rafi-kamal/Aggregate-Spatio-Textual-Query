@@ -16,7 +16,8 @@ public class GNNKQuery {
 
 	@Override
 	public String toString() {
-		return "GNNKQuery [queries=" + queries + "]";
+		return "GNNKQuery [" + aggregator.getName() 
+			+ ", queries=" + queries + "]";
 	}
 	
 }
