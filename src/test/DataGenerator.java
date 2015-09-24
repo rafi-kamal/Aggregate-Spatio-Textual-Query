@@ -17,6 +17,8 @@ public class DataGenerator {
 	private static final int MAX_NUMBER_OF_KEYWORDS = 20;
 	private static final int MAX_VALUE_OF_KEYWORD = 1000;
 	
+	private static final double QUERY_AREA_COVERAGE = 0.1;
+	
 	/**
 	 * Generate loc.txt (location file), wwords.txt (keywords with weight)
 	 * and gnnk.txt (gnnk query file)
@@ -71,8 +73,8 @@ public class DataGenerator {
 				writer.write(numberOfIndividualQueries + "\n");
 				
 				for (int j = 0; j < numberOfIndividualQueries; j++) {
-					double x = RANDOM.nextDouble();
-					double y = RANDOM.nextDouble();
+					double x = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
+					double y = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
 					
 					writer.write(j + "," + x + "," + y + ",");
 					

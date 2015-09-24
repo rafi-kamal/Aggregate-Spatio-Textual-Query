@@ -55,7 +55,6 @@ public class IRTree extends RTree {
 						// So replace the worst object with current object
 						currentBestObjects.poll();
 						currentBestObjects.add(first);
-						
 					}
 				}
 				costBound = currentBestObjects.peek().cost;
