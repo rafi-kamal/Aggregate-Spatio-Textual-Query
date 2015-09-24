@@ -50,7 +50,7 @@ public class Main {
 		for (GNNKQuery q : gnnkQueries) {
 			System.out.println("query " + count);
 
-			List<NNEntry> results = tree.gnnk(invertedFile, q, topk, false);
+			List<NNEntry> results = tree.gnnkBaseline(invertedFile, q, topk);
 			writer.writeResult(results);
 
 			ivIO += invertedFile.getIO();
