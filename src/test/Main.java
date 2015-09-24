@@ -41,6 +41,7 @@ public class Main {
 		long totalTime = 0;
 
 		int ivIO = 0;
+		int totalVisitedNodes = 0;
 
 		QueryFileReader reader = new QueryFileReader(queryFile);
 		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
@@ -48,17 +49,17 @@ public class Main {
 		startTime = System.currentTimeMillis();
 		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
 		for (GNNKQuery q : gnnkQueries) {
-			System.out.println("query " + count);
-
 			List<NNEntry> results = tree.gnnkBaseline(invertedFile, q, topk);
 			writer.writeResult(results);
 
+			totalVisitedNodes += tree.noOfVisitedNodes;
 			ivIO += invertedFile.getIO();
 			count++;
 		}
 		writer.close();
 		totalTime = System.currentTimeMillis() - startTime;
 
+		System.out.println("Average nodes visited: " + totalVisitedNodes * 1.0 / count);
 		System.out.println("Total time millisecond: " + totalTime);
 		System.out.println("Average time millisecond: " + totalTime * 1.0 / count);
 		System.out.println("Average total IO: " + (tree.getIO() + ivIO) * 1.0 / count);

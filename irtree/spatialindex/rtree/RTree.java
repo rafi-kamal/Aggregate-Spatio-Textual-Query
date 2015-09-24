@@ -111,6 +111,8 @@ public class RTree implements ISpatialIndex {
 	Region infiniteRegion;
 
 	Statistics stats;
+	
+	public int noOfVisitedNodes;
 
 	ArrayList<INodeCommand> writeNodeCommands = new ArrayList<INodeCommand>();
 	ArrayList<INodeCommand> readNodeCommands = new ArrayList<INodeCommand>();
@@ -1071,6 +1073,8 @@ public class RTree implements ISpatialIndex {
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
 			e = (RtreeEntry) first.node;
+			
+			noOfVisitedNodes++;
 
 			if (e.isLeafEntry) {
 				if (count >= topk && first.cost > knearest)

@@ -40,6 +40,8 @@ public class IRTree extends RTree {
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
+			
+			noOfVisitedNodes++;
 
 			if (rTreeEntry.isLeafEntry) {
 				if (currentBestObjects.size() < topk)
@@ -120,6 +122,8 @@ public class IRTree extends RTree {
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
+			
+			noOfVisitedNodes++;
 
 			if (rTreeEntry.isLeafEntry) {
 				if (results.size() < topk)

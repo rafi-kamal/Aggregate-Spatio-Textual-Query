@@ -56,12 +56,13 @@ public class LKT {
 		double[] f = new double[2];
 		long start = 0;
 		long end = 0;
-		long acc = 0;
+		long totalTime = 0;
 
 		// long start = System.currentTimeMillis();
 
 		int ivIO = 0;
-
+		int totalVisitedNodes = 0;
+		
 		while ((line = br.readLine()) != null) {
 			temp = line.split(",");
 
@@ -87,14 +88,16 @@ public class LKT {
 			tree.lkt(invertedFile, q, topk);
 
 			end = System.currentTimeMillis();
-			acc += (end - start);
+			totalTime += (end - start);
 
 			ivIO += invertedFile.getIO();
+			totalVisitedNodes += tree.noOfVisitedNodes;
 		}
 		br.close();
 
-		System.out.println("Total time millisecond: " + acc);
-		System.out.println("Average time millisecond: " + acc * 1.0 / count);
+		System.out.println("Average nodes visited: " + totalVisitedNodes * 1.0 / count);
+		System.out.println("Total time millisecond: " + totalTime);
+		System.out.println("Average time millisecond: " + totalTime * 1.0 / count);
 		System.out.println("Average total IO: " + (tree.getIO() + ivIO) * 1.0 / count);
 		System.out.println("Average tree IO: " + tree.getIO() * 1.0 / count);
 		System.out.println("Average inverted index IO: " + ivIO * 1.0 / count);
