@@ -6,6 +6,7 @@ import annk.domain.GNNKQuery;
 import annk.spatialindex.IRTree;
 import documentindex.InvertedFile;
 import io.QueryFileReader;
+import io.ResultWriter;
 import spatialindex.rtree.RTree;
 import spatialindex.spatialindex.NNEntry;
 import spatialindex.storagemanager.DiskStorageManager;
@@ -45,17 +46,17 @@ public class Main {
 		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
 		
 		startTime = System.currentTimeMillis();
+		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
 		for (GNNKQuery q : gnnkQueries) {
 			System.out.println("query " + count);
 
 			List<NNEntry> results = tree.gnnk(invertedFile, q, topk, false);
-			for (NNEntry result : results) {
-				System.out.println(result.node.getIdentifier() + " " + result.cost);
-			}
+			writer.writeResult(results);
 
 			ivIO += invertedFile.getIO();
 			count++;
 		}
+		writer.close();
 		totalTime = System.currentTimeMillis() - startTime;
 
 		System.out.println("Total time millisecond: " + totalTime);

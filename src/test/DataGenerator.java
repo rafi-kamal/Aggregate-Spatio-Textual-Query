@@ -9,7 +9,7 @@ import java.util.Random;
 public class DataGenerator {
 	private static final Random RANDOM = new Random(1);
 	
-	private static final int DATA_SET_SIZE = 100000;
+	private static final int DATA_SET_SIZE = 10000;
 	
 	private static final int NUMBER_OF_QUERIES = 10;
 	private static final int NUMBER_OF_INDIVIDUAL_QUERIES = 10;

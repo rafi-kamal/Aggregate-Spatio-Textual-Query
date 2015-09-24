@@ -1,7 +1,6 @@
 package annk.spatialindex;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -53,6 +52,7 @@ public class IRTree extends RTree {
 						currentBestObjects.poll();
 						currentBestObjects.add(first);
 					}
+					break;
 				}
 			} else {
 				Node n = readNode(rTreeEntry.getIdentifier());
