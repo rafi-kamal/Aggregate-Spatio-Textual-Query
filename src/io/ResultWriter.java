@@ -36,7 +36,7 @@ public class ResultWriter {
 		write("");
 	}
 	
-	private void write(String str) throws IOException {
+	public void write(String str) throws IOException {
 		if (printInConsole)
 			System.out.println(str);
 		writer.write(str + "\n");

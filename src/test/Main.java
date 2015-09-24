@@ -49,17 +49,19 @@ public class Main {
 		startTime = System.currentTimeMillis();
 		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
 		for (GNNKQuery q : gnnkQueries) {
-			List<NNEntry> results = tree.gnnkBaseline(invertedFile, q, topk);
+			List<NNEntry> results = tree.gnnk(invertedFile, q, topk);
+//			List<NNEntry> results = tree.gnnkBaseline(invertedFile, q, topk);
 			writer.writeResult(results);
 
 			totalVisitedNodes += tree.noOfVisitedNodes;
 			ivIO += invertedFile.getIO();
 			count++;
 		}
+		writer.write("Average nodes visited: " + totalVisitedNodes * 1.0 / count);
 		writer.close();
+		
 		totalTime = System.currentTimeMillis() - startTime;
 
-		System.out.println("Average nodes visited: " + totalVisitedNodes * 1.0 / count);
 		System.out.println("Total time millisecond: " + totalTime);
 		System.out.println("Average time millisecond: " + totalTime * 1.0 / count);
 		System.out.println("Average total IO: " + (tree.getIO() + ivIO) * 1.0 / count);

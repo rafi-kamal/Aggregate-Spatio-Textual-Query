@@ -34,30 +34,38 @@ public class IRTree extends RTree {
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
 		queue.add(root);
 
-		// The object with the worst cost will always be on top
-		PriorityQueue<NNEntry> currentBestObjects = new PriorityQueue<>(100, new WorstFirstNNEntryComparator());
+		// Current (at most) k best objects, sorted according to their decreasing value of cost.
+		// So the highest cost object will always be on top.
+		PriorityQueue<NNEntry> currentBestObjects = 
+				new PriorityQueue<>(100, new WorstFirstNNEntryComparator());
 
+		// Cost of the highest valued node of current best objects
+		double costBound = Double.MAX_VALUE;
+		
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
 			
-			noOfVisitedNodes++;
-
 			if (rTreeEntry.isLeafEntry) {
 				if (currentBestObjects.size() < topk)
 					currentBestObjects.add(first);
 				else {
-					NNEntry worstResult = currentBestObjects.peek();
-					if (worstResult.cost > first.cost) {
+					if (first.cost < costBound) {
 						// The current object is better than at least one object in currentBestObjects.
 						// So replace the worst object with current object
 						currentBestObjects.poll();
 						currentBestObjects.add(first);
+						
 					}
-					break;
 				}
+				costBound = currentBestObjects.peek().cost;
 			} else {
+				if (first.cost > costBound)
+					continue;
+				
 				Node n = readNode(rTreeEntry.getIdentifier());
+				
+				noOfVisitedNodes++;
 				
 				// For each child node, calculate the cost for all queries.
 				// The first parameter is the index of the child node, second parameter is the
@@ -89,6 +97,9 @@ public class IRTree extends RTree {
 				for (int child = 0; child < n.children; child++) {
 					List<Double> queryCosts = costs.get(child);
 					double aggregateCost = gnnkQuery.aggregator.getAggregateValue(queryCosts);
+					
+					if (aggregateCost > costBound)
+						continue;
 					
 					if (n.level == 0) {
 						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], true);
@@ -122,8 +133,6 @@ public class IRTree extends RTree {
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
-			
-			noOfVisitedNodes++;
 
 			if (rTreeEntry.isLeafEntry) {
 				if (results.size() < topk)
@@ -132,6 +141,8 @@ public class IRTree extends RTree {
 					break;
 			} else {
 				Node n = readNode(rTreeEntry.getIdentifier());
+				
+				noOfVisitedNodes++;
 				
 				// For each child node, calculate the cost for all queries.
 				// The first parameter is the index of the child node, second parameter is the
