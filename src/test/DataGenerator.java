@@ -9,9 +9,9 @@ import java.util.Random;
 public class DataGenerator {
 	private static final Random RANDOM = new Random(1);
 	
-	private static final int DATA_SET_SIZE = 100;
+	private static final int DATA_SET_SIZE = 100000;
 	
-	private static final int NUMBER_OF_GNNK_QUERIES = 10;
+	private static final int NUMBER_OF_QUERIES = 10;
 	private static final int NUMBER_OF_INDIVIDUAL_QUERIES = 10;
 	
 	private static final int MAX_NUMBER_OF_KEYWORDS = 20;
@@ -32,18 +32,41 @@ public class DataGenerator {
 		File locationFile = new File(directory, "loc.txt");
 		File keywordFile = new File(directory, "wwords.txt");
 		File gnnkQueryFile = new File(directory, "gnnk.txt");
+		File lktQueryFile = new File(directory, "LkT.txt");
 		
 		generateLocationFile(locationFile, DATA_SET_SIZE);
 		generateKeywordFile(keywordFile, DATA_SET_SIZE);
-		generateGNNKQueryFile(gnnkQueryFile, NUMBER_OF_GNNK_QUERIES, NUMBER_OF_INDIVIDUAL_QUERIES, "SUM");
+		generateGNNKQueryFile(gnnkQueryFile, NUMBER_OF_QUERIES, NUMBER_OF_INDIVIDUAL_QUERIES, "SUM");
+		generateLkTQueryFile(lktQueryFile, NUMBER_OF_QUERIES);
+	}
+	
+	public static void generateLkTQueryFile(File queryFile, int numberOfLkTQueries) throws IOException {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(queryFile))) {
+			for (int i = 0; i < numberOfLkTQueries; i++) {
+				double x = RANDOM.nextDouble();
+				double y = RANDOM.nextDouble();
+				
+				writer.write(i + "," + x + "," + y + ",");
+				
+				int numberOfKeywords = 1 + RANDOM.nextInt(MAX_NUMBER_OF_KEYWORDS);
+				for (int k = 0; k < numberOfKeywords; k++) {
+					int keyword = RANDOM.nextInt(MAX_VALUE_OF_KEYWORD);
+					writer.write(Integer.toString(keyword));
+					
+					if (k == numberOfKeywords - 1) writer.write("\n");
+					else writer.write(",");
+				}
+			}
+			writer.flush();
+		}
 	}
 	
 	public static void generateGNNKQueryFile(File queryFile, int numberOfGNNKQueries, 
 			int numberOfIndividualQueries, String aggregatorName) throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(queryFile))) {
+			writer.write(numberOfGNNKQueries + "\n");
+			
 			for (int i = 0; i < numberOfGNNKQueries; i++) {
-				writer.write(numberOfGNNKQueries + "\n");
-				
 				writer.write(aggregatorName + "\n");
 				writer.write(numberOfIndividualQueries + "\n");
 				
@@ -56,7 +79,7 @@ public class DataGenerator {
 					int numberOfKeywords = 1 + RANDOM.nextInt(MAX_NUMBER_OF_KEYWORDS);
 					for (int k = 0; k < numberOfKeywords; k++) {
 						int keyword = RANDOM.nextInt(MAX_VALUE_OF_KEYWORD);
-						writer.write(keyword + " " + 0.1);
+						writer.write(Integer.toString(keyword));
 						
 						if (k == numberOfKeywords - 1) writer.write("\n");
 						else writer.write(",");

@@ -14,8 +14,8 @@ runjava="java -ea -Dfile.encoding=UTF-8 -classpath ./bin:./lib/jdbm-1.0.jar"
 
 # Preparing and building trees
 $runjava build.StoreDocument $1/wwords.txt 4096
-$runjava build.BuildRtree $1/loc.txt rtree 4096 100
-$runjava build.BuildIRtree $1/wwords.txt rtree 4096
+$runjava build.BuildRtree $1/loc.txt $1/rtree 4096 100
+$runjava build.BuildIRtree $1/wwords.txt $1/rtree 4096
 
 # Output of the query
 # echo

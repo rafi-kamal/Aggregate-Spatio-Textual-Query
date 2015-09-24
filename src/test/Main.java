@@ -58,6 +58,7 @@ public class Main {
 		}
 		totalTime = System.currentTimeMillis() - startTime;
 
+		System.out.println("Total time millisecond: " + totalTime);
 		System.out.println("Average time millisecond: " + totalTime * 1.0 / count);
 		System.out.println("Average total IO: " + (tree.getIO() + ivIO) * 1.0 / count);
 		System.out.println("Average tree IO: " + tree.getIO() * 1.0 / count);
