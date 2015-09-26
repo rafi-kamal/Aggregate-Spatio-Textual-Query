@@ -13,23 +13,11 @@ public class RtreeEntry implements IEntry {
 	public Hashtable distmap;
 
 	IShape mbr;
-	public double irscore;
 
 	public RtreeEntry(int id, boolean isLeafEntry) {
 		this.id = id;
 		this.isLeafEntry = isLeafEntry;
 		distmap = new Hashtable();
-	}
-
-	public RtreeEntry(int id, double ir) {
-		this.id = id;
-		this.irscore = ir;
-	}
-
-	public RtreeEntry(int id, Region mbr, double ir) {
-		this.id = id;
-		this.mbr = new Region(mbr);
-		this.irscore = ir;
 	}
 
 	public RtreeEntry(int id, Region mbr, boolean isLeafEntry) {
@@ -53,8 +41,8 @@ public class RtreeEntry implements IEntry {
 
 	@Override
 	public String toString() {
-		return "RtreeEntry [id=" + id + ", irscore=" + irscore + ", isLeafEntry=" + isLeafEntry + ", treeid=" + treeid
-				+ ", wordhit=" + wordhit + ", distmap=" + distmap + ", mbr=" + mbr + "]";
+		return "RtreeEntry [id=" + id + ", isLeafEntry=" + isLeafEntry + ", treeid=" + treeid + ", wordhit=" + wordhit
+				+ ", distmap=" + distmap + ", mbr=" + mbr + "]";
 	}
 	
 	
