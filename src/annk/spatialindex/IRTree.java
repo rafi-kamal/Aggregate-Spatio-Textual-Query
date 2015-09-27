@@ -1,6 +1,7 @@
 package annk.spatialindex;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -58,7 +59,6 @@ public class IRTree extends RTree {
 			invertedFile.load(n.identifier);
 			
 			noOfVisitedNodes++;
-			
 			if (n.level == 0) {
 				// For each child node, calculate the cost for all queries.
 				// The first parameter is the index of the child node, second parameter is the
@@ -92,8 +92,9 @@ public class IRTree extends RTree {
 					if (aggregateCost < costBound) {
 						// The current object is better than at least one object in currentBestObjects.
 						// So replace the worst object with current object
+						int childId = n.pIdentifiers[child];
 						currentBestObjects.poll();
-						currentBestObjects.add(new NNEntry(new RtreeEntry(child, true), aggregateCost));
+						currentBestObjects.add(new NNEntry(new RtreeEntry(childId, true), aggregateCost));
 					}
 					costBound = currentBestObjects.peek().cost;
 				}
@@ -207,7 +208,7 @@ public class IRTree extends RTree {
 	/**
 	 * Put the entry with highest cost first
 	 */
-	public class WorstFirstNNEntryComparator implements Comparator<NNEntry> {
+	private class WorstFirstNNEntryComparator implements Comparator<NNEntry> {
 
 		@Override
 		public int compare(NNEntry n1, NNEntry n2) {

@@ -1119,7 +1119,7 @@ public class RTree implements ISpatialIndex {
 
 	public static double combinedScore(double spatial, double ir) {
 		// TODO divide with max value instead
-		return (alpha_dist * spatial + (1 - alpha_dist) * (1 - ir));
+		return (alpha_dist * spatial / 12 + (1 - alpha_dist) * (1 - ir));
 	}
 
 	public int getIO() {
