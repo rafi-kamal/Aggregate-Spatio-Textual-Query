@@ -5,10 +5,8 @@ import java.util.List;
 import annk.aggregator.IAggregator;
 import query.Query;
 
-public class SGNNKQuery {
-	public List<Query> queries;
+public class SGNNKQuery extends AggregateQuery {
 	public int subGroupSize;
-	public IAggregator aggregator;
 
 	public SGNNKQuery(List<Query> queries, int subGroupSize, IAggregator aggregator) {
 		this.queries = queries;

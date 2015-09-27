@@ -57,11 +57,11 @@ public class Main {
 			ivIO += invertedFile.getIO();
 			count++;
 		}
+		totalTime = System.currentTimeMillis() - startTime;
+		
 		writer.write("Average nodes visited: " + totalVisitedNodes * 1.0 / count);
 		writer.write("Total time millisecond: " + totalTime);
 		writer.close();
-		
-		totalTime = System.currentTimeMillis() - startTime;
 
 		System.out.println("Average time millisecond: " + totalTime * 1.0 / count);
 		System.out.println("Average total IO: " + (tree.getIO() + ivIO) * 1.0 / count);

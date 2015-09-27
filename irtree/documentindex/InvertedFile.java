@@ -182,12 +182,14 @@ public class InvertedFile {
 	 * Calculates the total similarity of each document (node), where weights are
 	 * calculated summing over the weight of the terms that matches the query keywords
 	 * 
+	 * Corresponding tree must be loaded by using load(treeId) before calling this method.
+	 * 
 	 * @return A map of (document ID, similarity) pairs
 	 */
-	public HashMap<Integer, Double> rankingSum(int treeid, List<Integer> keywords) throws Exception {
+	public HashMap<Integer, Double> rankingSum(List<Integer> keywords) throws Exception {
 
 		HashMap<Integer, Double> filter = new HashMap<Integer, Double>();
-		load(treeid);
+//		load(treeid);
 
 		for (int j = 0; j < keywords.size(); j++) {
 			int keyword = keywords.get(j);
@@ -210,10 +212,10 @@ public class InvertedFile {
 		return filter;
 	}
 
-	public HashMap rankingSumClusterEnhance(int treeid, List<Integer> words) throws Exception {
+	public HashMap rankingSumClusterEnhance(List<Integer> words) throws Exception {
 		HashMap filter = new HashMap();
 		HashMap filterfinal = new HashMap();
-		load(treeid);
+		
 		for (int j = 0; j < words.size(); j++) {
 			int word = (Integer) words.get(j);
 			Vector doclist = read(word);

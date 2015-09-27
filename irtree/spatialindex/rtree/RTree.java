@@ -1087,10 +1087,12 @@ public class RTree implements ISpatialIndex {
 				Node n = readNode(e.getIdentifier());
 
 				HashMap<Integer, Double> filter;
+				
+				invertedFile.load(n.identifier);
 				if (numOfClusters != 0)
-					filter = invertedFile.rankingSumClusterEnhance(n.identifier, q.keywords);
+					filter = invertedFile.rankingSumClusterEnhance(q.keywords);
 				else
-					filter = invertedFile.rankingSum(n.identifier, q.keywords);
+					filter = invertedFile.rankingSum(q.keywords);
 
 				for (int child = 0; child < n.children; child++) {
 					double irscore;
@@ -1116,6 +1118,7 @@ public class RTree implements ISpatialIndex {
 	}
 
 	public static double combinedScore(double spatial, double ir) {
+		// TODO divide with max value instead
 		return (alpha_dist * spatial + (1 - alpha_dist) * (1 - ir));
 	}
 

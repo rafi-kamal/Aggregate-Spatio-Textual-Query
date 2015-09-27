@@ -11,13 +11,13 @@ public class DataGenerator {
 	
 	private static final int DATA_SET_SIZE = 10000;
 	
-	private static final int NUMBER_OF_QUERIES = 10;
+	private static final int NUMBER_OF_QUERIES = 3;
 	private static final int NUMBER_OF_INDIVIDUAL_QUERIES = 10;
 	
-	private static final int MAX_NUMBER_OF_KEYWORDS = 20;
-	private static final int MAX_VALUE_OF_KEYWORD = 1000;
+	private static final int MAX_NUMBER_OF_KEYWORDS = 4;
+	private static final int MAX_VALUE_OF_KEYWORD = 784;
 	
-	private static final double QUERY_AREA_COVERAGE = 0.1;
+//	private static final double QUERY_AREA_COVERAGE = 0.1;
 	
 	/**
 	 * Generate loc.txt (location file), wwords.txt (keywords with weight)
@@ -36,10 +36,10 @@ public class DataGenerator {
 		File gnnkQueryFile = new File(directory, "gnnk.txt");
 		File lktQueryFile = new File(directory, "LkT.txt");
 		
-		generateLocationFile(locationFile, DATA_SET_SIZE);
-		generateKeywordFile(keywordFile, DATA_SET_SIZE);
+//		generateLocationFile(locationFile, DATA_SET_SIZE);
+//		generateKeywordFile(keywordFile, DATA_SET_SIZE);
 		generateGNNKQueryFile(gnnkQueryFile, NUMBER_OF_QUERIES, NUMBER_OF_INDIVIDUAL_QUERIES, "SUM");
-		generateLkTQueryFile(lktQueryFile, NUMBER_OF_QUERIES);
+//		generateLkTQueryFile(lktQueryFile, NUMBER_OF_QUERIES);
 	}
 	
 	public static void generateLkTQueryFile(File queryFile, int numberOfLkTQueries) throws IOException {
@@ -73,8 +73,10 @@ public class DataGenerator {
 				writer.write(numberOfIndividualQueries + "\n");
 				
 				for (int j = 0; j < numberOfIndividualQueries; j++) {
-					double x = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
-					double y = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
+//					double x = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
+//					double y = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
+					double x = 33 + RANDOM.nextDouble() * 7;
+					double y = -115 + RANDOM.nextDouble() * 35;
 					
 					writer.write(j + "," + x + "," + y + ",");
 					
