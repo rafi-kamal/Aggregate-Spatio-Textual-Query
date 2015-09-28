@@ -49,6 +49,7 @@ public class Main {
 		startTime = System.currentTimeMillis();
 		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
 		for (GNNKQuery q : gnnkQueries) {
+//			List<NNEntry> results = tree.gnnkWithQuerySupernode(invertedFile, q, topk);
 			List<NNEntry> results = tree.gnnk(invertedFile, q, topk);
 //			List<NNEntry> results = tree.gnnkBaseline(invertedFile, q, topk);
 			writer.writeResult(results);

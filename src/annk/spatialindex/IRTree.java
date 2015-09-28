@@ -29,7 +29,7 @@ public class IRTree extends RTree {
 	 * @return A list of objects with size at most k, 
 	 * where objects are sorted according to the decreasing value of their costs.
 	 */
-	public List<NNEntry> gnnk(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
+	public List<NNEntry> gnnkWithQuerySupernode(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
 			throws Exception {
 		
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
@@ -47,6 +47,9 @@ public class IRTree extends RTree {
 
 		// Cost of the highest valued node of current best objects
 		double costBound = Double.MAX_VALUE;
+		
+		Region queryMBR = gnnkQuery.getMBR();
+		List<Integer> combinedQueryKeywords = gnnkQuery.getCombinedKeywords();
 		
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
@@ -100,14 +103,12 @@ public class IRTree extends RTree {
 				}
 			}
 			else {
-				List<Integer> combinedQueryKeywords = gnnkQuery.getCombinedKeywords();
 				HashMap<Integer, Double> similarities = invertedFile.rankingSum(
 						combinedQueryKeywords);
 				
 				// Individual query costs are calculated, now calculate aggregate query cost
 				// and prune the children based on this cost.
 				for (int child = 0; child < n.children; child++) {
-					Region queryMBR = gnnkQuery.getMBR();
 					double spatialCost = n.pMBR[child].getMinimumDistance(queryMBR);
 					
 					int childId = n.pIdentifiers[child];
@@ -138,6 +139,8 @@ public class IRTree extends RTree {
 	 */
 	public List<NNEntry> gnnkBaseline(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
 			throws Exception {
+		
+		int[] b = new int[15];
 		
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
@@ -200,6 +203,104 @@ public class IRTree extends RTree {
 				}
 			}
 		}
+
+		Collections.sort(results);
+		return results;
+	}
+	
+	public List<NNEntry> gnnk(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
+			throws Exception {
+		
+		PriorityQueue<NNEntry> queue = new PriorityQueue<>(100, new Comparator<NNEntry>() {
+
+			@Override
+			public int compare(NNEntry o1, NNEntry o2) {
+				if (o1.getCost() < o2.getCost())
+					return -1;
+				if (o1.getCost() > o2.getCost())
+					return 1;
+				return 0;
+			}
+		});
+		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
+		queue.add(root);
+
+		// Current (at most) k best objects, sorted according to their decreasing value of cost.
+		// So the highest cost object will always be on top.
+		PriorityQueue<NNEntry> currentBestObjects = 
+				new PriorityQueue<>(topk, new WorstFirstNNEntryComparator());
+		// Dummy objects
+		for (int i = 0; i < topk; i++) {
+			currentBestObjects.add(new NNEntry(new RtreeEntry(-1, false), Double.MAX_VALUE));
+		}
+
+		// Cost of the highest valued node of current best objects
+		double costBound = Double.MAX_VALUE;
+
+		while (queue.size() != 0) {
+			NNEntry first = queue.poll();
+			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
+
+			if (rTreeEntry.isLeafEntry) {
+				if (first.cost > costBound)
+					continue;
+				
+				currentBestObjects.add(first);
+				currentBestObjects.poll();
+				costBound = currentBestObjects.peek().cost;
+			} else {
+				if (first.getCost() > costBound)
+					continue;
+				
+				Node n = readNode(rTreeEntry.getIdentifier());
+				
+				noOfVisitedNodes++;
+				
+				// For each child node, calculate the cost for all queries.
+				// The first parameter is the index of the child node, second parameter is the
+				// corresponding list of costs calculated for individual queries
+				HashMap<Integer, List<Double>> costs = new HashMap<>();
+				for (int child = 0; child < n.children; child++) {
+					costs.put(child, new ArrayList<Double>());
+				}
+//				int[] children = Arrays.copyOfRange(n.pIdentifiers, 0, n.children);
+//				System.out.println(n.identifier + ", " + n.level + ": " + Arrays.toString(children));
+				
+				invertedFile.load(n.identifier);
+				for (Query q : gnnkQuery.queries) {
+					HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords);
+					
+					for (int child = 0; child < n.children; child++) {
+						int childId = n.pIdentifiers[child];
+						double irScore = 0;
+						if (similarities.containsKey(childId)) 
+							irScore = similarities.get(childId);
+						
+						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
+						double queryCost = combinedScore(spatialCost, irScore);
+						costs.get(child).add(queryCost);
+					}
+				}
+				
+				// Individual query costs are calculated, now calculate aggregate query cost
+				for (int child = 0; child < n.children; child++) {
+					List<Double> queryCosts = costs.get(child);
+					double aggregateCost = gnnkQuery.aggregator.getAggregateValue(queryCosts);
+					
+					if (n.level == 0) {
+						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], true);
+					} else {
+						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], false);
+					}
+
+					NNEntry entry = new NNEntry(rTreeEntry, aggregateCost);
+					entry.level = n.level;
+					queue.add(entry);
+				}
+			}
+		}
+
+		List<NNEntry> results = new ArrayList<>(currentBestObjects);
 
 		Collections.sort(results);
 		return results;

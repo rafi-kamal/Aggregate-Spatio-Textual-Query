@@ -7,10 +7,16 @@ public class NNEntry implements Comparable<NNEntry> {
 
 	public IEntry node;
 	public double cost;
+	// TODO temporary var, remove this
+	public int level = 0;
 
 	public NNEntry(IEntry node, double cost) {
 		this.node = node;
 		this.cost = cost;
+	}
+	
+	public double getCost() {
+		return Math.pow(level, 1) + cost;
 	}
 	
 	public int compareTo(NNEntry other) {
