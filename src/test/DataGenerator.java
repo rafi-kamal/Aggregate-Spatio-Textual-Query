@@ -34,11 +34,13 @@ public class DataGenerator {
 		File locationFile = new File(directory, "loc.txt");
 		File keywordFile = new File(directory, "wwords.txt");
 		File gnnkQueryFile = new File(directory, "gnnk.txt");
+		File sgnnkQueryFile = new File(directory, "sgnnk.txt");
 		File lktQueryFile = new File(directory, "LkT.txt");
 		
 //		generateLocationFile(locationFile, DATA_SET_SIZE);
 //		generateKeywordFile(keywordFile, DATA_SET_SIZE);
 		generateGNNKQueryFile(gnnkQueryFile, NUMBER_OF_QUERIES, NUMBER_OF_INDIVIDUAL_QUERIES, "SUM");
+		generateSGNNKQueryFile(sgnnkQueryFile, NUMBER_OF_QUERIES, NUMBER_OF_INDIVIDUAL_QUERIES, "SUM");
 //		generateLkTQueryFile(lktQueryFile, NUMBER_OF_QUERIES);
 	}
 	
@@ -73,24 +75,47 @@ public class DataGenerator {
 				writer.write(numberOfIndividualQueries + "\n");
 				
 				for (int j = 0; j < numberOfIndividualQueries; j++) {
-//					double x = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
-//					double y = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
-					double x = 33 + RANDOM.nextDouble() * 7;
-					double y = -115 + RANDOM.nextDouble() * 35;
-					
-					writer.write(j + "," + x + "," + y + ",");
-					
-					int numberOfKeywords = 1 + RANDOM.nextInt(MAX_NUMBER_OF_KEYWORDS);
-					for (int k = 0; k < numberOfKeywords; k++) {
-						int keyword = RANDOM.nextInt(MAX_VALUE_OF_KEYWORD);
-						writer.write(Integer.toString(keyword));
-						
-						if (k == numberOfKeywords - 1) writer.write("\n");
-						else writer.write(",");
-					}
+					writeQuery(writer, j);
 				}
 			}
 			writer.flush();
+		}
+	}
+	
+	public static void generateSGNNKQueryFile(File queryFile, int numberOfGNNKQueries, 
+			int numberOfIndividualQueries, String aggregatorName) throws IOException {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(queryFile))) {
+			writer.write(numberOfGNNKQueries + "\n");
+			
+			for (int i = 0; i < numberOfGNNKQueries; i++) {
+				writer.write(aggregatorName + "\n");
+				writer.write(String.format("%d\n%d\n", 
+						numberOfIndividualQueries, numberOfIndividualQueries / 2));
+				
+				for (int j = 0; j < numberOfIndividualQueries; j++) {
+					writeQuery(writer, j);
+				}
+			}
+			writer.flush();
+		}
+	}
+
+	private static void writeQuery(BufferedWriter writer, int queryId) throws IOException {
+//		double x = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
+//		double y = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
+		
+		double x = 33 + RANDOM.nextDouble() * 7;
+		double y = -115 + RANDOM.nextDouble() * 35;
+		
+		writer.write(queryId + "," + x + "," + y + ",");
+		
+		int numberOfKeywords = 1 + RANDOM.nextInt(MAX_NUMBER_OF_KEYWORDS);
+		for (int k = 0; k < numberOfKeywords; k++) {
+			int keyword = RANDOM.nextInt(MAX_VALUE_OF_KEYWORD);
+			writer.write(Integer.toString(keyword));
+			
+			if (k == numberOfKeywords - 1) writer.write("\n");
+			else writer.write(",");
 		}
 	}
 	
