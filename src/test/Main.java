@@ -32,9 +32,7 @@ public class Main {
 		PropertySet ps2 = new PropertySet();
 		int indexIdentifier = 1; // (in this case I know that it is equal to 1)
 		ps2.setProperty("IndexIdentifier", indexIdentifier);
-		IRTree tree = new IRTree(ps2, diskfile);
 
-		InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
 
 		int count = 0;
 		long startTime = 0;
@@ -49,8 +47,10 @@ public class Main {
 		startTime = System.currentTimeMillis();
 		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
 		for (GNNKQuery q : gnnkQueries) {
+			InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
+			IRTree tree = new IRTree(ps2, diskfile);
 //			List<NNEntry> results = tree.gnnkWithQuerySupernode(invertedFile, q, topk);
-			List<NNEntry> results = tree.gnnk(invertedFile, q, topk);
+			List<NNEntry> results = tree.gnnkWithPrunning(invertedFile, q, topk);
 //			List<NNEntry> results = tree.gnnkBaseline(invertedFile, q, topk);
 			writer.writeResult(results);
 
@@ -65,8 +65,8 @@ public class Main {
 		writer.close();
 
 		System.out.println("Average time millisecond: " + totalTime * 1.0 / count);
-		System.out.println("Average total IO: " + (tree.getIO() + ivIO) * 1.0 / count);
-		System.out.println("Average tree IO: " + tree.getIO() * 1.0 / count);
-		System.out.println("Average inverted index IO: " + ivIO * 1.0 / count);
+//		System.out.println("Average total IO: " + (tree.getIO() + ivIO) * 1.0 / count);
+//		System.out.println("Average tree IO: " + tree.getIO() * 1.0 / count);
+//		System.out.println("Average inverted index IO: " + ivIO * 1.0 / count);
 	}
 }

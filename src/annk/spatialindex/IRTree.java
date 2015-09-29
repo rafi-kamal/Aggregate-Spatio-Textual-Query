@@ -1,14 +1,15 @@
 package annk.spatialindex;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import annk.domain.GNNKQuery;
+import annk.domain.SGNNKQuery;
 import documentindex.InvertedFile;
 import query.Query;
 import spatialindex.rtree.Node;
@@ -137,10 +138,8 @@ public class IRTree extends RTree {
 	 * @return A list of objects with size at most k, 
 	 * where objects are sorted according to the decreasing value of their costs.
 	 */
-	public List<NNEntry> gnnkBaseline(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
+	public List<NNEntry> gnnk(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
 			throws Exception {
-		
-		int[] b = new int[15];
 		
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
@@ -208,8 +207,83 @@ public class IRTree extends RTree {
 		return results;
 	}
 	
-	public List<NNEntry> gnnk(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
+	/**
+	 * @return A list of objects with size at most k, 
+	 * where objects are sorted according to the decreasing value of their costs.
+	 */
+	public List<NNEntry> sgnnk(InvertedFile invertedFile, SGNNKQuery sgnnkQuery, int topk, int m)
 			throws Exception {
+		
+		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
+		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
+		queue.add(root);
+
+		List<NNEntry> results = new ArrayList<>();
+
+		while (queue.size() != 0) {
+			NNEntry first = queue.poll();
+			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
+
+			if (rTreeEntry.isLeafEntry) {
+				if (results.size() < topk)
+					results.add(first);
+				else 
+					break;
+			} else {
+				Node n = readNode(rTreeEntry.getIdentifier());
+				
+				noOfVisitedNodes++;
+				
+				// For each child node, calculate the cost for all queries.
+				// The first parameter is the index of the child node, second parameter is the
+				// corresponding list of costs calculated for individual queries
+				HashMap<Integer, List<Double>> costs = new HashMap<>();
+				for (int child = 0; child < n.children; child++) {
+					costs.put(child, new ArrayList<Double>());
+				}
+//				int[] children = Arrays.copyOfRange(n.pIdentifiers, 0, n.children);
+//				System.out.println(n.identifier + ", " + n.level + ": " + Arrays.toString(children));
+				
+				invertedFile.load(n.identifier);
+				for (Query q : sgnnkQuery.queries) {
+					HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords);
+					
+					for (int child = 0; child < n.children; child++) {
+						int childId = n.pIdentifiers[child];
+						double irScore = 0;
+						if (similarities.containsKey(childId)) 
+							irScore = similarities.get(childId);
+						
+						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
+						double queryCost = combinedScore(spatialCost, irScore);
+						costs.get(child).add(queryCost);
+					}
+				}
+				
+				// Individual query costs are calculated, now calculate aggregate query cost
+				for (int child = 0; child < n.children; child++) {
+					List<Double> queryCosts = costs.get(child);
+					double aggregateCost = sgnnkQuery.aggregator.getAggregateValue(queryCosts);
+					
+					if (n.level == 0) {
+						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], true);
+					} else {
+						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], false);
+					}
+
+					queue.add(new NNEntry(rTreeEntry, aggregateCost));
+				}
+			}
+		}
+
+		Collections.sort(results);
+		return results;
+	}
+	
+	public List<NNEntry> gnnkWithPrunning(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
+			throws Exception {
+		
+		Map<Integer, List<String>> levelVsCost = new HashMap<>();
 		
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>(100, new Comparator<NNEntry>() {
 
@@ -240,17 +314,26 @@ public class IRTree extends RTree {
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
+			
+			if (first.cost > costBound)
+				continue;
+			
+			if (!levelVsCost.containsKey(first.level)) {
+				levelVsCost.put(first.level, new ArrayList<String>());
+			}
+			levelVsCost.get(first.level).add(
+					String.format("%02d-%s", noOfVisitedNodes, first.getCost()));
 
 			if (rTreeEntry.isLeafEntry) {
-				if (first.cost > costBound)
-					continue;
+//				if (first.cost > costBound)
+//					continue;
 				
 				currentBestObjects.add(first);
 				currentBestObjects.poll();
 				costBound = currentBestObjects.peek().cost;
 			} else {
-				if (first.getCost() > costBound)
-					continue;
+//				if (first.cost > costBound)
+//					continue;
 				
 				Node n = readNode(rTreeEntry.getIdentifier());
 				
@@ -298,6 +381,12 @@ public class IRTree extends RTree {
 					queue.add(entry);
 				}
 			}
+		}
+		
+		for (Integer level : levelVsCost.keySet()) {
+			List<String> costs = levelVsCost.get(level);
+			Collections.sort(costs);
+			System.out.println(level + ":" + costs);
 		}
 
 		List<NNEntry> results = new ArrayList<>(currentBestObjects);

@@ -18,4 +18,12 @@ public class GNNKQuery extends AggregateQuery {
 			+ ", queries=" + queries + "]";
 	}
 	
+	public static class Result extends AggregateQuery.Result {
+
+		public Result(int id, double cost) {
+			super(id, cost);
+		}
+		
+	}
+	
 }

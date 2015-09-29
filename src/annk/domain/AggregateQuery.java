@@ -42,4 +42,23 @@ public class AggregateQuery {
 		
 		return new ArrayList<>(keywords);
 	}
+	
+	public static class Result {
+		/**
+		 * ID of the data object
+		 */
+		public int id;
+		public double cost;
+
+		public Result(int id, double cost) {
+			this.id = id;
+			this.cost = cost;
+		}
+
+		@Override
+		public String toString() {
+			return "Result [id=" + id + ", cost=" + cost + "]";
+		}
+
+	}
 }

@@ -23,4 +23,19 @@ public class SGNNKQuery extends AggregateQuery {
 			+ ", queries=" + queries + ", subGroupSize=" + subGroupSize + "]";
 	}
 	
+	public static class Result extends AggregateQuery.Result {
+		public List<Integer> queryIds;
+
+		public Result(int id, double cost, List<Integer> queryIds) {
+			super(id, cost);
+			this.queryIds = queryIds;
+		}
+
+		@Override
+		public String toString() {
+			return "Result [id=" + id + ", cost=" + cost + ", queryIds=" + queryIds + "]";
+		}
+		
+	}
+	
 }

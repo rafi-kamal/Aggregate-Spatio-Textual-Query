@@ -16,7 +16,7 @@ public class NNEntry implements Comparable<NNEntry> {
 	}
 	
 	public double getCost() {
-		return Math.pow(level, 1) + cost;
+		return Math.pow(level, 10) + cost;
 	}
 	
 	public int compareTo(NNEntry other) {
