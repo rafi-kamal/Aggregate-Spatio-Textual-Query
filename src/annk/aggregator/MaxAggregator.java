@@ -14,5 +14,10 @@ public class MaxAggregator implements IAggregator {
 	public String getName() {
 		return "MAX";
 	}
+
+	@Override
+	public double getAggregateValue(Double value, int m) {
+		return value;
+	}
 	
 }

@@ -241,8 +241,6 @@ public class IRTree extends RTree {
 				for (int child = 0; child < n.children; child++) {
 					costs.put(child, new ArrayList<Double>());
 				}
-//				int[] children = Arrays.copyOfRange(n.pIdentifiers, 0, n.children);
-//				System.out.println(n.identifier + ", " + n.level + ": " + Arrays.toString(children));
 				
 				invertedFile.load(n.identifier);
 				for (Query q : sgnnkQuery.queries) {

@@ -17,5 +17,10 @@ public class SumAggregator implements IAggregator {
 	public String getName() {
 		return "SUM";
 	}
+
+	@Override
+	public double getAggregateValue(Double value, int m) {
+		return m * value;
+	}
 	
 }
