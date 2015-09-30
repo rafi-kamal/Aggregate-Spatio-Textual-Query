@@ -43,7 +43,7 @@ public class AggregateQuery {
 		return new ArrayList<>(keywords);
 	}
 	
-	public static class Result {
+	public static class Result implements Comparable<Result>{
 		/**
 		 * ID of the data object
 		 */
@@ -53,6 +53,15 @@ public class AggregateQuery {
 		public Result(int id, double cost) {
 			this.id = id;
 			this.cost = cost;
+		}
+		
+		@Override
+		public int compareTo(Result other) {
+			if (this.cost < other.cost)
+				return -1;
+			if (this.cost > other.cost)
+				return 1;
+			return 0;
 		}
 
 		@Override

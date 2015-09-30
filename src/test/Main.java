@@ -3,6 +3,7 @@ package test;
 import java.util.List;
 
 import annk.domain.GNNKQuery;
+import annk.domain.SGNNKQuery;
 import annk.spatialindex.IRTree;
 import documentindex.InvertedFile;
 import io.QueryFileReader;
@@ -33,7 +34,6 @@ public class Main {
 		int indexIdentifier = 1; // (in this case I know that it is equal to 1)
 		ps2.setProperty("IndexIdentifier", indexIdentifier);
 
-
 		int count = 0;
 		long startTime = 0;
 		long totalTime = 0;
@@ -42,22 +42,26 @@ public class Main {
 		int totalVisitedNodes = 0;
 
 		QueryFileReader reader = new QueryFileReader(queryFile);
-		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
+//		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
+		List<SGNNKQuery> gnnkQueries = reader.readSGNNKQueries();
 		
 		startTime = System.currentTimeMillis();
 		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
-		for (GNNKQuery q : gnnkQueries) {
+		for (SGNNKQuery q : gnnkQueries) {
 			InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
 			IRTree tree = new IRTree(ps2, diskfile);
 //			List<NNEntry> results = tree.gnnkWithQuerySupernode(invertedFile, q, topk);
-			List<NNEntry> results = tree.gnnkWithPrunning(invertedFile, q, topk);
+//			List<NNEntry> results = tree.gnnkWithPrunning(invertedFile, q, topk);
 //			List<NNEntry> results = tree.gnnkBaseline(invertedFile, q, topk);
-			writer.writeResult(results);
+			
+			List<SGNNKQuery.Result> results = tree.sgnnk(invertedFile, q, topk);
+			writer.writeSGNNKResult(results);
 
 			totalVisitedNodes += tree.noOfVisitedNodes;
 			ivIO += invertedFile.getIO();
 			count++;
 		}
+		
 		totalTime = System.currentTimeMillis() - startTime;
 		
 		writer.write("Average nodes visited: " + totalVisitedNodes * 1.0 / count);

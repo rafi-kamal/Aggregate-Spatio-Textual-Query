@@ -4,9 +4,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import annk.domain.SGNNKQuery;
 import spatialindex.spatialindex.NNEntry;
 
 public class ResultWriter {
@@ -27,10 +29,19 @@ public class ResultWriter {
 		this(noOfQueries, false);
 	}
 	
-	public void writeResult(List<NNEntry> results) throws IOException {
+	public void writeGNNKResult(List<NNEntry> results) throws IOException {
 		write("Query " + queryCount);
 		for (NNEntry result : results) {
 			write(String.format("%d %.3f", result.node.getIdentifier(), result.cost));
+		}
+		queryCount++;
+		write("");
+	}
+	
+	public void writeSGNNKResult(List<SGNNKQuery.Result> results) throws IOException {
+		write("Query " + queryCount);
+		for (SGNNKQuery.Result result : results) {
+			write(String.format("%d %.3f %s", result.id, result.cost, result.queryIds.toString()));
 		}
 		queryCount++;
 		write("");
