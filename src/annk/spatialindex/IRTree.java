@@ -79,7 +79,7 @@ public class IRTree extends RTree {
 						int childId = n.pIdentifiers[child];
 						double irScore = 0;
 						if (similarities.containsKey(childId)) 
-							irScore = similarities.get(childId);
+							irScore = similarities.get(childId) / q.keywords.size();
 						
 						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
 						double queryCost = combinedScore(spatialCost, irScore);
@@ -179,7 +179,7 @@ public class IRTree extends RTree {
 						int childId = n.pIdentifiers[child];
 						double irScore = 0;
 						if (similarities.containsKey(childId)) 
-							irScore = similarities.get(childId);
+							irScore = similarities.get(childId) / q.keywords.size();
 						
 						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
 						double queryCost = combinedScore(spatialCost, irScore);
@@ -250,7 +250,7 @@ public class IRTree extends RTree {
 						int childId = n.pIdentifiers[child];
 						double irScore = 0;
 						if (similarities.containsKey(childId)) 
-							irScore = similarities.get(childId);
+							irScore = similarities.get(childId) / q.keywords.size();
 						
 						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
 						double queryCost = combinedScore(spatialCost, irScore);
@@ -383,7 +383,7 @@ public class IRTree extends RTree {
 						int childId = n.pIdentifiers[child];
 						double irScore = 0;
 						if (similarities.containsKey(childId)) 
-							irScore = similarities.get(childId);
+							irScore = similarities.get(childId) / q.keywords.size();
 						
 						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
 						double queryCost = combinedScore(spatialCost, irScore);
