@@ -160,32 +160,8 @@ public class IRTree extends RTree {
 				Node n = readNode(rTreeEntry.getIdentifier());
 				
 				noOfVisitedNodes++;
-				
-				// For each child node, calculate the cost for all queries.
-				// The first parameter is the index of the child node, second parameter is the
-				// corresponding list of costs calculated for individual queries
-				HashMap<Integer, List<Double>> costs = new HashMap<>();
-				for (int child = 0; child < n.children; child++) {
-					costs.put(child, new ArrayList<Double>());
-				}
-//				int[] children = Arrays.copyOfRange(n.pIdentifiers, 0, n.children);
-//				System.out.println(n.identifier + ", " + n.level + ": " + Arrays.toString(children));
-				
-				invertedFile.load(n.identifier);
-				for (Query q : gnnkQuery.queries) {
-					HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords);
-					
-					for (int child = 0; child < n.children; child++) {
-						int childId = n.pIdentifiers[child];
-						double irScore = 0;
-						if (similarities.containsKey(childId)) 
-							irScore = similarities.get(childId) / q.keywords.size();
-						
-						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
-						double queryCost = combinedScore(spatialCost, irScore);
-						costs.get(child).add(queryCost);
-					}
-				}
+
+				HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, gnnkQuery.queries, n);
 				
 				// Individual query costs are calculated, now calculate aggregate query cost
 				for (int child = 0; child < n.children; child++) {
@@ -234,29 +210,7 @@ public class IRTree extends RTree {
 				
 				noOfVisitedNodes++;
 				
-				// For each child node, calculate the cost for all queries.
-				// The first parameter is the index of the child node, second parameter is the
-				// corresponding list of costs calculated for individual queries
-				HashMap<Integer, List<Double>> costs = new HashMap<>();
-				for (int child = 0; child < n.children; child++) {
-					costs.put(child, new ArrayList<Double>());
-				}
-				
-				invertedFile.load(n.identifier);
-				for (Query q : sgnnkQuery.queries) {
-					HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords);
-					
-					for (int child = 0; child < n.children; child++) {
-						int childId = n.pIdentifiers[child];
-						double irScore = 0;
-						if (similarities.containsKey(childId)) 
-							irScore = similarities.get(childId) / q.keywords.size();
-						
-						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
-						double queryCost = combinedScore(spatialCost, irScore);
-						costs.get(child).add(queryCost);
-					}
-				}
+				HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
 				
 				// Individual query costs are calculated, now calculate aggregate query cost
 				for (int child = 0; child < n.children; child++) {
@@ -304,6 +258,37 @@ public class IRTree extends RTree {
 
 		Collections.sort(results);
 		return results;
+	}
+
+
+	/**
+	 * For each child node, calculate the cost for all queries.
+	 * The first parameter of the result map is the index of the child node, 
+	 * second parameter is the corresponding list of costs calculated for individual queries.
+	 */
+	private HashMap<Integer, List<Double>> calculateQueryCosts(InvertedFile invertedFile, List<Query> queries, Node n)
+			throws Exception {
+		HashMap<Integer, List<Double>> costs = new HashMap<>();
+		for (int child = 0; child < n.children; child++) {
+			costs.put(child, new ArrayList<Double>());
+		}
+		
+		invertedFile.load(n.identifier);
+		for (Query q : queries) {
+			HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords);
+			
+			for (int child = 0; child < n.children; child++) {
+				int childId = n.pIdentifiers[child];
+				double irScore = 0;
+				if (similarities.containsKey(childId)) 
+					irScore = similarities.get(childId) / q.keywords.size();
+				
+				double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
+				double queryCost = combinedScore(spatialCost, irScore);
+				costs.get(child).add(queryCost);
+			}
+		}
+		return costs;
 	}
 	
 	public List<NNEntry> gnnkWithPrunning(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
@@ -362,34 +347,9 @@ public class IRTree extends RTree {
 //					continue;
 				
 				Node n = readNode(rTreeEntry.getIdentifier());
-				
 				noOfVisitedNodes++;
-				
-				// For each child node, calculate the cost for all queries.
-				// The first parameter is the index of the child node, second parameter is the
-				// corresponding list of costs calculated for individual queries
-				HashMap<Integer, List<Double>> costs = new HashMap<>();
-				for (int child = 0; child < n.children; child++) {
-					costs.put(child, new ArrayList<Double>());
-				}
-//				int[] children = Arrays.copyOfRange(n.pIdentifiers, 0, n.children);
-//				System.out.println(n.identifier + ", " + n.level + ": " + Arrays.toString(children));
-				
-				invertedFile.load(n.identifier);
-				for (Query q : gnnkQuery.queries) {
-					HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords);
-					
-					for (int child = 0; child < n.children; child++) {
-						int childId = n.pIdentifiers[child];
-						double irScore = 0;
-						if (similarities.containsKey(childId)) 
-							irScore = similarities.get(childId) / q.keywords.size();
-						
-						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
-						double queryCost = combinedScore(spatialCost, irScore);
-						costs.get(child).add(queryCost);
-					}
-				}
+
+				HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, gnnkQuery.queries, n);
 				
 				// Individual query costs are calculated, now calculate aggregate query cost
 				for (int child = 0; child < n.children; child++) {
