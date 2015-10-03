@@ -43,10 +43,10 @@ public class IRTree extends RTree {
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
 
 			if (rTreeEntry.isLeafEntry) {
-				if (results.size() < topk)
+//				if (results.size() < topk)
 					results.add(first);
-				else 
-					break;
+//				else 
+//					break;
 			} else {
 				Node n = readNode(rTreeEntry.getIdentifier());
 				
@@ -58,6 +58,10 @@ public class IRTree extends RTree {
 				for (int child = 0; child < n.children; child++) {
 					List<Double> queryCosts = costs.get(child);
 					double aggregateCost = gnnkQuery.aggregator.getAggregateValue(queryCosts);
+					
+					Collections.sort(queryCosts);
+					if (n.getChildIdentifier(child) == 57745)
+						System.out.println(queryCosts);
 					
 					if (n.level == 0) {
 						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], true);
@@ -135,6 +139,9 @@ public class IRTree extends RTree {
 					minimumQueryCosts = minimumQueryCosts.subList(0, sgnnkQuery.subGroupSize);
 					
 					double aggregateCost = sgnnkQuery.aggregator.getAggregateValue(minimumQueryCosts);
+					Collections.sort(queryCosts);
+					if (n.pIdentifiers[child] == 57745)
+						System.out.println(queryCosts);
 					
 					if (n.level == 0) {
 						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], true);

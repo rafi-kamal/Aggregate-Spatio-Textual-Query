@@ -9,8 +9,8 @@ public class SumAggregator implements IAggregator {
 	@Override
 	public double getAggregateValue(List<Double> values) {
 		double aggregateValue = 0;
-		for (int i = 0; i < values.size(); i++) {
-			aggregateValue += values.get(i);
+		for (Double value : values) {
+			aggregateValue += value;
 		}
 		return aggregateValue;
 	}

@@ -18,7 +18,7 @@ import spatialindex.storagemanager.PropertySet;
 public class Main {
 	public static void main(String[] args) throws Exception {
 		if (args.length != 4) {
-			System.out.println("Usage: GNNK index_file query_file topk alpha");
+			System.out.println("Usage: Main index_file query_file topk alpha");
 			System.exit(-1);
 		}
 
@@ -43,21 +43,21 @@ public class Main {
 		int totalVisitedNodes = 0;
 
 		QueryFileReader reader = new QueryFileReader(queryFile);
-		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
-//		List<SGNNKQuery> gnnkQueries = reader.readSGNNKQueries();
+//		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
+		List<SGNNKQuery> gnnkQueries = reader.readSGNNKQueries();
 		
 		startTime = System.currentTimeMillis();
 		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
-		for (GNNKQuery q : gnnkQueries) {
+		for (SGNNKQuery q : gnnkQueries) {
 			InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
 			IRTree tree = new IRTree(ps2, diskfile);
 //			List<NNEntry> results = tree.gnnkWithQuerySupernode(invertedFile, q, topk);
 //			List<NNEntry> results = tree.gnnkWithPrunning(invertedFile, q, topk);
-			List<NNEntry> results = tree.gnnk(invertedFile, q, topk);
-			writer.writeGNNKResult(results);
+//			List<NNEntry> results = tree.gnnk(invertedFile, q, topk);
+//			writer.writeGNNKResult(results);
 			
-//			List<SGNNKQuery.Result> results = tree.sgnnk(invertedFile, q, topk);
-//			writer.writeSGNNKResult(results);
+			List<SGNNKQuery.Result> results = tree.sgnnk(invertedFile, q, topk);
+			writer.writeSGNNKResult(results);
 
 //			Map<Integer, List<SGNNKQuery.Result>> results = tree.sgnnkExtended(invertedFile, q, topk);
 //			for (Integer subgroupSize : results.keySet()) {
