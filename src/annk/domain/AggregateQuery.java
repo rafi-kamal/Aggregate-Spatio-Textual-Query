@@ -13,6 +13,13 @@ import spatialindex.spatialindex.Region;
 public class AggregateQuery {
 	public List<Query> queries;
 	public IAggregator aggregator;
+	public int groupSize;
+	
+	public AggregateQuery(List<Query> queries, IAggregator aggregator) {
+		this.queries = queries;
+		this.aggregator = aggregator;
+		this.groupSize = queries.size();
+	}
 
 	public Region getMBR() {
 		double lowerX = Double.MAX_VALUE;

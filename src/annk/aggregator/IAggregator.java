@@ -10,6 +10,10 @@ public interface IAggregator {
 	 */
 	double getAggregateValue(List<Double> values);
 	
+	void initializeAccmulator();
+	void accumulate(Double value);
+	double getAccumulatedValue();
+	
 	/**
 	 * Apply the aggregate function <code>m</code> times over <code>value</code>
 	 * 

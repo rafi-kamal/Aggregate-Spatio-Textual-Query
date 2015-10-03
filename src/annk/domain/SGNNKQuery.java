@@ -9,9 +9,8 @@ public class SGNNKQuery extends AggregateQuery {
 	public int subGroupSize;
 
 	public SGNNKQuery(List<Query> queries, int subGroupSize, IAggregator aggregator) {
-		this.queries = queries;
+		super(queries, aggregator);
 		this.subGroupSize = subGroupSize;
-		this.aggregator = aggregator;
 		
 		assert subGroupSize <= queries.size() : 
 			"Sub-group size must be less then the number of queries";

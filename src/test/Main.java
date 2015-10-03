@@ -1,6 +1,7 @@
 package test;
 
 import java.util.List;
+import java.util.Map;
 
 import annk.domain.GNNKQuery;
 import annk.domain.SGNNKQuery;
@@ -42,24 +43,33 @@ public class Main {
 		int totalVisitedNodes = 0;
 
 		QueryFileReader reader = new QueryFileReader(queryFile);
-//		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
-		List<SGNNKQuery> gnnkQueries = reader.readSGNNKQueries();
+		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
+//		List<SGNNKQuery> gnnkQueries = reader.readSGNNKQueries();
 		
 		startTime = System.currentTimeMillis();
 		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
-		for (SGNNKQuery q : gnnkQueries) {
+		for (GNNKQuery q : gnnkQueries) {
 			InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
 			IRTree tree = new IRTree(ps2, diskfile);
 //			List<NNEntry> results = tree.gnnkWithQuerySupernode(invertedFile, q, topk);
 //			List<NNEntry> results = tree.gnnkWithPrunning(invertedFile, q, topk);
-//			List<NNEntry> results = tree.gnnkBaseline(invertedFile, q, topk);
+			List<NNEntry> results = tree.gnnk(invertedFile, q, topk);
+			writer.writeGNNKResult(results);
 			
-			List<SGNNKQuery.Result> results = tree.sgnnk(invertedFile, q, topk);
-			writer.writeSGNNKResult(results);
+//			List<SGNNKQuery.Result> results = tree.sgnnk(invertedFile, q, topk);
+//			writer.writeSGNNKResult(results);
+
+//			Map<Integer, List<SGNNKQuery.Result>> results = tree.sgnnkExtended(invertedFile, q, topk);
+//			for (Integer subgroupSize : results.keySet()) {
+//				writer.write("Size " + subgroupSize);
+//				writer.writeSGNNKResult(results.get(subgroupSize));
+//			}
 
 			totalVisitedNodes += tree.noOfVisitedNodes;
 			ivIO += invertedFile.getIO();
 			count++;
+			
+			writer.write("========================================");
 		}
 		
 		totalTime = System.currentTimeMillis() - startTime;
