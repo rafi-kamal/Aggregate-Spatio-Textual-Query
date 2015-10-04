@@ -297,12 +297,13 @@ public class DiskStorageManager implements IStorageManager
 
 				try
 				{
-					m_dataFile.seek(cPage * m_pageSize);
+					m_dataFile.seek((long) cPage * m_pageSize);
 					m_dataFile.write(m_buffer);
 				}
 				catch (IOException ex)
 				{
-					throw new IllegalStateException("Corrupted data file.");
+					ex.printStackTrace();
+					System.exit(1);
 				}
 
 				cIndex += cLen;
@@ -360,7 +361,8 @@ public class DiskStorageManager implements IStorageManager
 				}
 				catch (IOException ex)
 				{
-					throw new IllegalStateException("Corrupted data file.");
+					ex.printStackTrace();
+					System.exit(1);
 				}
 
 				cIndex += cLen;

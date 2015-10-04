@@ -34,3 +34,5 @@ for keyword_list, latitude, longitude in reader:
 		id += 1
 
 print id, len(keyword_map)
+
+# 40389114 4700739
