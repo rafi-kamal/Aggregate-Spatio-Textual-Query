@@ -243,13 +243,15 @@ public class DiskStorageManager implements IStorageManager
 		{
 			try
 			{
-				m_dataFile.seek(((Integer) e.m_pages.get(cNext)).intValue() * m_pageSize);
+				int mPage = (Integer) e.m_pages.get(cNext);
+				m_dataFile.seek((long) mPage * m_pageSize);
 				int bytesread = m_dataFile.read(m_buffer);
 				if (bytesread != m_pageSize) throw new IllegalStateException("Corrupted data file.");
 			}
 			catch (IOException ex)
 			{
-				throw new IllegalStateException("Corrupted data file.");
+				ex.printStackTrace();
+				System.exit(1);
 			}
 
 			cLen = (cRem > m_pageSize) ? m_pageSize : cRem;
@@ -356,7 +358,7 @@ public class DiskStorageManager implements IStorageManager
 
 				try
 				{
-					m_dataFile.seek(cPage * m_pageSize);
+					m_dataFile.seek((long) cPage * m_pageSize);
 					m_dataFile.write(m_buffer);
 				}
 				catch (IOException ex)
