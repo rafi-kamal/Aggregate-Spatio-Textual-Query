@@ -10,22 +10,33 @@ import documentindex.InvertedFile;
 import io.QueryFileReader;
 import io.ResultWriter;
 import spatialindex.rtree.RTree;
-import spatialindex.spatialindex.NNEntry;
 import spatialindex.storagemanager.DiskStorageManager;
 import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.PropertySet;
 
 public class Main {
+	/**
+	 * Query types
+	 * 1 - gnnk baseline
+	 * 2 - sgnnk baseline
+	 * 3 - gnnk
+	 * 4 - sgnnk
+	 * 5 - sgnnk extended
+	 */
 	public static void main(String[] args) throws Exception {
-		if (args.length != 4) {
-			System.out.println("Usage: Main index_file query_file topk alpha");
+		if (args.length < 5) {
+			System.out.println("Usage: Main index_file gnnk_query_file sgnnk_query_file topk alpha query_type");
 			System.exit(-1);
 		}
 
 		String indexFile = args[0];
-		String queryFile = args[1];
-		int topk = Integer.parseInt(args[2]);
-		RTree.alpha_dist = Double.parseDouble(args[3]);
+		String gnnkQueryFile = args[1];
+		String sgnnkQueryFile = args[2];
+		int topk = Integer.parseInt(args[3]);
+		RTree.alpha_dist = Double.parseDouble(args[4]);
+		int queryType = 3;
+		if (args.length > 5)
+			queryType = Integer.parseInt(args[5]);
 
 		PropertySet ps = new PropertySet();
 		ps.setProperty("FileName", indexFile + ".rtree");
@@ -41,35 +52,61 @@ public class Main {
 
 		int ivIO = 0;
 		int totalVisitedNodes = 0;
-
-		QueryFileReader reader = new QueryFileReader(queryFile);
-//		List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
-		List<SGNNKQuery> gnnkQueries = reader.readSGNNKQueries();
 		
 		startTime = System.currentTimeMillis();
-		ResultWriter writer = new ResultWriter(gnnkQueries.size(), true);
-		for (SGNNKQuery q : gnnkQueries) {
-			InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
-			IRTree tree = new IRTree(ps2, diskfile);
-//			List<NNEntry> results = tree.gnnkWithQuerySupernode(invertedFile, q, topk);
-//			List<NNEntry> results = tree.gnnkWithPrunning(invertedFile, q, topk);
-//			List<NNEntry> results = tree.gnnk(invertedFile, q, topk);
-//			writer.writeGNNKResult(results);
-			
-			List<SGNNKQuery.Result> results = tree.sgnnk(invertedFile, q, topk);
-			writer.writeSGNNKResult(results);
+		InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
+		IRTree tree = new IRTree(ps2, diskfile);
 
-//			Map<Integer, List<SGNNKQuery.Result>> results = tree.sgnnkExtended(invertedFile, q, topk);
-//			for (Integer subgroupSize : results.keySet()) {
-//				writer.write("Size " + subgroupSize);
-//				writer.writeSGNNKResult(results.get(subgroupSize));
-//			}
-
-			totalVisitedNodes += tree.noOfVisitedNodes;
-			ivIO += invertedFile.getIO();
-			count++;
+		ResultWriter writer;
+		if (queryType == 1 || queryType == 3) {
+			QueryFileReader reader = new QueryFileReader(gnnkQueryFile);
+			List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
+			writer = new ResultWriter(gnnkQueries.size(), true);
 			
-			writer.write("========================================");
+			for (GNNKQuery q : gnnkQueries) {
+				List<GNNKQuery.Result> results;
+				if (queryType == 1)
+					results = tree.gnnkBaseline(invertedFile, q, topk);
+				else
+					results = tree.gnnk(invertedFile, q, topk);
+				writer.writeGNNKResult(results);
+				
+				totalVisitedNodes += tree.noOfVisitedNodes;
+				ivIO += invertedFile.getIO();
+				count++;
+				
+				writer.write("========================================");
+			}
+		}
+		else {
+			QueryFileReader reader = new QueryFileReader(sgnnkQueryFile);
+			List<SGNNKQuery> sgnnkQueries = reader.readSGNNKQueries();
+			writer = new ResultWriter(sgnnkQueries.size(), true);
+			
+			for (SGNNKQuery q : sgnnkQueries) {
+				if (queryType == 5) {
+					Map<Integer, List<SGNNKQuery.Result>> results = tree.sgnnkExtended(invertedFile, q, topk);
+					for (Integer subgroupSize : results.keySet()) {
+						writer.write("Size " + subgroupSize);
+						writer.writeSGNNKResult(results.get(subgroupSize));
+					}
+				}
+				else {
+					List<SGNNKQuery.Result> results;
+					if (queryType == 2)
+						results = null;
+					else if (queryType == 4)
+						results = tree.sgnnk(invertedFile, q, topk);
+					results = tree.sgnnk(invertedFile, q, topk);
+					writer.writeSGNNKResult(results);
+				}
+		
+				totalVisitedNodes += tree.noOfVisitedNodes;
+				ivIO += invertedFile.getIO();
+				count++;
+				
+				writer.write("========================================");
+			}
 		}
 		
 		totalTime = System.currentTimeMillis() - startTime;

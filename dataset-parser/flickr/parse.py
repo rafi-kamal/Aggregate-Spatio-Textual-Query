@@ -16,9 +16,11 @@ id = 0				# id of the data object
 keyword_map = {}	# holds keyword string and corresponding integer id
 
 reader = csv.reader(input_file, delimiter = '\t')
-for keyword_list, latitude, longitude in reader:
+for keyword_list, longitude, latitude in reader:
 	if keyword_list and latitude and longitude:
-		# print keywords, latitude, longitude
+		# print latitude, longitude
+		if float(latitude) > 47 or float(latitude) < 28 or float(longitude) < -120 or float(longitude) > -70:
+			continue
 
 		keywords = keyword_list.split(',')
 		for keyword in keywords:

@@ -4,12 +4,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import annk.domain.GNNKQuery;
 import annk.domain.SGNNKQuery;
-import spatialindex.spatialindex.NNEntry;
 
 public class ResultWriter {
 	private BufferedWriter writer;
@@ -29,10 +28,10 @@ public class ResultWriter {
 		this(noOfQueries, false);
 	}
 	
-	public void writeGNNKResult(List<NNEntry> results) throws IOException {
+	public void writeGNNKResult(List<GNNKQuery.Result> results) throws IOException {
 		write("Query " + queryCount);
-		for (NNEntry result : results) {
-			write(String.format("%d %.3f", result.node.getIdentifier(), result.cost));
+		for (GNNKQuery.Result result : results) {
+			write(String.format("%d %.3f", result.id, result.cost));
 		}
 		queryCount++;
 		write("");
