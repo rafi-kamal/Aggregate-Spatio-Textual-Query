@@ -37,6 +37,9 @@ public class Weightcompute {
 
 			lr = new LineNumberReader(new FileReader(infile));
 			line = lr.readLine();
+			
+			double maxWeight = 0;
+			
 			while (line != null) {
 				String[] cols = line.split(",");
 				
@@ -65,6 +68,7 @@ public class Weightcompute {
 							+ lmd * totalFrequency / totalLength;
 					weight = Math.pow(weight, documentFrequency);
 					buf += word + " " + weight + ",";
+					maxWeight = Math.max(maxWeight, weight);
 				}
 				buf = buf.substring(0, buf.length() - 1);
 				out.println(wordID + "," + buf);
@@ -73,6 +77,8 @@ public class Weightcompute {
 			lr.close();
 			out.close();
 			fw.close();
+			
+			System.out.println(dic.size() + " " + maxWeight);
 
 		} catch (Exception e) {
 			e.printStackTrace();

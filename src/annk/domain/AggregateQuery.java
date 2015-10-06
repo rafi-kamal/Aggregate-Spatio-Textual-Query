@@ -66,9 +66,15 @@ public class AggregateQuery {
 		public int compareTo(Result other) {
 			if (this.cost < other.cost)
 				return -1;
-			if (this.cost > other.cost)
+			else if (this.cost > other.cost)
 				return 1;
-			return 0;
+			else {
+				if (this.id < other.id)
+					return -1;
+				else if (this.id > other.id)
+					return 1;
+				return 0;
+			}
 		}
 
 		@Override

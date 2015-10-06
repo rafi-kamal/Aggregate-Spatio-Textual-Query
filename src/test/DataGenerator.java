@@ -11,11 +11,11 @@ public class DataGenerator {
 	
 	private static final int DATA_SET_SIZE = 10000;
 	
-	private static final int NUMBER_OF_QUERIES = 3;
+	private static final int NUMBER_OF_QUERIES = 1;
 	private static final int NUMBER_OF_INDIVIDUAL_QUERIES = 10;
 	
 	private static final int MAX_NUMBER_OF_KEYWORDS = 4;
-	private static final int MAX_VALUE_OF_KEYWORD = 784;
+	private static final int MAX_VALUE_OF_KEYWORD = 566;
 	
 //	private static final double QUERY_AREA_COVERAGE = 0.1;
 	
@@ -104,8 +104,13 @@ public class DataGenerator {
 //		double x = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
 //		double y = RANDOM.nextDouble() * Math.sqrt(QUERY_AREA_COVERAGE);
 		
-		double x = 33 + RANDOM.nextDouble() * 7;
-		double y = -115 + RANDOM.nextDouble() * 35;
+		// yelp
+//		double x = 33 + RANDOM.nextDouble() * 7;
+//		double y = -115 + RANDOM.nextDouble() * 35;
+//		
+		// flickr
+		double x = 28 + RANDOM.nextDouble() * 19;
+		double y = -70 - RANDOM.nextDouble() * 50;
 		
 		writer.write(queryId + "," + x + "," + y + ",");
 		

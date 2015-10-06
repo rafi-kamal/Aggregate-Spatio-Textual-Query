@@ -2,8 +2,6 @@ package spatialindex.spatialindex;
 
 import java.util.List;
 
-import query.Query;
-
 /**
  * A holder class for R-tree node and corresponding cost.
  */
@@ -11,6 +9,7 @@ public class NNEntry implements Comparable<NNEntry> {
 
 	public IEntry node;
 	public List<Integer> queryIndices;
+	public List<Double> queryCosts;
 	public double cost;
 	// TODO temporary var, remove this
 	public int level = 0;
@@ -18,6 +17,12 @@ public class NNEntry implements Comparable<NNEntry> {
 	public NNEntry(IEntry node, List<Integer> queryIndices, double cost) {
 		this.node = node;
 		this.queryIndices = queryIndices;
+		this.cost = cost;
+	}
+
+	public NNEntry(IEntry node, double cost, List<Double> queryCosts) {
+		this.node = node;
+		this.queryCosts = queryCosts;
 		this.cost = cost;
 	}
 	

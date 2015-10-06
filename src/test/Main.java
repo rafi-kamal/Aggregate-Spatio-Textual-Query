@@ -1,10 +1,13 @@
 package test;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import annk.domain.GNNKQuery;
 import annk.domain.SGNNKQuery;
+import annk.domain.SGNNKQuery.Result;
 import annk.spatialindex.IRTree;
 import documentindex.InvertedFile;
 import io.QueryFileReader;
@@ -21,7 +24,8 @@ public class Main {
 	 * 2 - sgnnk baseline
 	 * 3 - gnnk
 	 * 4 - sgnnk
-	 * 5 - sgnnk extended
+	 * 5 - sgnnk * (n - m + 1)
+	 * 6 - sgnnk extended
 	 */
 	public static void main(String[] args) throws Exception {
 		if (args.length < 5) {
@@ -34,7 +38,7 @@ public class Main {
 		String sgnnkQueryFile = args[2];
 		int topk = Integer.parseInt(args[3]);
 		RTree.alpha_dist = Double.parseDouble(args[4]);
-		int queryType = 4;
+		int queryType = 6;
 		if (args.length > 5)
 			queryType = Integer.parseInt(args[5]);
 
@@ -50,12 +54,10 @@ public class Main {
 		long startTime = 0;
 		long totalTime = 0;
 
-		int ivIO = 0;
+//		int ivIO = 0;
 		int totalVisitedNodes = 0;
 		
 		startTime = System.currentTimeMillis();
-		InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
-		IRTree tree = new IRTree(ps2, diskfile);
 
 		ResultWriter writer;
 		if (queryType == 1 || queryType == 3) {
@@ -64,15 +66,22 @@ public class Main {
 			writer = new ResultWriter(gnnkQueries.size(), true);
 			
 			for (GNNKQuery q : gnnkQueries) {
+				InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
+				IRTree tree = new IRTree(ps2, diskfile);
+				
 				List<GNNKQuery.Result> results;
-				if (queryType == 1)
+				if (queryType == 1) {
+					System.out.println("GNNK Baseline");
 					results = tree.gnnkBaseline(invertedFile, q, topk);
-				else
+				}
+				else {
+					System.out.println("GNNK");
 					results = tree.gnnk(invertedFile, q, topk);
+				}
 				writer.writeGNNKResult(results);
 				
 				totalVisitedNodes += tree.noOfVisitedNodes;
-				ivIO += invertedFile.getIO();
+//				ivIO += invertedFile.getIO();
 				count++;
 				
 				writer.write("========================================");
@@ -84,25 +93,54 @@ public class Main {
 			writer = new ResultWriter(sgnnkQueries.size(), true);
 			
 			for (SGNNKQuery q : sgnnkQueries) {
-				if (queryType == 5) {
+				if (queryType == 6) {
+					InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
+					IRTree tree = new IRTree(ps2, diskfile);
+					
+					System.out.println("SGNNK Extended");
 					Map<Integer, List<SGNNKQuery.Result>> results = tree.sgnnkExtended(invertedFile, q, topk);
-					for (Integer subgroupSize : results.keySet()) {
+					List<Integer> subroupSizes = new ArrayList<Integer>(results.keySet());
+					Collections.sort(subroupSizes);
+					for (Integer subgroupSize : subroupSizes) {
 						writer.write("Size " + subgroupSize);
 						writer.writeSGNNKResult(results.get(subgroupSize));
 					}
+					totalVisitedNodes += tree.noOfVisitedNodes;
+				}
+				else if (queryType == 5) {
+					System.out.println("SGNNK Extended Baseline");
+					while (q.subGroupSize <= q.groupSize) {
+						InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
+						IRTree tree = new IRTree(ps2, diskfile);
+						
+						writer.write("Size " + q.subGroupSize);
+						List<Result> results = tree.sgnnk(invertedFile, q, topk);
+						writer.writeSGNNKResult(results);
+						
+						q.subGroupSize++;
+						totalVisitedNodes += tree.noOfVisitedNodes;
+					}
 				}
 				else {
+					InvertedFile invertedFile = new InvertedFile(indexFile, 4096);
+					IRTree tree = new IRTree(ps2, diskfile);
+					
 					List<SGNNKQuery.Result> results;
-					if (queryType == 2)
+					if (queryType == 2) {
+						System.out.println("SGNNK Baseline");
 						results = tree.sgnnkBaseline(invertedFile, q, topk);
-					else if (queryType == 4)
+					}
+					else if (queryType == 4) {
+						System.out.println("SGNNK");
 						results = tree.sgnnk(invertedFile, q, topk);
+					}
 					results = tree.sgnnk(invertedFile, q, topk);
+					
 					writer.writeSGNNKResult(results);
+					totalVisitedNodes += tree.noOfVisitedNodes;
 				}
 		
-				totalVisitedNodes += tree.noOfVisitedNodes;
-				ivIO += invertedFile.getIO();
+//				ivIO += invertedFile.getIO();
 				count++;
 				
 				writer.write("========================================");

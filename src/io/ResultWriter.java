@@ -41,15 +41,25 @@ public class ResultWriter {
 		write("Query " + queryCount);
 		for (SGNNKQuery.Result result : results) {
 			write(String.format("%d %.3f %s", result.id, result.cost, result.queryIds.toString()));
+//			write(String.format("%d %.3f, ", result.id, result.cost));
 		}
 		queryCount++;
 		write("");
 	}
 	
 	public void write(String str) throws IOException {
+		write(str, true);
+	}
+	
+	public void write(String str, boolean printNewline) throws IOException {
 		if (printInConsole)
-			System.out.println(str);
-		writer.write(str + "\n");
+			System.out.print(str);
+		writer.write(str);
+		if (printNewline) {
+			if (printInConsole)
+				System.out.println();
+			writer.write("\n");
+		}
 	}
 	
 	public void close() throws IOException {
