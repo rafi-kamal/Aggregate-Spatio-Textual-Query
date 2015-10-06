@@ -34,7 +34,7 @@ public class Main {
 		String sgnnkQueryFile = args[2];
 		int topk = Integer.parseInt(args[3]);
 		RTree.alpha_dist = Double.parseDouble(args[4]);
-		int queryType = 3;
+		int queryType = 4;
 		if (args.length > 5)
 			queryType = Integer.parseInt(args[5]);
 
@@ -94,7 +94,7 @@ public class Main {
 				else {
 					List<SGNNKQuery.Result> results;
 					if (queryType == 2)
-						results = null;
+						results = tree.sgnnkBaseline(invertedFile, q, topk);
 					else if (queryType == 4)
 						results = tree.sgnnk(invertedFile, q, topk);
 					results = tree.sgnnk(invertedFile, q, topk);

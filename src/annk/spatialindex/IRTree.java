@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -30,9 +31,9 @@ public class IRTree extends RTree {
 			throws Exception {
 		noOfVisitedNodes = 0;
 		
-		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
+		LinkedList<NNEntry> list = new LinkedList<>();
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
-		queue.add(root);
+		list.add(root);
 
 		// Current (at most) k best objects, sorted according to their decreasing value of cost.
 		// So the highest cost object will always be on top.
@@ -46,8 +47,8 @@ public class IRTree extends RTree {
 		// Cost of the highest valued node of current best objects
 		double costBound = Double.MAX_VALUE;
 
-		while (queue.size() != 0) {
-			NNEntry first = queue.poll();
+		while (list.size() != 0) {
+			NNEntry first = list.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
 			
 			if (first.cost > costBound)
@@ -71,7 +72,7 @@ public class IRTree extends RTree {
 				} else {
 					rTreeEntry = new RtreeEntry(childId, false);
 					NNEntry entry = new NNEntry(rTreeEntry, aggregateCost);
-					queue.add(entry);
+					list.add(entry);
 				}
 			}
 		}
@@ -80,6 +81,94 @@ public class IRTree extends RTree {
 		Collections.sort(results);
 		return results;
 	}
+	
+	/**
+	 * @return A list of objects with size at most k, 
+	 * where objects are sorted according to the decreasing value of their costs.
+	 */
+	public List<SGNNKQuery.Result> sgnnkBaseline(InvertedFile invertedFile, SGNNKQuery sgnnkQuery, int topk)
+			throws Exception {
+		noOfVisitedNodes = 0;
+		
+		LinkedList<NNEntry> list = new LinkedList<>();
+		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
+		list.add(root);
+
+		List<SGNNKQuery.Result> results = new ArrayList<>();
+
+		// Current (at most) k best objects, sorted according to their decreasing value of cost.
+		// So the highest cost object will always be on top.
+		PriorityQueue<SGNNKQuery.Result> currentBestObjects = 
+				new PriorityQueue<>(topk, new WorstFirstNNEntryComparator());
+		// Dummy objects
+		for (int i = 0; i < topk; i++) {
+			currentBestObjects.add(new SGNNKQuery.Result(-1, Double.MAX_VALUE, null));
+		}
+		double costBound = Double.MAX_VALUE;
+
+		while (list.size() != 0) {
+			NNEntry first = list.poll();
+			if (first.cost > costBound)
+				continue;
+			
+			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
+			Node n = readNode(rTreeEntry.getIdentifier());
+			
+			noOfVisitedNodes++;
+			
+			HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
+			
+			// Individual query costs are calculated, now calculate aggregate query cost
+			for (int child = 0; child < n.children; child++) {
+				final List<Double> queryCosts = costs.get(child);
+				
+				List<Integer> minimumCostQueryIndices = new ArrayList<>();
+				for (int queryIndex = 0; queryIndex < queryCosts.size(); queryIndex++) {
+					minimumCostQueryIndices.add(queryIndex);
+				}
+				// Sort query indices according to increasing order of query cost
+				Collections.sort(minimumCostQueryIndices, new Comparator<Integer>() {
+
+					@Override
+					public int compare(Integer i1, Integer i2) {
+						if (queryCosts.get(i1) < queryCosts.get(i2)) return -1;
+						else if (queryCosts.get(i1) > queryCosts.get(i2)) return 1;
+						return 0;
+					}
+				});
+				
+				// Now choose first m queries with lowest cost
+				List<Double> minimumQueryCosts = new ArrayList<>();		
+				List<Integer> minimumCostQueryIds = new ArrayList<>();	
+				for (int i = 0; i < sgnnkQuery.subGroupSize; i++) {
+					Integer queryIndex = minimumCostQueryIndices.get(i);
+					minimumQueryCosts.add(queryCosts.get(queryIndex));
+					minimumCostQueryIds.add(sgnnkQuery.queries.get(queryIndex).id);
+				}
+				
+				minimumCostQueryIndices = minimumCostQueryIndices.subList(0, sgnnkQuery.subGroupSize);
+				minimumQueryCosts = minimumQueryCosts.subList(0, sgnnkQuery.subGroupSize);
+				
+				double aggregateCost = sgnnkQuery.aggregator.getAggregateValue(minimumQueryCosts);
+				Collections.sort(queryCosts);
+				int childId = n.pIdentifiers[child];
+				
+				if (n.level == 0) {
+					currentBestObjects.add(new SGNNKQuery.Result(childId, aggregateCost, minimumCostQueryIds));
+					currentBestObjects.poll();
+					costBound = currentBestObjects.peek().cost;
+				} else {
+					rTreeEntry = new RtreeEntry(childId, false);
+					list.add(new NNEntry(rTreeEntry, minimumCostQueryIds, aggregateCost));
+				}
+
+			}
+		}
+
+		Collections.sort(results);
+		return results;
+	}
+
 
 	/**
 	 * @return A list of objects with size at most k, 
@@ -94,7 +183,7 @@ public class IRTree extends RTree {
 		queue.add(root);
 
 		List<GNNKQuery.Result> results = new ArrayList<>();
-
+		
 		while (queue.size() != 0) {
 			NNEntry first = queue.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
