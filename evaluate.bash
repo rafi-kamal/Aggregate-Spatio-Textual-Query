@@ -64,56 +64,57 @@ function run {
 	sgnnkeio="${ioCosts[4]} ${ioCosts[5]}"
 }
 
+# $1 = key
+# $2 = output directory
+# $3 = output file prefix
 function writeData {
-	key=$1
-	filePrefix=$2
-	echo "Writing data for $1 in $filePrefix..."
-	echo $key $gnnkcpu | tee -a "$filePrefix-gnnk-cpu.dat"
-	echo $key $gnnkio | tee -a "$filePrefix-gnnk-io.dat"
-	echo $key $sgnnkcpu | tee -a "$filePrefix-sgnnk-cpu.dat"
-	echo $key $sgnnkio | tee -a "$filePrefix-sgnnk-io.dat"
-	echo $key $sgnnkecpu | tee -a "$filePrefix-sgnnke-cpu.dat"
-	echo $key $sgnnkeio | tee -a "$filePrefix-sgnnke-io.dat"
+	echo "Writing data for $1 in $3..."
+	echo $1 $gnnkcpu | tee -a "$2/cpu/$3-gnnk.dat"
+	echo $1 $gnnkio | tee -a "$2/io/$3-gnnk.dat"
+	echo $1 $sgnnkcpu | tee -a "$2/cpu/$3-sgnnk.dat"
+	echo $1 $sgnnkio | tee -a "$2/io/$3-sgnnk.dat"
+	echo $1 $sgnnkecpu | tee -a "$2/cpu/$3-sgnnke.dat"
+	echo $1 $sgnnkeio | tee -a "$2/io/$3-sgnnke.dat"
 }
 
 for n in ${ns[@]}; do
 	run $1 $n $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
-	writeData $n $2/groupsize
+	writeData $n $2 groupsize
 done
 
 for mPercentage in ${mPercentages[@]}; do
 	run $1 $nDefault $mPercentage $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
-	writeData $mPercentage $2/subgroup-size
+	writeData $mPercentage $2 subgroup-size
 done
 
 for numberOfKeyword in ${numberOfKeywords[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeyword $querySpaceAreaPercentageDefault \
 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
-	writeData $numberOfKeyword $2/number-of-keyword
+	writeData $numberOfKeyword $2 number-of-keyword
 done
 
 for querySpaceAreaPercentage in ${querySpaceAreaPercentages[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentage \
 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
-	writeData $querySpaceAreaPercentage $2/query-space-area
+	writeData $querySpaceAreaPercentage $2 query-space-area
 done
 
 for keywordSpaceSizePercentage in ${keywordSpaceSizePercentages[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
 		$keywordSpaceSizePercentage $topkDefault $aplhaDefault
-	writeData $keywordSpaceSizePercentage $2/keyword-space-size
+	writeData $keywordSpaceSizePercentage $2 keyword-space-size
 done
 
 for topk in ${topks[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
 		$keywordSpaceSizePercentageDefault $topk $aplhaDefault
-	writeData $topk $2/topk
+	writeData $topk $2 topk
 done
 
 for alpha in ${alphas[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
 		$keywordSpaceSizePercentageDefault $topkDefault $alpha
-	writeData $alpha $2/alpha
+	writeData $alpha $2 alpha
 done
