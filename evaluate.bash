@@ -8,7 +8,8 @@ if [ $# -lt 2 ]; then
 fi
 
 # delete all output files
-rm -rf $2/*
+rm -rf $2/cpu/*
+rm -rf $2/io/*
 
 runjava="java -ea -Dfile.encoding=UTF-8 -classpath ./bin:./lib/jdbm-1.0.jar"
 queryTypes=(5 4 3 2 1 0)
@@ -32,8 +33,8 @@ keywordSpaceSizePercentageDefault=20
 topks=(1 10 20 40 100)
 topkDefault=10
 
-alphas=(.1 .3 .5 .7 .9)
-aplhaDefault=.5
+alphas=(0.1 0.3 0.5 0.7 0.9)
+aplhaDefault=0.5
 
 # $1 = directory
 # $2 = n
