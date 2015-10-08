@@ -38,7 +38,7 @@ public class Main {
 		String sgnnkQueryFile = args[2];
 		int topk = Integer.parseInt(args[3]);
 		RTree.alpha_dist = Double.parseDouble(args[4]);
-		int queryType = 6;
+		int queryType = 4;
 		if (args.length > 5)
 			queryType = Integer.parseInt(args[5]);
 

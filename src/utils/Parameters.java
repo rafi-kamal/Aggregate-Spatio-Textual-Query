@@ -8,7 +8,7 @@ public interface Parameters {
 	final double longitudeStart = -111.253141;
 	final double longitudeEnd = -89.59568;
 	
-	final double uniqueKeywords = 783;
+	final int uniqueKeywords = 783;
 	final double maxWeight = 0.82478;
 	
 	final double maxD = Math.sqrt((latitudeEnd - latitudeStart) * (latitudeEnd - latitudeStart)
