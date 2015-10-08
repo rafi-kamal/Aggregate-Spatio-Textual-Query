@@ -85,10 +85,10 @@ public class QueryGenerator {
 				double centroidLatitude = Parameters.latitudeStart + 
 						RANDOM.nextDouble() * (Parameters.latitudeEnd - Parameters.latitudeStart);
 				double centroidLongtitude = Parameters.longitudeStart + 
-						RANDOM.nextDouble() * (Parameters.longitudeEnd - Parameters.latitudeStart);
+						RANDOM.nextDouble() * (Parameters.longitudeEnd - Parameters.longitudeStart);
 				
 				int keywordSpaceSpan = (int) (Parameters.uniqueKeywords * keywordSpaceSizePercentage / 100);
-				int keywordSpaceMiddle = RANDOM.nextInt(Parameters.uniqueKeywords - keywordSpaceSpan); 
+				int keywordSpaceMiddle = RANDOM.nextInt(Parameters.uniqueKeywords - keywordSpaceSpan + 1); 
 				
 				for (int j = 0; j < groupSize; j++) {
 					writeQuery(writer, j, numberOfKeywords, keywordSpaceMiddle, keywordSpaceSpan,
@@ -118,10 +118,10 @@ public class QueryGenerator {
 				double centroidLatitude = Parameters.latitudeStart + 
 						RANDOM.nextDouble() * (Parameters.latitudeEnd - Parameters.latitudeStart);
 				double centroidLongtitude = Parameters.longitudeStart + 
-						RANDOM.nextDouble() * (Parameters.longitudeEnd - Parameters.latitudeStart);
+						RANDOM.nextDouble() * (Parameters.longitudeEnd - Parameters.longitudeStart);
 				
 				int keywordSpaceSpan = (int) (Parameters.uniqueKeywords * keywordSpaceSizePercentage / 100);
-				int keywordSpaceMiddle = RANDOM.nextInt(Parameters.uniqueKeywords - keywordSpaceSpan); 
+				int keywordSpaceMiddle = RANDOM.nextInt(Parameters.uniqueKeywords - keywordSpaceSpan + 1); 
 				
 				for (int j = 0; j < groupSize; j++) {
 					writeQuery(writer, j, numberOfKeywords, keywordSpaceMiddle, keywordSpaceSpan,

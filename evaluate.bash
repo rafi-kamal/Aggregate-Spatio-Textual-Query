@@ -8,74 +8,32 @@ if [ $# -lt 2 ]; then
 fi
 
 # delete all output files
-rm $2/*
+rm -rf $2/*
 
 runjava="java -ea -Dfile.encoding=UTF-8 -classpath ./bin:./lib/jdbm-1.0.jar"
-queryTypes=(1 2 3 4 5 6)
+queryTypes=(5 4 3 2 1 0)
 
 # Group Size
-ns=(10 20 40 70)
+ns=(10 20 40 60 80)
 nDefault=20
 
-mPercentages=(40 50 65 80)
-mPercentageDefault=50
+mPercentages=(40 50 60 70 80)
+mPercentageDefault=60
 
-numberOfKeywords=(2 4 8 16)
+numberOfKeywords=(1 2 4 8 16)
 numberOfKeywordsDefault=4
 
-querySpaceAreaPercentages=(1 2 4 8 16)
-querySpaceAreaPercentageDefault=4
+querySpaceAreaPercentages=(1 5 10 20 50 100)
+querySpaceAreaPercentageDefault=20
 
-keywordSpaceSizePercentages=(1 2 4 8 16)
-keywordSpaceSizePercentageDefault=4
+keywordSpaceSizePercentages=(1 5 10 20 50 100)
+keywordSpaceSizePercentageDefault=20
 
-topks=(1 5 10 20 40)
-topkDefault=5
+topks=(1 10 20 40 100)
+topkDefault=10
 
 alphas=(.1 .3 .5 .7 .9)
 aplhaDefault=.5
-
-for n in ${ns[@]}; do
-	run $1 $n $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \\
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
-	write $n $2/groupsize
-done
-
-for mPercentage in ${mPercentages[@]}; do
-	run $1 $nDefault $mPercentage $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \\
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
-	write $n $2/subgroupSize
-done
-
-for numberOfKeyword in ${numberOfKeywords[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeyword $querySpaceAreaPercentageDefault \\
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
-	write $n $2/numberOfKeyword
-done
-
-for querySpaceAreaPercentage in ${querySpaceAreaPercentages[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentage \\
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
-	write $n $2/querySpaceAreaPercentage
-done
-
-for keywordSpaceSizePercentage in ${keywordSpaceSizePercentages[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \\
-		$keywordSpaceSizePercentage $topkDefault $aplhaDefault
-	write $n $2/keywordSpaceSizePercentage
-done
-
-for topk in ${topks[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \\
-		$keywordSpaceSizePercentageDefault $topk $aplhaDefault
-	write $n $2/topk
-done
-
-for alpha in ${alphas[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \\
-		$keywordSpaceSizePercentageDefault $topkDefault $alpha
-	write $n $2/alpha
-done
 
 # $1 = directory
 # $2 = n
@@ -93,26 +51,69 @@ function run {
 	local cpuCosts=()
 	local ioCosts=()
 	for queryType in ${queryTypes[@]}; do
-		result=$($runjava test.Main $1/rtree $1/gnnk.txt $1/sgnnk.txt $7 $8 $queryType)
-		cpuCosts+=${result[0]}
-		ioCosts+=${result[1]}
+		result=($($runjava test.Main $1/rtree $1/gnnk.txt $1/sgnnk.txt $7 $8 $queryType))
+		cpuCosts[queryType]=${result[0]}
+		ioCosts[queryType]=${result[1]}
 	done
 
-	gnnkcpu="${cpuCosts[2]} ${cpuCosts[1]}"
-	gnnkio="${ioCosts[2]} ${ioCosts[1]}"
-	sgnnkcpu="${cpuCosts[4]} ${cpuCosts[3]}"
-	sgnnkio="${ioCosts[4]} ${ioCosts[3]}"
-	sgnnkecpu="${cpuCosts[6]} ${cpuCosts[5]}"
-	sgnnkeio="${ioCosts[6]} ${ioCosts[5]}"
+	gnnkcpu="${cpuCosts[0]} ${cpuCosts[1]}"
+	gnnkio="${ioCosts[0]} ${ioCosts[1]}"
+	sgnnkcpu="${cpuCosts[2]} ${cpuCosts[3]}"
+	sgnnkio="${ioCosts[2]} ${ioCosts[3]}"
+	sgnnkecpu="${cpuCosts[4]} ${cpuCosts[5]}"
+	sgnnkeio="${ioCosts[4]} ${ioCosts[5]}"
 }
 
-function write {
+function writeData {
 	key=$1
 	filePrefix=$2
-	echo $key $gnnkcpu >> $filePrefix-gnnk-cpu.dat
-	echo $key $gnnkio >> $filePrefix-gnnk-io.dat
-	echo $key $sgnnkcpu >> $filePrefix-sgnnk-cpu.dat
-	echo $key $sgnnkio >> $filePrefix-sgnnk-io.dat
-	echo $key $sgnnkecpu >> $filePrefix-sgnnke-cpu.dat
-	echo $key $sgnnkecpu >> $filePrefix-sgnnke-cpu.dat
+	echo "Writing data for $1 in $filePrefix..."
+	echo $key $gnnkcpu | tee -a "$filePrefix-gnnk-cpu.dat"
+	echo $key $gnnkio | tee -a "$filePrefix-gnnk-io.dat"
+	echo $key $sgnnkcpu | tee -a "$filePrefix-sgnnk-cpu.dat"
+	echo $key $sgnnkio | tee -a "$filePrefix-sgnnk-io.dat"
+	echo $key $sgnnkecpu | tee -a "$filePrefix-sgnnke-cpu.dat"
+	echo $key $sgnnkeio | tee -a "$filePrefix-sgnnke-io.dat"
 }
+
+for n in ${ns[@]}; do
+	run $1 $n $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
+	writeData $n $2/groupsize
+done
+
+for mPercentage in ${mPercentages[@]}; do
+	run $1 $nDefault $mPercentage $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
+	writeData $mPercentage $2/subgroup-size
+done
+
+for numberOfKeyword in ${numberOfKeywords[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeyword $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
+	writeData $numberOfKeyword $2/number-of-keyword
+done
+
+for querySpaceAreaPercentage in ${querySpaceAreaPercentages[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentage \
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
+	writeData $querySpaceAreaPercentage $2/query-space-area
+done
+
+for keywordSpaceSizePercentage in ${keywordSpaceSizePercentages[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentage $topkDefault $aplhaDefault
+	writeData $keywordSpaceSizePercentage $2/keyword-space-size
+done
+
+for topk in ${topks[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topk $aplhaDefault
+	writeData $topk $2/topk
+done
+
+for alpha in ${alphas[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topkDefault $alpha
+	writeData $alpha $2/alpha
+done

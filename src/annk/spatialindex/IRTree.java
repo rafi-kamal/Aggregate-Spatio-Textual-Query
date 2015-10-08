@@ -32,8 +32,6 @@ public class IRTree extends RTree {
 	
 	public List<GNNKQuery.Result> gnnkBaseline(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
 			throws Exception {
-		noOfVisitedNodes = 0;
-		
 		LinkedList<NNEntry> list = new LinkedList<>();
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
 		list.add(root);
@@ -91,8 +89,6 @@ public class IRTree extends RTree {
 	 */
 	public List<SGNNKQuery.Result> sgnnkBaseline(InvertedFile invertedFile, SGNNKQuery sgnnkQuery, int topk)
 			throws Exception {
-		noOfVisitedNodes = 0;
-		
 		LinkedList<NNEntry> list = new LinkedList<>();
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
 		list.add(root);
@@ -178,8 +174,6 @@ public class IRTree extends RTree {
 	 */
 	public List<GNNKQuery.Result> gnnk(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
 			throws Exception {
-		noOfVisitedNodes = 0;
-		
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
 		queue.add(root);
@@ -228,8 +222,6 @@ public class IRTree extends RTree {
 	 */
 	public List<SGNNKQuery.Result> sgnnk(InvertedFile invertedFile, SGNNKQuery sgnnkQuery, int topk)
 			throws Exception {
-		noOfVisitedNodes = 0;
-		
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
 		queue.add(root);
@@ -309,8 +301,6 @@ public class IRTree extends RTree {
 	 */
 	public Map<Integer, List<SGNNKQuery.Result>> sgnnkExtended(InvertedFile invertedFile, SGNNKQuery sgnnkQuery, int topk)
 			throws Exception {
-		noOfVisitedNodes = 0;
-		
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
 		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0, null);
 		queue.add(root);
