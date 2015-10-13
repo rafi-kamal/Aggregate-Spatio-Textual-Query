@@ -1,6 +1,6 @@
-# USAGE: gnuplot -e "indir='input/cpu'; outdir='results/cpu'" plot.gpl
+# USAGE: gnuplot -M "indir='input/cpu'; outdir='results/cpu'" plot.gpl
 
-set terminal latex size 3 inch, 2.5 inch
+set terminal latex size 3 inch, 2.1 inch
 # set format xy "$%g$"
 # set t wxt persist
 set style data histograms
@@ -9,89 +9,96 @@ set boxwidth 0.9 relative
 set style fill pattern 1.0 border -1
 set yrange [0:]
 set xtic scale 0
-set ylabel "\\rotatebox{90}{milliseconds}"
-set offsets graph 0, 0, 0.1, 0
+set ylabel "\\rotatebox{90}{".ylabel."}"
+set offsets graph 0, 0, offset, 0
 
 # alpha
 set xlabel "$\\alpha$" rotate by 90
-set key right top
+set key default
+set key right top Right
 fileprefix="/alpha"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-PQ", '' using 2 title "GNNK-BB"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-PQ", '' using 2 title "SGNNK-BB"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-E", '' using 2 title "SGNNK-M"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
 
 # group size
 set xlabel "Group Size" rotate by 90
+set key default
 set key top left reverse Left
 fileprefix="/groupsize"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-PQ", '' using 2 title "GNNK-BB"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-PQ", '' using 2 title "SGNNK-BB"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-E", '' using 2 title "SGNNK-M"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
 
 # subgroup size
-set xlabel "Subgroup Size (%)" rotate by 90
-set key right top
+set xlabel "Subgroup Size (\\%)" rotate by 90
+set key default
+set key right top Right
 fileprefix="/subgroup-size"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-PQ", '' using 2 title "GNNK-BB"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-PQ", '' using 2 title "SGNNK-BB"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-E", '' using 2 title "SGNNK-M"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
 
 # number of keywords
 set xlabel "Number of Keywords" rotate by 90
+set key default
 set key top left reverse Left
 fileprefix="/number-of-keyword"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-PQ", '' using 2 title "GNNK-BB"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-PQ", '' using 2 title "SGNNK-BB"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-E", '' using 2 title "SGNNK-M"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
 
 # query space size
-set xlabel "Query Space Area (%)" rotate by 90
-set key right top
+set xlabel "Query Space Area (\\%)" rotate by 90
+set key default
+set key right top Right
 fileprefix="/query-space-area"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-PQ", '' using 2 title "GNNK-BB"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-PQ", '' using 2 title "SGNNK-BB"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-E", '' using 2 title "SGNNK-M"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
 
 # number of keywords
-set xlabel "Keyword Space Size (%)" rotate by 90
+set xlabel "Keyword Space Size (\\%)" rotate by 90
+set key default
 set key top left reverse Left
 fileprefix="/keyword-space-size"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-PQ", '' using 2 title "GNNK-BB"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-PQ", '' using 2 title "SGNNK-BB"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-E", '' using 2 title "SGNNK-M"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
 
 # top k
 set xlabel "$k$" rotate by 90
+set key default
 set key top left reverse Left
 fileprefix="/topk"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-PQ", '' using 2 title "GNNK-BB"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-PQ", '' using 2 title "SGNNK-BB"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-E", '' using 2 title "SGNNK-M"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
