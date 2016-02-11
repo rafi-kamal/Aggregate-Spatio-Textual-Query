@@ -50,12 +50,9 @@ public class Main {
 		int indexIdentifier = 1; // (in this case I know that it is equal to 1)
 		ps2.setProperty("IndexIdentifier", indexIdentifier);
 
-		int count = 0;
 		long startTime = 0;
 		long totalTime = 0;
 
-		int invertedFileIO = 0;
-		
 		boolean printInConsole = false;
 		startTime = System.currentTimeMillis();
 
@@ -75,8 +72,6 @@ public class Main {
 			writer = new ResultWriter(gnnkQueries.size(), printInConsole);
 			
 			for (GNNKQuery q : gnnkQueries) {
-				invertedFile.resetIO();
-				
 				List<GNNKQuery.Result> results;
 				if (queryType == 1) {
 					if (printInConsole) System.out.println("GNNK Baseline");
@@ -87,9 +82,6 @@ public class Main {
 					results = tree.gnnk(invertedFile, q, topk);
 				}
 				writer.writeGNNKResult(results);
-				
-				invertedFileIO += invertedFile.getIO();
-				count++;
 				
 				writer.write("========================================");
 			}
@@ -113,7 +105,6 @@ public class Main {
 						writer.writeSGNNKResult(results.get(subgroupSize));
 					}
 					
-					invertedFileIO += invertedFile.getIO();
 				}
 				else if (queryType == 5) {
 					if (printInConsole) System.out.println("SGNNK Extended Baseline");
@@ -124,8 +115,6 @@ public class Main {
 						writer.writeSGNNKResult(results);
 						
 						q.subGroupSize++;
-						
-						invertedFileIO += invertedFile.getIO();
 					}
 				}
 				else {
@@ -141,10 +130,7 @@ public class Main {
 					}
 					results = tree.sgnnk(invertedFile, q, topk);
 					writer.writeSGNNKResult(results);
-					
-					invertedFileIO += invertedFile.getIO();
 				}
-				count++;
 				
 				writer.write("========================================");
 			}
@@ -152,23 +138,22 @@ public class Main {
 		
 		totalTime = System.currentTimeMillis() - startTime;
 		
-		totalTime = (long) totalTime * 10 / numberOfQueries;
-		invertedFileIO = (int) invertedFileIO * 10 / numberOfQueries;
+		int averageTime = (int) (totalTime / numberOfQueries);
+		int averageFileIO = (tree.getIO() + invertedFile.getIO()) / numberOfQueries;
+		double averageNodesVisited = tree.noOfVisitedNodes * 1.0 / numberOfQueries;
 		
-		writer.write("Average nodes visited: " + tree.noOfVisitedNodes * 1.0 / count);
+		writer.write("Average nodes visited: " + averageNodesVisited);
 		writer.write("Total time millisecond: " + totalTime);
 		writer.close();
 		
-		double averageCPUTime = totalTime * 1.0 / count;
-		double averageIO = (tree.getIO() + invertedFileIO) * 1.0 / count;
 		if (printInConsole) {
-			System.out.println("Average time millisecond: " + averageCPUTime);
-			System.out.println("Average total IO: " + averageIO);
+			System.out.println("Average time millisecond: " + averageTime);
+			System.out.println("Average total IO: " + averageFileIO);
 //			System.out.println("Average tree IO: " + tree.getIO() * 1.0 / count);
 //			System.out.println("Average inverted index IO: " + ivIO * 1.0 / count);
 		}
 		else {
-			System.out.printf("%.0f %.0f", averageCPUTime, averageIO);
+			System.out.printf("%d %d\n", averageTime, averageFileIO);
 		}
 	}
 }

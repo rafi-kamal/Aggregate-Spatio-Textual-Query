@@ -82,16 +82,17 @@ public class QueryFileReader {
 		String[] temp = queryLine.split(",");
 
 		int id = Integer.parseInt(temp[0]);
-		double x = Double.parseDouble(temp[1]);
-		double y = Double.parseDouble(temp[2]);
+		double weight = Double.parseDouble(temp[1]);
+		double x = Double.parseDouble(temp[2]);
+		double y = Double.parseDouble(temp[3]);
 		Point location = new Point(new double[] {x, y});
 
 		List<Integer> keywords = new ArrayList<>();
-		for (int j = 3; j <  temp.length; j++) {
+		for (int j = 4; j <  temp.length; j++) {
 			keywords.add(Integer.parseInt(temp[j]));
 		}
 		
-		Query query = new Query(id, location, keywords);
+		Query query = new Query(id, weight, location, keywords);
 		return query;
 	}
 }

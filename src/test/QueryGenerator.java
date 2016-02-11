@@ -88,10 +88,8 @@ public class QueryGenerator {
 				int keywordSpaceSpan = (int) (Parameters.uniqueKeywords * keywordSpaceSizePercentage / 100);
 				int keywordSpaceMiddle = RANDOM.nextInt(Parameters.uniqueKeywords - keywordSpaceSpan + 1); 
 				
-				for (int j = 0; j < groupSize; j++) {
-					writeQuery(writer, j, numberOfKeywords, keywordSpaceMiddle, keywordSpaceSpan,
-							centroidLatitude, centroidLongtitude, latitudeSpan, longtitudeSpan);
-				}
+				writeQueries(writer, groupSize, numberOfKeywords, keywordSpaceMiddle, keywordSpaceSpan, 
+						centroidLatitude, centroidLongtitude, latitudeSpan, longtitudeSpan);
 			}
 			writer.flush();
 		}
@@ -121,23 +119,39 @@ public class QueryGenerator {
 				int keywordSpaceSpan = (int) (Parameters.uniqueKeywords * keywordSpaceSizePercentage / 100);
 				int keywordSpaceMiddle = RANDOM.nextInt(Parameters.uniqueKeywords - keywordSpaceSpan + 1); 
 				
-				for (int j = 0; j < groupSize; j++) {
-					writeQuery(writer, j, numberOfKeywords, keywordSpaceMiddle, keywordSpaceSpan,
-							centroidLatitude, centroidLongtitude, latitudeSpan, longtitudeSpan);
-				}
+				writeQueries(writer, groupSize, numberOfKeywords, keywordSpaceMiddle, keywordSpaceSpan, 
+						centroidLatitude, centroidLongtitude, latitudeSpan, longtitudeSpan);
 			}
 			writer.flush();
 		}
 	}
+	
+	private static void writeQueries(BufferedWriter writer, int numberOfQueries, 
+			int numberOfKeywords, int keywordSpaceMiddle, int keywordSpaceSpan,
+			double centroidLatitude, double centroidLongtitude, double latitudeSpan, double longtitudeSpan) throws IOException {
+		int[] queryWeights = new int[numberOfQueries];
+		int queryWeightSum = 0;
+		
+		for (int i = 0; i < numberOfQueries; i++) {
+			queryWeights[i] = RANDOM.nextInt(Integer.MAX_VALUE / numberOfQueries);
+			queryWeightSum += queryWeights[i];
+		}
+		
+		for (int i = 0; i < numberOfQueries; i++) {
+			writeQuery(writer, i, (double) queryWeights[i] / queryWeightSum, 
+					numberOfKeywords, keywordSpaceMiddle, keywordSpaceSpan, 
+					centroidLatitude, centroidLongtitude, latitudeSpan, longtitudeSpan);
+		}
+	}
 
-	private static void writeQuery(BufferedWriter writer, int queryId, 
+	private static void writeQuery(BufferedWriter writer, int queryId, double weight,
 			int numberOfKeywords, int keywordSpaceMiddle, int keywordSpaceSpan,
 			double centroidLatitude, double centroidLongtitude, double latitudeSpan, double longtitudeSpan) 
 					throws IOException {
 		double x = (centroidLatitude - latitudeSpan / 2) + RANDOM.nextDouble() * latitudeSpan;
 		double y = (centroidLongtitude - longtitudeSpan / 2) + RANDOM.nextDouble() * longtitudeSpan;
 		
-		writer.write(queryId + "," + x + "," + y + ",");
+		writer.write(queryId + "," + weight + "," + x + "," + y + ",");
 		
 		for (int k = 0; k < numberOfKeywords; k++) {
 			int keyword = keywordSpaceMiddle + RANDOM.nextInt(keywordSpaceSpan);
