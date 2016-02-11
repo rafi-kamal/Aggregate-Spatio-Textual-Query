@@ -73,7 +73,7 @@ public class IRTree extends RTree {
 				} else {
 					rTreeEntry = new RtreeEntry(childId, false);
 					NNEntry entry = new NNEntry(rTreeEntry, aggregateCost);
-					list.add(entry);
+					list.addFirst(entry);
 				}
 			}
 		}
@@ -157,7 +157,7 @@ public class IRTree extends RTree {
 					costBound = currentBestObjects.peek().cost;
 				} else {
 					rTreeEntry = new RtreeEntry(childId, false);
-					list.add(new NNEntry(rTreeEntry, minimumCostQueryIds, aggregateCost));
+					list.addFirst(new NNEntry(rTreeEntry, minimumCostQueryIds, aggregateCost));
 				}
 
 			}

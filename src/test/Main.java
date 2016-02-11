@@ -65,9 +65,13 @@ public class Main {
 		invertedFile.resetIO();
 		IRTree tree = new IRTree(ps2, diskfile);
 		
+		int numberOfQueries;
+		
 		if (queryType == 0 || queryType == 1) {
 			QueryFileReader reader = new QueryFileReader(gnnkQueryFile);
 			List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
+			numberOfQueries = gnnkQueries.size();
+			
 			writer = new ResultWriter(gnnkQueries.size(), printInConsole);
 			
 			for (GNNKQuery q : gnnkQueries) {
@@ -93,6 +97,8 @@ public class Main {
 		else {
 			QueryFileReader reader = new QueryFileReader(sgnnkQueryFile);
 			List<SGNNKQuery> sgnnkQueries = reader.readSGNNKQueries();
+			numberOfQueries = sgnnkQueries.size();
+			
 			writer = new ResultWriter(sgnnkQueries.size(), printInConsole);
 			
 			for (SGNNKQuery q : sgnnkQueries) {
@@ -145,6 +151,9 @@ public class Main {
 		}
 		
 		totalTime = System.currentTimeMillis() - startTime;
+		
+		totalTime = (long) totalTime * 10 / numberOfQueries;
+		invertedFileIO = (int) invertedFileIO * 10 / numberOfQueries;
 		
 		writer.write("Average nodes visited: " + tree.noOfVisitedNodes * 1.0 / count);
 		writer.write("Total time millisecond: " + totalTime);

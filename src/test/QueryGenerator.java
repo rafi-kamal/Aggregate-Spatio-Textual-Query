@@ -11,9 +11,7 @@ import utils.Parameters;
 public class QueryGenerator {
 	private static final Random RANDOM = new Random(1);
 	
-	private static final int DATA_SET_SIZE = 10000;
-	private static final int NUMBER_OF_QUERIES = 10;
-	private static final int MAX_VALUE_OF_KEYWORD = 566;
+	private static final int NUMBER_OF_QUERIES = 20;
 	
 //	private static final double QUERY_AREA_COVERAGE = 0.1;
 	
@@ -56,7 +54,7 @@ public class QueryGenerator {
 				writer.write(i + "," + x + "," + y + ",");
 				
 				for (int k = 0; k < numberOfKeywords; k++) {
-					int keyword = RANDOM.nextInt(MAX_VALUE_OF_KEYWORD);
+					int keyword = RANDOM.nextInt(Parameters.uniqueKeywords);
 					writer.write(Integer.toString(keyword));
 					
 					if (k == numberOfKeywords - 1) writer.write("\n");
@@ -169,7 +167,7 @@ public class QueryGenerator {
 
 				int numberOfKeywords = 1 + RANDOM.nextInt(Parameters.uniqueKeywords + 1);
 				for (int k = 0; k < numberOfKeywords; k++) {
-					int keyword = RANDOM.nextInt(MAX_VALUE_OF_KEYWORD);
+					int keyword = RANDOM.nextInt(Parameters.uniqueKeywords);
 					writer.write(keyword + " " + 0.1);
 
 					if (k == numberOfKeywords - 1) writer.write("\n");

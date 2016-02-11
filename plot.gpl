@@ -1,6 +1,6 @@
 # USAGE: gnuplot -M "indir='input/cpu'; outdir='results/cpu'" plot.gpl
 
-set terminal latex size 3 inch, 2.1 inch
+set terminal latex size 3 inch, 2 inch
 # set format xy "$%g$"
 # set t wxt persist
 set style data histograms
@@ -19,11 +19,11 @@ set key right top Right
 fileprefix="/alpha"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
 
 # group size
 set xlabel "Group Size" rotate by 90
@@ -32,11 +32,11 @@ set key top left reverse Left
 fileprefix="/groupsize"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
 
 # subgroup size
 set xlabel "Subgroup Size (\\%)" rotate by 90
@@ -45,11 +45,11 @@ set key right top Right
 fileprefix="/subgroup-size"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
 
 # number of keywords
 set xlabel "Number of Keywords" rotate by 90
@@ -58,11 +58,11 @@ set key top left reverse Left
 fileprefix="/number-of-keyword"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
 
 # query space size
 set xlabel "Query Space Area (\\%)" rotate by 90
@@ -71,11 +71,11 @@ set key right top Right
 fileprefix="/query-space-area"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
 
 # number of keywords
 set xlabel "Keyword Space Size (\\%)" rotate by 90
@@ -84,11 +84,11 @@ set key top left reverse Left
 fileprefix="/keyword-space-size"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
 
 # top k
 set xlabel "$k$" rotate by 90
@@ -97,8 +97,8 @@ set key top left reverse Left
 fileprefix="/topk"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-PQ"
+plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-PQ"
+plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "SGNNK-M", '' using 2 title "SGNNK-E"
+plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
