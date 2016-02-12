@@ -12,5 +12,5 @@ local.properties
 .loadpath
 data/*
 !data/*.txt
-data/result-*.txt
+result-*.txt
 java.hprof*

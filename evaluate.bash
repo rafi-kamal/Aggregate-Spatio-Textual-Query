@@ -2,14 +2,15 @@
 
 # Run the experiments with different parameters and collect performance evaluation data
 
-if [ $# -lt 2 ]; then
-	echo -e "USAGE: evalulate.bash input_directory output_directory"
+if [ $# -lt 3 ]; then
+	echo -e "USAGE: evalulate.bash input_directory output_directory aggregator"
 	exit 0
 fi
 
 # delete all output files
-rm -rf $2/cpu/*
-rm -rf $2/io/*
+rm -rf $2/*
+mkdir -p $2/cpu/
+mkdir -p $2/io/
 
 runjava="java -ea -Dfile.encoding=UTF-8 -classpath ./bin:./lib/jdbm-1.0.jar"
 queryTypes=(5 4 3 2 1 0)
@@ -33,7 +34,7 @@ keywordSpaceSizePercentageDefault=20
 topks=(1 10 20 40 100)
 topkDefault=10
 
-alphas=(0.1 0.3 0.5 0.7 0.9)
+alphas=(0.1 0.3 0.5 0.7 0.9 1.0)
 aplhaDefault=0.5
 
 # $1 = directory
@@ -44,9 +45,10 @@ aplhaDefault=0.5
 # $6 = keywordSpacePercentage
 # $7 = topk
 # $8 = alpha
+# $0 = aggregator
 function run {
 	# Generate queries
-	$runjava test.QueryGenerator $1 $2 $3 $4 $5 $6
+	$runjava test.QueryGenerator $1 $2 $3 $4 $5 $6 $9
 
 	# Run algorithms and collect result
 	local cpuCosts=()
@@ -80,42 +82,42 @@ function writeData {
 
 for n in ${ns[@]}; do
 	run $1 $n $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
 	writeData $n $2 groupsize
 done
 
 for mPercentage in ${mPercentages[@]}; do
 	run $1 $nDefault $mPercentage $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
 	writeData $mPercentage $2 subgroup-size
 done
 
 for numberOfKeyword in ${numberOfKeywords[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeyword $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
 	writeData $numberOfKeyword $2 number-of-keyword
 done
 
 for querySpaceAreaPercentage in ${querySpaceAreaPercentages[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentage \
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
 	writeData $querySpaceAreaPercentage $2 query-space-area
 done
 
 for keywordSpaceSizePercentage in ${keywordSpaceSizePercentages[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentage $topkDefault $aplhaDefault
+		$keywordSpaceSizePercentage $topkDefault $aplhaDefault $3
 	writeData $keywordSpaceSizePercentage $2 keyword-space-size
 done
 
 for topk in ${topks[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topk $aplhaDefault
+		$keywordSpaceSizePercentageDefault $topk $aplhaDefault $3
 	writeData $topk $2 topk
 done
 
 for alpha in ${alphas[@]}; do
 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topkDefault $alpha
+		$keywordSpaceSizePercentageDefault $topkDefault $alpha $3
 	writeData $alpha $2 alpha
 done

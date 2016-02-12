@@ -20,8 +20,9 @@ public class QueryGenerator {
 	 * and gnnk.txt (gnnk query file)
 	 */
 	public static void main(String[] args) throws Exception {
-		if (args.length != 6) {
-			System.err.println("Usage: data_directory group_size subgroup_size% no_of_query_keywords query_space_area% keyword_space_size%");
+		if (args.length != 7) {
+			System.err.println("Usage: data_directory group_size subgroup_size% "
+					+ "no_of_query_keywords query_space_area% keyword_space_size% aggreagtor_type(SUM/MAX)");
 			System.exit(1);
 		}
 		
@@ -31,6 +32,7 @@ public class QueryGenerator {
 		int numberOfKeywords = Integer.parseInt(args[3]);
 		double querySpaceAreaPercentage = Double.parseDouble(args[4]);
 		double keywordSpaceSizePercentage = Double.parseDouble(args[5]);
+		String aggregatorType = args[6].toUpperCase();
 		
 		File locationFile = new File(directory, "loc.txt");
 		File keywordFile = new File(directory, "wwords.txt");
@@ -40,8 +42,10 @@ public class QueryGenerator {
 		
 //		generateLocationFile(locationFile, DATA_SET_SIZE);
 //		generateKeywordFile(keywordFile, DATA_SET_SIZE);
-		generateGNNKQueryFile(gnnkQueryFile, NUMBER_OF_QUERIES, groupSize, numberOfKeywords, querySpaceAreaPercentage, keywordSpaceSizePercentage, "SUM");
-		generateSGNNKQueryFile(sgnnkQueryFile, NUMBER_OF_QUERIES, groupSize, subgroupSizePercentage, numberOfKeywords, querySpaceAreaPercentage, keywordSpaceSizePercentage, "SUM");
+		generateGNNKQueryFile(gnnkQueryFile, NUMBER_OF_QUERIES, groupSize, numberOfKeywords, 
+				querySpaceAreaPercentage, keywordSpaceSizePercentage, aggregatorType);
+		generateSGNNKQueryFile(sgnnkQueryFile, NUMBER_OF_QUERIES, groupSize, subgroupSizePercentage, 
+				numberOfKeywords, querySpaceAreaPercentage, keywordSpaceSizePercentage, aggregatorType);
 //		generateLkTQueryFile(lktQueryFile, NUMBER_OF_QUERIES);
 	}
 	
@@ -177,7 +181,7 @@ public class QueryGenerator {
 	public static void generateKeywordFile(File keywordFile, int dataSetSize) throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(keywordFile))) {
 			for (int i = 0; i < dataSetSize; i++) {
-				writer.write(i+ ",");
+				writer.write(i + ",");
 
 				int numberOfKeywords = 1 + RANDOM.nextInt(Parameters.uniqueKeywords + 1);
 				for (int k = 0; k < numberOfKeywords; k++) {
