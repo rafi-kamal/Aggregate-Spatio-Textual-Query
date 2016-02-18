@@ -242,7 +242,7 @@ public class IRTree extends RTree {
 				noOfVisitedNodes++;
 				
 				if (!levelVsVisitedNodes.containsKey(n.level))
-					levelVsVisitedNodes.put(n.level, new ArrayList<>());
+					levelVsVisitedNodes.put(n.level, new ArrayList<AggregateQuery.Result>());
 				levelVsVisitedNodes.get(n.level).add(new AggregateQuery.Result(n.identifier, first.cost));
 				
 				HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
