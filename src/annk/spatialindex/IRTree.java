@@ -136,7 +136,7 @@ public class IRTree extends RTree {
 				List<Double> minimumQueryCosts = new ArrayList<>();		
 				List<Integer> minimumCostQueryIds = new ArrayList<>();	
 				for (int i = 0; i < sgnnkQuery.subGroupSize; i++) {
-					Integer queryIndex = minimumCostQueryIndices.get(i);
+					int queryIndex = minimumCostQueryIndices.get(i);
 					minimumQueryCosts.add(queryCosts.get(queryIndex));
 					minimumCostQueryIds.add(sgnnkQuery.queries.get(queryIndex).id);
 				}
@@ -424,7 +424,7 @@ public class IRTree extends RTree {
 		
 		invertedFile.load(n.identifier);
 		for (Query q : queries) {
-			HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords);
+			HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords, q.keywordWeights);
 			
 			for (int child = 0; child < n.children; child++) {
 				int childId = n.pIdentifiers[child];

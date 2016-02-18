@@ -4,13 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import spatialindex.rtree.RTree;
 import storage.BtreeStore;
@@ -186,31 +180,65 @@ public class InvertedFile {
 	 * 
 	 * @return A map of (document ID, similarity) pairs
 	 */
+    @Deprecated
 	public HashMap<Integer, Double> rankingSum(List<Integer> keywords) throws Exception {
 
-		HashMap<Integer, Double> filter = new HashMap<Integer, Double>();
+		HashMap<Integer, Double> filter = new HashMap<>();
 //		load(treeid);
 
-		for (int j = 0; j < keywords.size(); j++) {
-			int keyword = keywords.get(j);
-			
-			Vector<PlEntry> doclist = read(keyword);
-			if (doclist == null)
-				continue;
-			for (int k = 0; k < doclist.size(); k++) {
-				PlEntry ple = doclist.get(k);
+        for (Integer keyword : keywords) {
+            Vector<PlEntry> docList = read(keyword);
+            if (docList == null)
+                continue;
+            for (int k = 0; k < docList.size(); k++) {
+                PlEntry ple = docList.get(k);
 
-				if (filter.containsKey(ple.documentId)) {
-					double similarity = (Double) filter.get(ple.documentId);
-					similarity = similarity + ple.weight;
-					filter.put(ple.documentId, similarity);
-				} else
-					filter.put(ple.documentId, ple.weight);
-			}
-		}
+                if (filter.containsKey(ple.documentId)) {
+                    double similarity = filter.get(ple.documentId);
+                    similarity = similarity + ple.weight;
+                    filter.put(ple.documentId, similarity);
+                } else
+                    filter.put(ple.documentId, ple.weight);
+            }
+        }
 
 		return filter;
 	}
+
+    /**
+     * Calculates the total similarity of each document (node). The 'keywords' parameter contains a keyword -> weight
+     * mapping.
+     *
+     * Corresponding tree must be loaded by using load(treeId) before calling this method.
+     *
+     * @return A map of (document ID, similarity) pairs
+     */
+    public HashMap<Integer, Double> rankingSum(List<Integer> keywords, List<Double> keywordWeights) throws Exception {
+
+        HashMap<Integer, Double> filter = new HashMap<>();
+//		load(treeid);
+
+        for (int i = 0; i < keywords.size(); i++) {
+            int keyword = keywords.get(i);
+            double weight = keywordWeights.get(i);
+
+            Vector<PlEntry> docList = read(keyword);
+            if (docList == null)
+                continue;
+
+            for (PlEntry ple : docList) {
+                if (filter.containsKey(ple.documentId)) {
+                    double similarity = filter.get(ple.documentId);
+                    similarity = similarity + weight;
+                    filter.put(ple.documentId, similarity);
+                } else {
+                    filter.put(ple.documentId, weight);
+                }
+            }
+        }
+
+        return filter;
+    }
 
 	public HashMap rankingSumClusterEnhance(List<Integer> words) throws Exception {
 		HashMap filter = new HashMap();

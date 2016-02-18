@@ -14,4 +14,5 @@ data/*
 result-*.txt
 java.hprof*
 **/.idea/workspace.xml
+**/.idea/dictionaries/*
 **/.idea/tasks.xml

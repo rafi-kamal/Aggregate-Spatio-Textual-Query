@@ -1,9 +1,7 @@
 package io;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import annk.aggregator.AggregatorFactory;
 import annk.aggregator.IAggregator;
@@ -87,12 +85,17 @@ public class QueryFileReader {
 		double y = Double.parseDouble(temp[3]);
 		Point location = new Point(new double[] {x, y});
 
-		List<Integer> keywords = new ArrayList<>();
-		for (int j = 4; j <  temp.length; j++) {
-			keywords.add(Integer.parseInt(temp[j]));
-		}
+        List<Integer> keywords = new ArrayList<>();
+        List<Double> keywordWeights = new ArrayList<>();
+		for (int j = 4; j < temp.length; j++) {
+			String[] temp2 = temp[j].split(" ");
+            int keyword = Integer.parseInt(temp2[0]);
+            double keywordWeight = Double.parseDouble(temp2[1]);
+            keywords.add(keyword);
+            keywordWeights.add(keywordWeight);
+        }
 		
-		Query query = new Query(id, weight, location, keywords);
+		Query query = new Query(id, weight, location, keywords, keywordWeights);
 		return query;
 	}
 }
