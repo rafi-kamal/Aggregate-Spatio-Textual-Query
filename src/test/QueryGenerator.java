@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import utils.Parameters;
@@ -137,7 +139,7 @@ public class QueryGenerator {
 		int queryWeightSum = 0;
 		
 		for (int i = 0; i < numberOfQueries; i++) {
-			queryWeights[i] = RANDOM.nextInt(Integer.MAX_VALUE / numberOfQueries);
+			queryWeights[i] = 1 + RANDOM.nextInt(Integer.MAX_VALUE / numberOfQueries);
 			queryWeightSum += queryWeights[i];
 		}
 		
@@ -156,10 +158,22 @@ public class QueryGenerator {
 		double y = (centroidLongtitude - longtitudeSpan / 2) + RANDOM.nextDouble() * longtitudeSpan;
 		
 		writer.write(queryId + "," + weight + "," + x + "," + y + ",");
-		
-		for (int k = 0; k < numberOfKeywords; k++) {
+
+        List<Integer> keywords = new ArrayList<>();
+        List<Double> keywordWeights = new ArrayList<>();
+        double weightTotal = 0;
+
+        for (int k = 0; k < numberOfKeywords; k++) {
 			int keyword = keywordSpaceMiddle + RANDOM.nextInt(keywordSpaceSpan);
-			writer.write(Integer.toString(keyword));
+            double keywordWeight = 0.5 + RANDOM.nextDouble() / 2;
+            weightTotal += keywordWeight;
+
+            keywords.add(keyword);
+            keywordWeights.add(keywordWeight);
+        }
+
+        for (int k = 0; k < numberOfKeywords; k++) {
+			writer.write(keywords.get(k) + " " + (keywordWeights.get(k) / weightTotal));
 			
 			if (k == numberOfKeywords - 1) writer.write("\n");
 			else writer.write(",");

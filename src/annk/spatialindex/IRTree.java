@@ -419,7 +419,7 @@ public class IRTree extends RTree {
 		
 		HashMap<Integer, List<Double>> costs = new HashMap<>();
 		for (int child = 0; child < n.children; child++) {
-			costs.put(child, new ArrayList<>());
+			costs.put(child, new ArrayList<Double>());
 		}
 		
 		invertedFile.load(n.identifier);
