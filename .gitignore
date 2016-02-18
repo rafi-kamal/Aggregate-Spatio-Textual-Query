@@ -1,4 +1,3 @@
-*.pydevproject
 .metadata
 .gradle
 bin/
@@ -14,3 +13,5 @@ data/*
 !data/*.txt
 result-*.txt
 java.hprof*
+**/.idea/workspace.xml
+**/.idea/tasks.xml

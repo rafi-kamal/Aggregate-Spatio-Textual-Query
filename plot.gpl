@@ -10,7 +10,7 @@ set style fill pattern 1.0 border -1
 set yrange [0:]
 set xtic scale 0
 set ylabel "\\rotatebox{90}{".ylabel."}"
-set offsets graph 0, 0, offset, 0
+set offsets graph 0, 0, offset, 0 # Empty space on the top
 
 # alpha
 set xlabel "$\\alpha$" rotate by 90
@@ -18,7 +18,7 @@ set key default
 set key right top Right
 fileprefix="/alpha"
 
-set output outdir.fileprefix."-gnnk.tex"
+set output outdir.fileprefix."-gnnk.tex" # set output filename
 plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
 set output outdir.fileprefix."-sgnnk.tex"
 plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"

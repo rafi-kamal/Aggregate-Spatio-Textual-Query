@@ -8,10 +8,10 @@ public interface IAggregator {
 	 * 
 	 * @return f(value[0], value[1], ... , value[n - 1])
 	 */
-	double getAggregateValue(List<Double> values);
+	double getAggregateValue(List<Double> values, List<Double> weights);
 	
 	void initializeAccmulator();
-	void accumulate(Double value);
+	void accumulate(Double value, Double weight);
 	double getAccumulatedValue();
 	
 	/**

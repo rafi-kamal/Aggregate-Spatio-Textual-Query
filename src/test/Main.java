@@ -50,11 +50,8 @@ public class Main {
 		int indexIdentifier = 1; // (in this case I know that it is equal to 1)
 		ps2.setProperty("IndexIdentifier", indexIdentifier);
 
-		long startTime = 0;
-		long totalTime = 0;
-
 		boolean printInConsole = false;
-		startTime = System.currentTimeMillis();
+		long startTime = System.currentTimeMillis();
 
 		ResultWriter writer;
 		
@@ -98,7 +95,7 @@ public class Main {
 					invertedFile.resetIO();
 					if (printInConsole) System.out.println("SGNNK Extended");
 					Map<Integer, List<SGNNKQuery.Result>> results = tree.sgnnkExtended(invertedFile, q, topk);
-					List<Integer> subroupSizes = new ArrayList<Integer>(results.keySet());
+					List<Integer> subroupSizes = new ArrayList<>(results.keySet());
 					Collections.sort(subroupSizes);
 					for (Integer subgroupSize : subroupSizes) {
 						writer.write("Size " + subgroupSize);
@@ -135,8 +132,8 @@ public class Main {
 				writer.write("========================================");
 			}
 		}
-		
-		totalTime = System.currentTimeMillis() - startTime;
+
+		long totalTime = System.currentTimeMillis() - startTime;
 		
 		int averageTime = (int) (totalTime / numberOfQueries);
 		int averageFileIO = (tree.getIO() + invertedFile.getIO()) / numberOfQueries;

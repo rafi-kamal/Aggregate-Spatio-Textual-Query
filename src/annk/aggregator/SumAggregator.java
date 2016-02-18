@@ -7,10 +7,10 @@ public class SumAggregator implements IAggregator {
 	private double totalAccumulatedValue;
 
 	@Override
-	public double getAggregateValue(List<Double> values) {
+	public double getAggregateValue(List<Double> values, List<Double> weights) {
 		double aggregateValue = 0;
-		for (Double value : values) {
-			aggregateValue += value;
+		for (int i = 0; i < values.size(); i++) {
+			aggregateValue += values.get(i) / weights.get(i);
 		}
 		return aggregateValue;
 	}
@@ -31,8 +31,8 @@ public class SumAggregator implements IAggregator {
 	}
 
 	@Override
-	public void accumulate(Double value) {
-		totalAccumulatedValue += value;
+	public void accumulate(Double value, Double weight) {
+		totalAccumulatedValue += value * weight;
 	}
 
 	@Override

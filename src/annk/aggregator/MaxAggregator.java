@@ -8,8 +8,14 @@ public class MaxAggregator implements IAggregator {
 	private double maximum;
 	
 	@Override
-	public double getAggregateValue(List<Double> values) {
-		return Collections.max(values);
+	public double getAggregateValue(List<Double> values, List<Double> weights) {
+        double max = 0;
+        for (int i = 0; i < values.size(); i++) {
+            if (max < values.get(i) / weights.get(i)) {
+                max = values.get(i) / weights.get(i);
+            }
+        }
+		return max;
 	}
 
 	@Override
@@ -28,8 +34,8 @@ public class MaxAggregator implements IAggregator {
 	}
 
 	@Override
-	public void accumulate(Double value) {
-		maximum = Math.max(maximum, value);
+	public void accumulate(Double value, Double weight) {
+		maximum = Math.max(maximum * weight, value);
 	}
 
 	@Override

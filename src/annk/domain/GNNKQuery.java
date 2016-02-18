@@ -1,5 +1,6 @@
 package annk.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import annk.aggregator.IAggregator;

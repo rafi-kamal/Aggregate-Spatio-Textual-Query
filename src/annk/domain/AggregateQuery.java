@@ -21,6 +21,15 @@ public class AggregateQuery {
 		this.groupSize = queries.size();
 	}
 
+	public List<Double> getWeights() {
+		List<Double> weights = new ArrayList<>();
+		for (Query query : queries) {
+			weights.add(query.weight);
+		}
+
+		return weights;
+	}
+
 	public Region getMBR() {
 		double lowerX = Double.MAX_VALUE;
 		double lowerY = Double.MAX_VALUE;
