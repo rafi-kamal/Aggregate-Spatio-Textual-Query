@@ -22,19 +22,19 @@ nDefault=20
 mPercentages=(40 50 60 70 80)
 mPercentageDefault=60
 
-numberOfKeywords=(1 2 4 8 16)
+numberOfKeywords=(1 2 3 5 8 10)
 numberOfKeywordsDefault=4
 
-querySpaceAreaPercentages=(1 5 10 20 50 100)
+querySpaceAreaPercentages=(1 5 10 20 30 40)
 querySpaceAreaPercentageDefault=20
 
-keywordSpaceSizePercentages=(1 5 10 20 50 100)
+keywordSpaceSizePercentages=(1 5 10 20 30 40)
 keywordSpaceSizePercentageDefault=20
 
-topks=(1 10 20 40 100)
+topks=(1 10 20 30 40 50)
 topkDefault=10
 
-alphas=(0.1 0.3 0.5 0.7 0.9 1.0)
+alphas=(0.0 0.3 0.5 0.7 1.0)
 aplhaDefault=0.5
 
 # $1 = directory

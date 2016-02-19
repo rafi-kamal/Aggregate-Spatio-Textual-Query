@@ -3,14 +3,19 @@
 set terminal latex size 3 inch, 2 inch
 # set format xy "$%g$"
 # set t wxt persist
-set style data histograms
-set style histogram cluster gap 1
-set boxwidth 0.9 relative
-set style fill pattern 1.0 border -1
+# set style data histograms
+# set style histogram cluster gap 1
+# set boxwidth 0.9 relative
+# set style fill pattern 1.0 border -1
 set yrange [0:]
 set xtic scale 0
 set ylabel "\\rotatebox{90}{".ylabel."}"
 set offsets graph 0, 0, offset, 0 # Empty space on the top
+
+set style line 1 linetype 1 linecolor rgb "#C0504D" linewidth 2
+set style line 2 linetype 3 linecolor rgb "#5F91BD" linewidth 2
+set style line 3 linetype 2 linecolor rgb "#9FAABD" linewidth 3
+set style line 4 linetype 4 linecolor rgb "#BB91BD" linewidth 3
 
 # alpha
 set xlabel "$\\alpha$" rotate by 90
@@ -18,12 +23,23 @@ set key default
 set key right top Right
 fileprefix="/alpha"
 
-set output outdir.fileprefix."-gnnk.tex" # set output filename
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
+set output outdir.fileprefix."-gnnk.tex"
+plot indir.fileprefix."-gnnk.dat" using 1:2:xtic(1) title "GNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "GNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "GNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "GNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
+plot indir.fileprefix."-sgnnk.dat" using 1:2:xtic(1) title "SGNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "SGNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "SGNNK-BF (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "SGNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
+plot indir.fileprefix."-sgnnke.dat" using 1:2:xtic(1) title "MSGNNK-N (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "MSGNNK-BB (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "MSGNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "MSGNNK-BB (MAX)" with linespoints
 
 # group size
 set xlabel "Group Size" rotate by 90
@@ -32,11 +48,22 @@ set key top left reverse Left
 fileprefix="/groupsize"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
+plot indir.fileprefix."-gnnk.dat" using 1:2:xtic(1) title "GNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "GNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "GNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "GNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
+plot indir.fileprefix."-sgnnk.dat" using 1:2:xtic(1) title "SGNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "SGNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "SGNNK-BF (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "SGNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
+plot indir.fileprefix."-sgnnke.dat" using 1:2:xtic(1) title "MSGNNK-N (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "MSGNNK-BB (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "MSGNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "MSGNNK-BB (MAX)" with linespoints
 
 # subgroup size
 set xlabel "Subgroup Size (\\%)" rotate by 90
@@ -45,11 +72,22 @@ set key right top Right
 fileprefix="/subgroup-size"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
+plot indir.fileprefix."-gnnk.dat" using 1:2:xtic(1) title "GNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "GNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "GNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "GNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
+plot indir.fileprefix."-sgnnk.dat" using 1:2:xtic(1) title "SGNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "SGNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "SGNNK-BF (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "SGNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
+plot indir.fileprefix."-sgnnke.dat" using 1:2:xtic(1) title "MSGNNK-N (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "MSGNNK-BB (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "MSGNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "MSGNNK-BB (MAX)" with linespoints
 
 # number of keywords
 set xlabel "Number of Keywords" rotate by 90
@@ -58,11 +96,22 @@ set key top left reverse Left
 fileprefix="/number-of-keyword"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
+plot indir.fileprefix."-gnnk.dat" using 1:2:xtic(1) title "GNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "GNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "GNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "GNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
+plot indir.fileprefix."-sgnnk.dat" using 1:2:xtic(1) title "SGNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "SGNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "SGNNK-BF (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "SGNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
+plot indir.fileprefix."-sgnnke.dat" using 1:2:xtic(1) title "MSGNNK-N (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "MSGNNK-BB (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "MSGNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "MSGNNK-BB (MAX)" with linespoints
 
 # query space size
 set xlabel "Query Space Area (\\%)" rotate by 90
@@ -71,11 +120,22 @@ set key right top Right
 fileprefix="/query-space-area"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
+plot indir.fileprefix."-gnnk.dat" using 1:2:xtic(1) title "GNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "GNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "GNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "GNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
+plot indir.fileprefix."-sgnnk.dat" using 1:2:xtic(1) title "SGNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "SGNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "SGNNK-BF (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "SGNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
+plot indir.fileprefix."-sgnnke.dat" using 1:2:xtic(1) title "MSGNNK-N (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "MSGNNK-BB (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "MSGNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "MSGNNK-BB (MAX)" with linespoints
 
 # number of keywords
 set xlabel "Keyword Space Size (\\%)" rotate by 90
@@ -84,11 +144,22 @@ set key top left reverse Left
 fileprefix="/keyword-space-size"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
+plot indir.fileprefix."-gnnk.dat" using 1:2:xtic(1) title "GNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "GNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "GNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "GNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
+plot indir.fileprefix."-sgnnk.dat" using 1:2:xtic(1) title "SGNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "SGNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "SGNNK-BF (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "SGNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
+plot indir.fileprefix."-sgnnke.dat" using 1:2:xtic(1) title "MSGNNK-N (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "MSGNNK-BB (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "MSGNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "MSGNNK-BB (MAX)" with linespoints
 
 # top k
 set xlabel "$k$" rotate by 90
@@ -97,8 +168,19 @@ set key top left reverse Left
 fileprefix="/topk"
 
 set output outdir.fileprefix."-gnnk.tex"
-plot indir.fileprefix."-gnnk.dat" using 3:xtic(1) title "GNNK-BB", '' using 2 title "GNNK-BF"
+plot indir.fileprefix."-gnnk.dat" using 1:2:xtic(1) title "GNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "GNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "GNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "GNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnk.tex"
-plot indir.fileprefix."-sgnnk.dat" using 3:xtic(1) title "SGNNK-BB", '' using 2 title "SGNNK-BF"
+plot indir.fileprefix."-sgnnk.dat" using 1:2:xtic(1) title "SGNNK-BB (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "SGNNK-BF (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "SGNNK-BF (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "SGNNK-BF (MAX)" with linespoints
+
 set output outdir.fileprefix."-sgnnke.tex"
-plot indir.fileprefix."-sgnnke.dat" using 3:xtic(1) title "MSGNNK-N", '' using 2 title "MSGNNK-BB"
+plot indir.fileprefix."-sgnnke.dat" using 1:2:xtic(1) title "MSGNNK-N (SUM)" with linespoints, \
+	'' using 1:3:xtic(1) title "MSGNNK-BB (SUM)" with linespoints, \
+	'' using 1:4:xtic(1) title "MSGNNK-BB (MAX)" with linespoints, \
+	'' using 1:5:xtic(1) title "MSGNNK-BB (MAX)" with linespoints
