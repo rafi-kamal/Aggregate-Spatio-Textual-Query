@@ -368,9 +368,10 @@ public class IRTree extends RTree {
                             sgnnkQuery.queries.get(queryIndex).weight);
 				}
 				
-				double totalQueryCost = 0;
+				double minQueryCost = -1;
 				boolean prune = true;
 				List<Double> aggregateQueryCosts = new ArrayList<>();
+				
 				for (int i = sgnnkQuery.subGroupSize - 1; i < sgnnkQuery.groupSize; i++) {
                     int queryIndex = minimumCostQueryIndices.get(i);
 					sgnnkQuery.aggregator.accumulate(minimumQueryCosts.get(i),
@@ -386,15 +387,16 @@ public class IRTree extends RTree {
 							bestResults.add(new SGNNKQuery.Result(n.getChildIdentifier(child), queryCost, queryIds));
 							bestResults.poll();
 						}
+						
+						if (minQueryCost != -1) {
+							minQueryCost = Math.min(minQueryCost, queryCost);
+						}
 					}
-					
-					totalQueryCost += queryCost;
 				}
-				double avgQueryCost = totalQueryCost / (sgnnkQuery.groupSize - sgnnkQuery.subGroupSize + 1);
 				
 				if (n.level > 0 && !prune) {
 					rTreeEntry = new RtreeEntry(n.pIdentifiers[child], false);
-					queue.add(new NNEntry(rTreeEntry, avgQueryCost, aggregateQueryCosts));
+					queue.add(new NNEntry(rTreeEntry, minQueryCost, aggregateQueryCosts));
 				}
 			}
 		}
