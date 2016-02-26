@@ -1,6 +1,5 @@
 package annk.aggregator;
 
-import java.util.Collections;
 import java.util.List;
 
 public class MaxAggregator implements IAggregator {
@@ -11,8 +10,8 @@ public class MaxAggregator implements IAggregator {
 	public double getAggregateValue(List<Double> values, List<Double> weights) {
         double max = 0;
         for (int i = 0; i < values.size(); i++) {
-            if (max < values.get(i) / weights.get(i)) {
-                max = values.get(i) / weights.get(i);
+            if (max < values.get(i) * weights.get(i)) {
+                max = values.get(i) * weights.get(i);
             }
         }
 		return max;

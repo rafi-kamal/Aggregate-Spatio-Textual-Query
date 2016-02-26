@@ -10,7 +10,7 @@ public class SumAggregator implements IAggregator {
 	public double getAggregateValue(List<Double> values, List<Double> weights) {
 		double aggregateValue = 0;
 		for (int i = 0; i < values.size(); i++) {
-			aggregateValue += values.get(i) / weights.get(i);
+			aggregateValue += values.get(i) * weights.get(i);
 		}
 		return aggregateValue;
 	}

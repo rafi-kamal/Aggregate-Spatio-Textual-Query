@@ -160,7 +160,7 @@ public class Main {
 //			System.out.println("Average inverted index IO: " + ivIO * 1.0 / count);
 		}
 		else {
-			System.out.printf("%d %d %.2f\n", averageTime, averageFileIO, averageCost);
+			System.out.printf("%d %d %.6f\n", averageTime, averageFileIO, averageCost);
 		}
 	}
 }

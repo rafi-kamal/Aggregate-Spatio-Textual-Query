@@ -13,7 +13,7 @@ import utils.Parameters;
 public class QueryGenerator {
 	private static final Random RANDOM = new Random(1);
 	
-	private static final int NUMBER_OF_QUERIES = 1;
+	private static final int NUMBER_OF_QUERIES = 5;
 	
 //	private static final double QUERY_AREA_COVERAGE = 0.1;
 	
@@ -144,7 +144,7 @@ public class QueryGenerator {
 		}
 		
 		for (int i = 0; i < numberOfQueries; i++) {
-			writeQuery(writer, i, (double) queryWeights[i] / queryWeightSum, 
+			writeQuery(writer, i, (double) queryWeights[i] / queryWeightSum * numberOfQueries, 
 					numberOfKeywords, keywordSpaceMiddle, keywordSpaceSpan, 
 					centroidLatitude, centroidLongtitude, latitudeSpan, longtitudeSpan);
 		}

@@ -17,7 +17,7 @@ queryTypes=(5 4 3 2 1 0)
 
 # Group Size
 ns=(10 20 40 60 80)
-nDefault=20
+nDefault=10
 
 mPercentages=(40 50 60 70 80)
 mPercentageDefault=60
@@ -45,6 +45,7 @@ aplhaDefault=0.5
 # $6 = keywordSpacePercentage
 # $7 = topk
 # $8 = alpha
+# $9 = query type
 # $0 = aggregator
 function run {
 	# Generate queries
@@ -80,44 +81,59 @@ function writeData {
 	echo $1 $sgnnkeio | tee -a "$2/io/$3-sgnnke.dat"
 }
 
-for n in ${ns[@]}; do
-	run $1 $n $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
-	writeData $n $2 groupsize
-done
 
-for mPercentage in ${mPercentages[@]}; do
-	run $1 $nDefault $mPercentage $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
-	writeData $mPercentage $2 subgroup-size
-done
 
-for numberOfKeyword in ${numberOfKeywords[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeyword $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
-	writeData $numberOfKeyword $2 number-of-keyword
-done
+# for n in ${ns[@]}; do
+# 	run $1 $n $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+# 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
+# 	writeData $n $2 groupsize
+# done
 
-for querySpaceAreaPercentage in ${querySpaceAreaPercentages[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentage \
-		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
-	writeData $querySpaceAreaPercentage $2 query-space-area
-done
+# for mPercentage in ${mPercentages[@]}; do
+# 	run $1 $nDefault $mPercentage $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+# 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
+# 	writeData $mPercentage $2 subgroup-size
+# done
 
-for keywordSpaceSizePercentage in ${keywordSpaceSizePercentages[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentage $topkDefault $aplhaDefault $3
-	writeData $keywordSpaceSizePercentage $2 keyword-space-size
-done
+# for numberOfKeyword in ${numberOfKeywords[@]}; do
+# 	run $1 $nDefault $mPercentageDefault $numberOfKeyword $querySpaceAreaPercentageDefault \
+# 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
+# 	writeData $numberOfKeyword $2 number-of-keyword
+# done
 
-for topk in ${topks[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topk $aplhaDefault $3
-	writeData $topk $2 topk
-done
+# for querySpaceAreaPercentage in ${querySpaceAreaPercentages[@]}; do
+# 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentage \
+# 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
+# 	writeData $querySpaceAreaPercentage $2 query-space-area
+# done
 
-for alpha in ${alphas[@]}; do
-	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-		$keywordSpaceSizePercentageDefault $topkDefault $alpha $3
-	writeData $alpha $2 alpha
+# for keywordSpaceSizePercentage in ${keywordSpaceSizePercentages[@]}; do
+# 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+# 		$keywordSpaceSizePercentage $topkDefault $aplhaDefault $3
+# 	writeData $keywordSpaceSizePercentage $2 keyword-space-size
+# done
+
+# for topk in ${topks[@]}; do
+# 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+# 		$keywordSpaceSizePercentageDefault $topk $aplhaDefault $3
+# 	writeData $topk $2 topk
+# done
+
+# for alpha in ${alphas[@]}; do
+# 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+# 		$keywordSpaceSizePercentageDefault $topkDefault $alpha $3
+# 	writeData $alpha $2 alpha
+# done
+
+# Keyword Dropping
+
+droppingPercentages=(0 20 40 60 80)
+$runjava test.QueryGenerator $1 $nDefault $mPercentageDefault 10 \
+	$querySpaceAreaPercentageDefault $keywordSpaceSizePercentageDefault $3
+
+for droppingPercentage in ${droppingPercentages[@]}; do
+	result=($($runjava test.Main $1/rtree $1/gnnk.txt $1/sgnnk.txt $topkDefault $aplhaDefault 0 $droppingPercentage))
+	cost=${result[2]}
+
+	echo $droppingPercentage $cost | tee -a "$2/keyword-dropping.dat"
 done
