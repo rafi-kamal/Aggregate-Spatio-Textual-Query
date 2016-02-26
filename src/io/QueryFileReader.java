@@ -1,7 +1,12 @@
 package io;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import annk.aggregator.AggregatorFactory;
 import annk.aggregator.IAggregator;
@@ -12,9 +17,19 @@ import spatialindex.spatialindex.Point;
 
 public class QueryFileReader {
 	private File queryFile;
+	private int keywordDropPercentage;
+
+	public QueryFileReader(File queryFile, int keywordDropPercentage) {
+		this.queryFile = queryFile;
+		this.keywordDropPercentage = keywordDropPercentage;
+	}
 
 	public QueryFileReader(File queryFile) {
-		this.queryFile = queryFile;
+		this(queryFile, 0);
+	}
+	
+	public QueryFileReader(String fileName, int keywordDropPercentage) {
+		this(new File(fileName), keywordDropPercentage);
 	}
 	
 	public QueryFileReader(String fileName) {
@@ -85,17 +100,39 @@ public class QueryFileReader {
 		double y = Double.parseDouble(temp[3]);
 		Point location = new Point(new double[] {x, y});
 
-        List<Integer> keywords = new ArrayList<>();
-        List<Double> keywordWeights = new ArrayList<>();
+        class Keyword {
+        	int id;
+        	double weight;
+        	
+			public Keyword(int id, double weight) {
+				this.id = id;
+				this.weight = weight;
+			}
+		}
+        
+        List<Keyword> keywords = new ArrayList<>();
+        
 		for (int j = 4; j < temp.length; j++) {
 			String[] temp2 = temp[j].split(" ");
             int keyword = Integer.parseInt(temp2[0]);
             double keywordWeight = Double.parseDouble(temp2[1]);
-            keywords.add(keyword);
-            keywordWeights.add(keywordWeight);
+            keywords.add(new Keyword(keyword, keywordWeight));
         }
+		Collections.sort(keywords, Comparator.comparing((Keyword keyword) -> keyword.weight).reversed());
 		
-		Query query = new Query(id, weight, location, keywords, keywordWeights);
+		int limit = keywords.size() - keywords.size() * keywordDropPercentage / 100;
+		
+		List<Integer> keywordIds = keywords.stream()
+				.map((keyword) -> keyword.id)
+				.limit(limit)
+				.collect(Collectors.toList());
+		
+		List<Double> keywordWeights = keywords.stream()
+				.map((keyword) -> keyword.weight)
+				.limit(limit)
+				.collect(Collectors.toList());
+		
+		Query query = new Query(id, weight, location, keywordIds, keywordWeights);
 		return query;
 	}
 }

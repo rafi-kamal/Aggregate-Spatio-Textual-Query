@@ -66,6 +66,7 @@ import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.InvalidPageException;
 import spatialindex.storagemanager.PropertySet;
 import storage.DocumentStore;
+import utils.Parameters;
 
 public class RTree implements ISpatialIndex {
 	//////////////////////////////////////
@@ -1118,10 +1119,13 @@ public class RTree implements ISpatialIndex {
 	}
 
 	public static double combinedScore(double spatial, double ir) {
-		// TODO divide with max value instead
-		final double maxD = 50;
-		final double maxW = 0.8;
-		return (alpha_dist * spatial / maxD + (1 - alpha_dist) * (1 - ir / maxW));
+		double spatialCost = spatial / Parameters.maxD;
+		double keywordMismatchCost = (1 - ir);
+		
+		double totalCost = alpha_dist * spatialCost + (1 - alpha_dist) * keywordMismatchCost;
+//		System.out.println(totalCost + " " + spatialCost + " " + keywordMismatchCost);
+		
+		return totalCost;
 	}
 
 	public int getIO() {

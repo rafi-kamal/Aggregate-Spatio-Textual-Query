@@ -28,8 +28,9 @@ public class Main {
 	 * 5 - sgnnk * (n - m + 1)
 	 */
 	public static void main(String[] args) throws Exception {
-		if (args.length < 5) {
-			System.out.println("Usage: Main index_file gnnk_query_file sgnnk_query_file topk alpha query_type");
+		if (args.length < 6) {
+			System.out.println("Usage: Main index_file gnnk_query_file sgnnk_query_file "
+					+ "topk alpha query_type [keyword_drop_percentage]");
 			System.exit(-1);
 		}
 
@@ -38,9 +39,10 @@ public class Main {
 		String sgnnkQueryFile = args[2];
 		int topk = Integer.parseInt(args[3]);
 		RTree.alpha_dist = Double.parseDouble(args[4]);
-		int queryType = 4;
-		if (args.length > 5)
-			queryType = Integer.parseInt(args[5]);
+		int queryType = Integer.parseInt(args[5]);
+		int keywordDropPercentage = 0;
+		if (args.length > 6) 
+			keywordDropPercentage = Integer.parseInt(args[6]);
 
 		PropertySet ps = new PropertySet();
 		ps.setProperty("FileName", indexFile + ".rtree");
@@ -60,9 +62,10 @@ public class Main {
 		IRTree tree = new IRTree(ps2, diskfile);
 		
 		int numberOfQueries;
+		double totalCost = 0; // It doesn't keep track of MSGNNK cost - too much extra work 
 		
 		if (queryType == 0 || queryType == 1) {
-			QueryFileReader reader = new QueryFileReader(gnnkQueryFile);
+			QueryFileReader reader = new QueryFileReader(gnnkQueryFile, keywordDropPercentage);
 			List<GNNKQuery> gnnkQueries = reader.readGNNKQueries();
 			numberOfQueries = gnnkQueries.size();
 			
@@ -79,12 +82,13 @@ public class Main {
 					results = tree.gnnk(invertedFile, q, topk);
 				}
 				writer.writeGNNKResult(results);
+				totalCost += results.get(0).cost;
 				
 				writer.write("========================================");
 			}
 		}
 		else {
-			QueryFileReader reader = new QueryFileReader(sgnnkQueryFile);
+			QueryFileReader reader = new QueryFileReader(sgnnkQueryFile, keywordDropPercentage);
 			List<SGNNKQuery> sgnnkQueries = reader.readSGNNKQueries();
 			numberOfQueries = sgnnkQueries.size();
 			
@@ -111,6 +115,8 @@ public class Main {
 						List<Result> results = tree.sgnnk(invertedFile, q, topk);
 						writer.writeSGNNKResult(results);
 						
+						totalCost += results.get(0).cost;
+						
 						q.subGroupSize++;
 					}
 				}
@@ -126,6 +132,9 @@ public class Main {
 						results = tree.sgnnk(invertedFile, q, topk);
 					}
 					results = tree.sgnnk(invertedFile, q, topk);
+
+					totalCost += results.get(0).cost;
+					
 					writer.writeSGNNKResult(results);
 				}
 				
@@ -138,6 +147,7 @@ public class Main {
 		int averageTime = (int) (totalTime / numberOfQueries);
 		int averageFileIO = (tree.getIO() + invertedFile.getIO()) / numberOfQueries;
 		double averageNodesVisited = tree.noOfVisitedNodes * 1.0 / numberOfQueries;
+		double averageCost = totalCost / numberOfQueries;
 		
 		writer.write("Average nodes visited: " + averageNodesVisited);
 		writer.write("Total time millisecond: " + totalTime);
@@ -150,7 +160,7 @@ public class Main {
 //			System.out.println("Average inverted index IO: " + ivIO * 1.0 / count);
 		}
 		else {
-			System.out.printf("%d %d\n", averageTime, averageFileIO);
+			System.out.printf("%d %d %.2f\n", averageTime, averageFileIO, averageCost);
 		}
 	}
 }

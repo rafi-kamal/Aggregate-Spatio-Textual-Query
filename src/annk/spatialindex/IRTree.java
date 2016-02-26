@@ -180,17 +180,15 @@ public class IRTree extends RTree {
 
 		List<GNNKQuery.Result> results = new ArrayList<>();
 		
-		while (queue.size() != 0) {
+		while (queue.size() != 0 && results.size() < topk) {
 			NNEntry first = queue.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
 
 			if (rTreeEntry.isLeafEntry) {
-				if (results.size() < topk)
-					results.add(new GNNKQuery.Result(first.node.getIdentifier(), first.cost));
-				else 
-					break;
+				results.add(new GNNKQuery.Result(first.node.getIdentifier(), first.cost));
 			} else {
 				Node n = readNode(rTreeEntry.getIdentifier());
+//				System.out.println(first.cost + " " + n.level);
 				
 				noOfVisitedNodes++;
 
@@ -228,15 +226,12 @@ public class IRTree extends RTree {
 
 		List<SGNNKQuery.Result> results = new ArrayList<>();
 
-		while (queue.size() != 0) {
+		while (queue.size() != 0 && results.size() < topk) {
 			NNEntry first = queue.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
 
 			if (rTreeEntry.isLeafEntry) {
-				if (results.size() < topk)
-					results.add(new SGNNKQuery.Result(first.node.getIdentifier(), first.cost, first.queryIndices));
-				else 
-					break;
+				results.add(new SGNNKQuery.Result(first.node.getIdentifier(), first.cost, first.queryIndices));
 			} else {
 				Node n = readNode(rTreeEntry.getIdentifier());
 				noOfVisitedNodes++;
@@ -432,10 +427,11 @@ public class IRTree extends RTree {
 				int childId = n.pIdentifiers[child];
 				double irScore = 0;
 				if (similarities.containsKey(childId)) 
-					irScore = similarities.get(childId) / q.keywords.size();
+					irScore = similarities.get(childId);
 				
 				double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
 				double queryCost = combinedScore(spatialCost, irScore);
+				
 				costs.get(child).add(queryCost);
 			}
 		}
