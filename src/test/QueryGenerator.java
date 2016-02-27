@@ -13,7 +13,7 @@ import utils.Parameters;
 public class QueryGenerator {
 	private static final Random RANDOM = new Random(1);
 	
-	private static final int NUMBER_OF_QUERIES = 5;
+	private static final int NUMBER_OF_QUERIES = 20;
 	
 //	private static final double QUERY_AREA_COVERAGE = 0.1;
 	

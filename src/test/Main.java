@@ -96,7 +96,6 @@ public class Main {
 			
 			for (SGNNKQuery q : sgnnkQueries) {
 				if (queryType == 4) {
-					invertedFile.resetIO();
 					if (printInConsole) System.out.println("SGNNK Extended");
 					Map<Integer, List<SGNNKQuery.Result>> results = tree.sgnnkExtended(invertedFile, q, topk);
 					List<Integer> subroupSizes = new ArrayList<>(results.keySet());
@@ -110,7 +109,6 @@ public class Main {
 				else if (queryType == 5) {
 					if (printInConsole) System.out.println("SGNNK Extended Baseline");
 					while (q.subGroupSize <= q.groupSize) {
-						invertedFile.resetIO();
 						writer.write("Size " + q.subGroupSize);
 						List<Result> results = tree.sgnnk(invertedFile, q, topk);
 						writer.writeSGNNKResult(results);
@@ -121,7 +119,6 @@ public class Main {
 					}
 				}
 				else {
-					invertedFile.resetIO();
 					List<SGNNKQuery.Result> results;
 					if (queryType == 3) {
 						if (printInConsole) System.out.println("SGNNK Baseline");
