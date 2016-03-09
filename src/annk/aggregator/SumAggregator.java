@@ -2,17 +2,25 @@ package annk.aggregator;
 
 import java.util.List;
 
+import annk.domain.Cost;
+
 public class SumAggregator implements IAggregator {
 	
-	private double totalAccumulatedValue;
+	double totalSum;
+	double spatialSum;
+	double irSum;
 
 	@Override
-	public double getAggregateValue(List<Double> values, List<Double> weights) {
-		double aggregateValue = 0;
+	public Cost getAggregateValue(List<Cost> values, List<Double> weights) {
+		double totalSum = 0;
+		double spatialSum = 0;
+		double irSum = 0;
 		for (int i = 0; i < values.size(); i++) {
-			aggregateValue += values.get(i) * weights.get(i);
+			totalSum += values.get(i).totalCost * weights.get(i);
+			spatialSum += values.get(i).spatialCost * weights.get(i);
+			irSum += values.get(i).irCost * weights.get(i);
 		}
-		return aggregateValue;
+		return new Cost(irSum, spatialSum, totalSum);
 	}
 
 	@Override
@@ -21,23 +29,27 @@ public class SumAggregator implements IAggregator {
 	}
 
 	@Override
-	public double getAggregateValue(Double value, int m) {
-		return m * value;
+	public Cost getAggregateValue(Cost value, int m) {
+		return new Cost(m * value.irCost, m * value.spatialCost, m * value.totalCost);
 	}
 
 	@Override
 	public void initializeAccmulator() {
-		totalAccumulatedValue = 0;
+		totalSum = 0;
+		spatialSum = 0;
+		irSum = 0;
 	}
 
 	@Override
-	public void accumulate(Double value, Double weight) {
-		totalAccumulatedValue += value * weight;
+	public void accumulate(Cost value, Double weight) {
+		totalSum += value.totalCost * weight;
+		spatialSum += value.spatialCost * weight;
+		irSum += value.irCost * weight;
 	}
 
 	@Override
-	public double getAccumulatedValue() {
-		return totalAccumulatedValue;
+	public Cost getAccumulatedValue() {
+		return new Cost(irSum, spatialSum, totalSum);
 	}
 	
 }

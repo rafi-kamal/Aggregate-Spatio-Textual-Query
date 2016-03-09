@@ -2,16 +2,21 @@ package annk.aggregator;
 
 import java.util.List;
 
+import annk.domain.Cost;
+
 public class MaxAggregator implements IAggregator {
 	
-	private double maximum;
+	private Cost maximum;
 	
 	@Override
-	public double getAggregateValue(List<Double> values, List<Double> weights) {
-        double max = 0;
+	public Cost getAggregateValue(List<Cost> values, List<Double> weights) {
+        double maxTotal = 0;
+        Cost max = null;
         for (int i = 0; i < values.size(); i++) {
-            if (max < values.get(i) * weights.get(i)) {
-                max = values.get(i) * weights.get(i);
+            if (maxTotal < values.get(i).totalCost * weights.get(i)) {
+                max = new Cost(values.get(i).irCost * weights.get(i), 
+                		values.get(i).spatialCost * weights.get(i),
+                		values.get(i).totalCost * weights.get(i));
             }
         }
 		return max;
@@ -23,22 +28,23 @@ public class MaxAggregator implements IAggregator {
 	}
 
 	@Override
-	public double getAggregateValue(Double value, int m) {
+	public Cost getAggregateValue(Cost value, int m) {
 		return value;
 	}
 
 	@Override
 	public void initializeAccmulator() {
-		maximum = Double.MIN_VALUE;
+		maximum = new Cost(0, 0, 0);
 	}
 
 	@Override
-	public void accumulate(Double value, Double weight) {
-		maximum = Math.max(maximum * weight, value);
+	public void accumulate(Cost value, Double weight) {
+		if (maximum.totalCost < value.totalCost * weight)
+			maximum = new Cost(value.irCost * weight, value.spatialCost * weight, value.totalCost * weight);
 	}
 
 	@Override
-	public double getAccumulatedValue() {
+	public Cost getAccumulatedValue() {
 		return maximum;
 	}
 	

@@ -1,6 +1,5 @@
 package annk.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import annk.aggregator.IAggregator;
@@ -20,10 +19,9 @@ public class GNNKQuery extends AggregateQuery {
 	
 	public static class Result extends AggregateQuery.Result {
 
-		public Result(int id, double cost) {
+		public Result(int id, Cost cost) {
 			super(id, cost);
 		}
-		
 	}
 	
 }

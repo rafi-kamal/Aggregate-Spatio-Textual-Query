@@ -18,14 +18,19 @@ function combine {
 }
 
 indir="/home/rafi/Dropbox/Thesis/Results"
-outdir="/home/rafi/Desktop/Writing/graphs"
+outdir="graphs"
+
+mkdir -p $outdir"/flickr/io"
+mkdir -p $outdir"/flickr/cpu"
+mkdir -p $outdir"/yelp/io"
+mkdir -p $outdir"/yelp/cpu"
 
 combine $indir"/yelp"
-gnuplot -e 'indir="combined-data/cpu"; 	outdir="'$outdir'/yelp/cpu"; ylabel="running time (ms)"; offset=200' plot.gpl
+gnuplot -e 'indir="combined-data/cpu"; 	outdir="'$outdir'/yelp/cpu"; ylabel="running time (ms)"; offset=300' plot.gpl
 gnuplot -e 'indir="combined-data/io";  	outdir="'$outdir'/yelp/io";  ylabel="\\# page accesses"; offset=1000' plot.gpl
 
 combine $indir"/flickr"
-gnuplot -e 'indir="combined-data/cpu"; 	outdir="'$outdir'/flickr/cpu"; ylabel="running time (ms)"; offset=2000' plot.gpl
+gnuplot -e 'indir="combined-data/cpu"; 	outdir="'$outdir'/flickr/cpu"; ylabel="running time (ms)"; offset=5000' plot.gpl
 gnuplot -e 'indir="combined-data/io";  	outdir="'$outdir'/flickr/io";  ylabel="\\# page accesses"; offset=500' plot.gpl
 
 function combineKeywordDropping {
@@ -40,5 +45,8 @@ combineKeywordDropping $indir"/yelp"
 gnuplot -e 'indir="combined-data";	outdir="'$outdir'/yelp/";	ylabel="Query Cost";	offset=0' plot-dropping.gpl
 combineKeywordDropping $indir"/flickr"
 gnuplot -e 'indir="combined-data";	outdir="'$outdir'/flickr/";	ylabel="Query Cost";	offset=0' plot-dropping.gpl
+
+# rm -rf $writingLocation
+cp -r $outdir "/home/rafi/Desktop/Writing/"
 
 rm -rf "combined-data"

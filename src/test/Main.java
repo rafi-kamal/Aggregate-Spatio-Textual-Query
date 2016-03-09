@@ -63,6 +63,8 @@ public class Main {
 		
 		int numberOfQueries;
 		double totalCost = 0; // It doesn't keep track of MSGNNK cost - too much extra work 
+		double spatialCost = 0;
+		double irCost = 0;
 		
 		if (queryType == 0 || queryType == 1) {
 			QueryFileReader reader = new QueryFileReader(gnnkQueryFile, keywordDropPercentage);
@@ -82,7 +84,9 @@ public class Main {
 					results = tree.gnnk(invertedFile, q, topk);
 				}
 				writer.writeGNNKResult(results);
-				totalCost += results.get(0).cost;
+				totalCost += results.get(0).cost.totalCost;
+				spatialCost += results.get(0).cost.spatialCost;
+				irCost += results.get(0).cost.irCost;
 				
 				writer.write("========================================");
 			}
@@ -113,7 +117,9 @@ public class Main {
 						List<Result> results = tree.sgnnk(invertedFile, q, topk);
 						writer.writeSGNNKResult(results);
 						
-						totalCost += results.get(0).cost;
+						totalCost += results.get(0).cost.totalCost;
+						spatialCost += results.get(0).cost.spatialCost;
+						irCost += results.get(0).cost.irCost;
 						
 						q.subGroupSize++;
 					}
@@ -130,7 +136,9 @@ public class Main {
 					}
 					results = tree.sgnnk(invertedFile, q, topk);
 
-					totalCost += results.get(0).cost;
+					totalCost += results.get(0).cost.totalCost;
+					spatialCost += results.get(0).cost.spatialCost;
+					irCost += results.get(0).cost.irCost;
 					
 					writer.writeSGNNKResult(results);
 				}
@@ -144,7 +152,7 @@ public class Main {
 		int averageTime = (int) (totalTime / numberOfQueries);
 		int averageFileIO = (tree.getIO() + invertedFile.getIO()) / numberOfQueries;
 		double averageNodesVisited = tree.noOfVisitedNodes * 1.0 / numberOfQueries;
-		double averageCost = totalCost / numberOfQueries;
+		double averageSpatialCost = spatialCost / numberOfQueries;
 		
 		writer.write("Average nodes visited: " + averageNodesVisited);
 		writer.write("Total time millisecond: " + totalTime);
@@ -157,7 +165,7 @@ public class Main {
 //			System.out.println("Average inverted index IO: " + ivIO * 1.0 / count);
 		}
 		else {
-			System.out.printf("%d %d %.6f\n", averageTime, averageFileIO, averageCost);
+			System.out.printf("%d %d %.6f\n", averageTime, averageFileIO, averageSpatialCost);
 		}
 	}
 }

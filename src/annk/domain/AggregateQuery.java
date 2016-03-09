@@ -64,18 +64,18 @@ public class AggregateQuery {
 		 * ID of the data object
 		 */
 		public int id;
-		public double cost;
+		public Cost cost;
 
-		public Result(int id, double cost) {
+		public Result(int id, Cost cost) {
 			this.id = id;
 			this.cost = cost;
 		}
 		
 		@Override
 		public int compareTo(Result other) {
-			if (this.cost < other.cost)
+			if (this.cost.totalCost < other.cost.totalCost)
 				return -1;
-			else if (this.cost > other.cost)
+			else if (this.cost.totalCost > other.cost.totalCost)
 				return 1;
 			else {
 				if (this.id < other.id)

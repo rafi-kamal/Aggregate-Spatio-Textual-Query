@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import annk.domain.AggregateQuery;
+import annk.domain.Cost;
 import annk.domain.GNNKQuery;
+import annk.domain.NNEntry;
 import annk.domain.SGNNKQuery;
 import documentindex.InvertedFile;
 import query.Query;
 import spatialindex.rtree.Node;
 import spatialindex.rtree.RTree;
-import spatialindex.spatialindex.NNEntry;
 import spatialindex.spatialindex.RtreeEntry;
 import spatialindex.storagemanager.IStorageManager;
 import spatialindex.storagemanager.PropertySet;
@@ -33,7 +34,7 @@ public class IRTree extends RTree {
 	public List<GNNKQuery.Result> gnnkBaseline(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
 			throws Exception {
 		LinkedList<NNEntry> list = new LinkedList<>();
-		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
+		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), new Cost(0, 0, 0));
 		list.add(root);
 
 		// Current (at most) k best objects, sorted according to their decreasing value of cost.
@@ -42,7 +43,7 @@ public class IRTree extends RTree {
 				new PriorityQueue<>(topk, new WorstFirstNNEntryComparator());
 		// Dummy objects
 		for (int i = 0; i < topk; i++) {
-			currentBestObjects.add(new GNNKQuery.Result(-1, Double.MAX_VALUE));
+			currentBestObjects.add(new GNNKQuery.Result(-1, new Cost(0, 0, Double.MAX_VALUE)));
 		}
 
 		// Cost of the highest valued node of current best objects
@@ -52,24 +53,24 @@ public class IRTree extends RTree {
 			NNEntry first = list.poll();
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
 			
-			if (first.cost > costBound)
+			if (first.cost.totalCost > costBound)
 				continue;
 			
 			Node n = readNode(rTreeEntry.getIdentifier());
 			noOfVisitedNodes++;
 
-			HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, gnnkQuery.queries, n);
+			HashMap<Integer, List<Cost>> costs = calculateQueryCosts(invertedFile, gnnkQuery.queries, n);
 			
 			// Individual query costs are calculated, now calculate aggregate query cost
 			for (int child = 0; child < n.children; child++) {
-				List<Double> queryCosts = costs.get(child);
-				double aggregateCost = gnnkQuery.aggregator.getAggregateValue(queryCosts, gnnkQuery.getWeights());
+				List<Cost> queryCosts = costs.get(child);
+				Cost aggregateCost = gnnkQuery.aggregator.getAggregateValue(queryCosts, gnnkQuery.getWeights());
 				
 				int childId = n.pIdentifiers[child];
 				if (n.level == 0) {
 					currentBestObjects.add(new GNNKQuery.Result(childId, aggregateCost));
 					currentBestObjects.poll();
-					costBound = currentBestObjects.peek().cost;
+					costBound = currentBestObjects.peek().cost.totalCost;
 				} else {
 					rTreeEntry = new RtreeEntry(childId, false);
 					NNEntry entry = new NNEntry(rTreeEntry, aggregateCost);
@@ -90,7 +91,7 @@ public class IRTree extends RTree {
 	public List<SGNNKQuery.Result> sgnnkBaseline(InvertedFile invertedFile, SGNNKQuery sgnnkQuery, int topk)
 			throws Exception {
 		LinkedList<NNEntry> list = new LinkedList<>();
-		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
+		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), new Cost(0, 0, 0));
 		list.add(root);
 
 		List<SGNNKQuery.Result> results = new ArrayList<>();
@@ -101,13 +102,13 @@ public class IRTree extends RTree {
 				new PriorityQueue<>(topk, new WorstFirstNNEntryComparator());
 		// Dummy objects
 		for (int i = 0; i < topk; i++) {
-			currentBestObjects.add(new SGNNKQuery.Result(-1, Double.MAX_VALUE, null));
+			currentBestObjects.add(new SGNNKQuery.Result(-1, new Cost(0, 0, Double.MAX_VALUE), null));
 		}
 		double costBound = Double.MAX_VALUE;
 
 		while (list.size() != 0) {
 			NNEntry first = list.poll();
-			if (first.cost > costBound)
+			if (first.cost.totalCost > costBound)
 				continue;
 			
 			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
@@ -115,11 +116,11 @@ public class IRTree extends RTree {
 			
 			noOfVisitedNodes++;
 			
-			HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
+			HashMap<Integer, List<Cost>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
 			
 			// Individual query costs are calculated, now calculate aggregate query cost
 			for (int child = 0; child < n.children; child++) {
-				final List<Double> queryCosts = costs.get(child);
+				final List<Cost> queryCosts = costs.get(child);
 				
 				List<Integer> minimumCostQueryIndices = new ArrayList<>();
 				for (int queryIndex = 0; queryIndex < queryCosts.size(); queryIndex++) {
@@ -127,13 +128,13 @@ public class IRTree extends RTree {
 				}
 				// Sort query indices according to increasing order of query cost
 				Collections.sort(minimumCostQueryIndices, (i1, i2) -> {
-                    if (queryCosts.get(i1) < queryCosts.get(i2)) return -1;
-                    else if (queryCosts.get(i1) > queryCosts.get(i2)) return 1;
+                    if (queryCosts.get(i1).totalCost < queryCosts.get(i2).totalCost) return -1;
+                    else if (queryCosts.get(i1).totalCost > queryCosts.get(i2).totalCost) return 1;
                     return 0;
                 });
 				
 				// Now choose first m queries with lowest cost
-				List<Double> minimumQueryCosts = new ArrayList<>();		
+				List<Cost> minimumQueryCosts = new ArrayList<>();		
 				List<Integer> minimumCostQueryIds = new ArrayList<>();	
 				for (int i = 0; i < sgnnkQuery.subGroupSize; i++) {
 					int queryIndex = minimumCostQueryIndices.get(i);
@@ -148,13 +149,13 @@ public class IRTree extends RTree {
                     minimumQueryWeights.add(sgnnkQuery.queries.get(queryIndex).weight);
                 }
 
-                double aggregateCost = sgnnkQuery.aggregator.getAggregateValue(minimumQueryCosts, minimumQueryWeights);
+                Cost aggregateCost = sgnnkQuery.aggregator.getAggregateValue(minimumQueryCosts, minimumQueryWeights);
 				int childId = n.pIdentifiers[child];
 				
 				if (n.level == 0) {
 					currentBestObjects.add(new SGNNKQuery.Result(childId, aggregateCost, minimumCostQueryIds));
 					currentBestObjects.poll();
-					costBound = currentBestObjects.peek().cost;
+					costBound = currentBestObjects.peek().cost.totalCost;
 				} else {
 					rTreeEntry = new RtreeEntry(childId, false);
 					list.addFirst(new NNEntry(rTreeEntry, minimumCostQueryIds, aggregateCost));
@@ -175,7 +176,7 @@ public class IRTree extends RTree {
 	public List<GNNKQuery.Result> gnnk(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
 			throws Exception {
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
-		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
+		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), new Cost(0, 0, 0));
 		queue.add(root);
 
 		List<GNNKQuery.Result> results = new ArrayList<>();
@@ -192,12 +193,12 @@ public class IRTree extends RTree {
 				
 				noOfVisitedNodes++;
 
-				HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, gnnkQuery.queries, n);
+				HashMap<Integer, List<Cost>> costs = calculateQueryCosts(invertedFile, gnnkQuery.queries, n);
 				
 				// Individual query costs are calculated, now calculate aggregate query cost
 				for (int child = 0; child < n.children; child++) {
-					List<Double> queryCosts = costs.get(child);
-					double aggregateCost = gnnkQuery.aggregator.getAggregateValue(queryCosts, gnnkQuery.getWeights());
+					List<Cost> queryCosts = costs.get(child);
+					Cost aggregateCost = gnnkQuery.aggregator.getAggregateValue(queryCosts, gnnkQuery.getWeights());
 					
 					if (n.level == 0) {
 						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], true);
@@ -221,7 +222,7 @@ public class IRTree extends RTree {
 	public List<SGNNKQuery.Result> sgnnk(InvertedFile invertedFile, SGNNKQuery sgnnkQuery, int topk)
 			throws Exception {
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
-		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
+		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), new Cost(0, 0, 0));
 		queue.add(root);
 
 		List<SGNNKQuery.Result> results = new ArrayList<>();
@@ -240,11 +241,11 @@ public class IRTree extends RTree {
 					levelVsVisitedNodes.put(n.level, new ArrayList<AggregateQuery.Result>());
 				levelVsVisitedNodes.get(n.level).add(new AggregateQuery.Result(n.identifier, first.cost));
 				
-				HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
+				HashMap<Integer, List<Cost>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
 				
 				// Individual query costs are calculated, now calculate aggregate query cost
 				for (int child = 0; child < n.children; child++) {
-					final List<Double> queryCosts = costs.get(child);
+					final List<Cost> queryCosts = costs.get(child);
 					
 					List<Integer> minimumCostQueryIndices = new ArrayList<>();
 					for (int queryIndex = 0; queryIndex < queryCosts.size(); queryIndex++) {
@@ -252,13 +253,13 @@ public class IRTree extends RTree {
 					}
 					// Sort query indices according to increasing order of query cost
 					Collections.sort(minimumCostQueryIndices, (i1, i2) -> {
-						if (queryCosts.get(i1) < queryCosts.get(i2)) return -1;
-						else if (queryCosts.get(i1) > queryCosts.get(i2)) return 1;
+						if (queryCosts.get(i1).totalCost < queryCosts.get(i2).totalCost) return -1;
+						else if (queryCosts.get(i1).totalCost > queryCosts.get(i2).totalCost) return 1;
 						return 0;
 					});
 					
 					// Now choose first m queries with lowest cost
-					List<Double> minimumQueryCosts = new ArrayList<>();		
+					List<Cost> minimumQueryCosts = new ArrayList<>();		
 					List<Integer> minimumCostQueryIds = new ArrayList<>();	
 					for (int i = 0; i < sgnnkQuery.subGroupSize; i++) {
 						Integer queryIndex = minimumCostQueryIndices.get(i);
@@ -274,7 +275,7 @@ public class IRTree extends RTree {
                         minimumQueryWeights.add(sgnnkQuery.queries.get(queryIndex).weight);
                     }
 					
-					double aggregateCost = sgnnkQuery.aggregator.getAggregateValue(minimumQueryCosts, minimumQueryWeights);
+					Cost aggregateCost = sgnnkQuery.aggregator.getAggregateValue(minimumQueryCosts, minimumQueryWeights);
 					
 					if (n.level == 0) {
 						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], true);
@@ -298,14 +299,14 @@ public class IRTree extends RTree {
 	public Map<Integer, List<SGNNKQuery.Result>> sgnnkExtended(InvertedFile invertedFile, SGNNKQuery sgnnkQuery, int topk)
 			throws Exception {
 		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
-		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0, null);
+		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), new Cost(0, 0, 0), null);
 		queue.add(root);
 
 		Map<Integer, PriorityQueue<SGNNKQuery.Result>> topResults = new HashMap<>();
 		for (int i = sgnnkQuery.subGroupSize; i <= sgnnkQuery.groupSize; i++) {
 			PriorityQueue<SGNNKQuery.Result> bestResults = new PriorityQueue<>(topk, new WorstFirstNNEntryComparator());
 			for (int j = 0; j < topk; j++) {
-				bestResults.add(new SGNNKQuery.Result(-1, Double.MAX_VALUE, null));
+				bestResults.add(new SGNNKQuery.Result(-1, new Cost(0, 0, Double.MAX_VALUE), null));
 			}
 			topResults.put(i, bestResults);
 		}
@@ -318,9 +319,9 @@ public class IRTree extends RTree {
 			if (first.queryCosts != null) {		
 				boolean pruneNode = true;
 				for (int i = 0; i < first.queryCosts.size(); i++) {
-					double prunningBound = topResults.get(i + sgnnkQuery.subGroupSize).peek().cost;
+					double prunningBound = topResults.get(i + sgnnkQuery.subGroupSize).peek().cost.totalCost;
 //					System.out.println(prunningBound);
-					if (first.queryCosts.get(i) < prunningBound) 
+					if (first.queryCosts.get(i).totalCost < prunningBound) 
 						pruneNode = false;
 				}
 				if (pruneNode) continue;
@@ -330,11 +331,11 @@ public class IRTree extends RTree {
 			
 			noOfVisitedNodes++;
 			
-			HashMap<Integer, List<Double>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
+			HashMap<Integer, List<Cost>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
 			
 			// Individual query costs are calculated, now calculate aggregate query cost
 			for (int child = 0; child < n.children; child++) {
-				final List<Double> queryCosts = costs.get(child);
+				final List<Cost> queryCosts = costs.get(child);
 				
 				List<Integer> minimumCostQueryIndices = new ArrayList<>();
 				for (int queryIndex = 0; queryIndex < queryCosts.size(); queryIndex++) {
@@ -342,13 +343,13 @@ public class IRTree extends RTree {
 				}
 				// Sort query indices according to increasing order of query cost
 				Collections.sort(minimumCostQueryIndices, (i1, i2) -> {
-                    if (queryCosts.get(i1) < queryCosts.get(i2)) return -1;
-                    else if (queryCosts.get(i1) > queryCosts.get(i2)) return 1;
+                    if (queryCosts.get(i1).totalCost < queryCosts.get(i2).totalCost) return -1;
+                    else if (queryCosts.get(i1).totalCost > queryCosts.get(i2).totalCost) return 1;
                     return 0;
                 });
 				
 				// Now choose first m queries with lowest cost
-				List<Double> minimumQueryCosts = new ArrayList<>();		
+				List<Cost> minimumQueryCosts = new ArrayList<>();		
 				List<Integer> minimumCostQueryIds = new ArrayList<>();	
 				for (int i = 0; i < sgnnkQuery.groupSize; i++) {
 					Integer queryIndex = minimumCostQueryIndices.get(i);
@@ -363,28 +364,28 @@ public class IRTree extends RTree {
                             sgnnkQuery.queries.get(queryIndex).weight);
 				}
 				
-				double minQueryCost = -1;
+				Cost minQueryCost = null;
 				boolean prune = true;
-				List<Double> aggregateQueryCosts = new ArrayList<>();
+				List<Cost> aggregateQueryCosts = new ArrayList<>();
 				
 				for (int i = sgnnkQuery.subGroupSize - 1; i < sgnnkQuery.groupSize; i++) {
                     int queryIndex = minimumCostQueryIndices.get(i);
 					sgnnkQuery.aggregator.accumulate(minimumQueryCosts.get(i),
                             sgnnkQuery.queries.get(queryIndex).weight);
-					double queryCost = sgnnkQuery.aggregator.getAccumulatedValue();
+					Cost queryCost = sgnnkQuery.aggregator.getAccumulatedValue();
 					aggregateQueryCosts.add(queryCost);
 					
 					PriorityQueue<SGNNKQuery.Result> bestResults = topResults.get(i + 1);
 					List<Integer> queryIds = minimumCostQueryIds.subList(0, i + 1);
-					if (queryCost < bestResults.peek().cost) {
+					if (queryCost.totalCost < bestResults.peek().cost.totalCost) {
 						prune = false;
 						if (n.level == 0) {
 							bestResults.add(new SGNNKQuery.Result(n.getChildIdentifier(child), queryCost, queryIds));
 							bestResults.poll();
 						}
 						
-						if (minQueryCost != -1) {
-							minQueryCost = Math.min(minQueryCost, queryCost);
+						if (minQueryCost == null || minQueryCost.totalCost < queryCost.totalCost) {
+							minQueryCost = queryCost;
 						}
 					}
 				}
@@ -411,12 +412,12 @@ public class IRTree extends RTree {
 	 * The first parameter of the result map is the index of the child node, 
 	 * second parameter is the corresponding list of costs calculated for individual queries.
 	 */
-	private HashMap<Integer, List<Double>> calculateQueryCosts(InvertedFile invertedFile, List<Query> queries, Node n)
+	private HashMap<Integer, List<Cost>> calculateQueryCosts(InvertedFile invertedFile, List<Query> queries, Node n)
 			throws Exception {
 		
-		HashMap<Integer, List<Double>> costs = new HashMap<>();
+		HashMap<Integer, List<Cost>> costs = new HashMap<>();
 		for (int child = 0; child < n.children; child++) {
-			costs.put(child, new ArrayList<Double>());
+			costs.put(child, new ArrayList<Cost>());
 		}
 		
 		invertedFile.load(n.identifier);
@@ -432,7 +433,7 @@ public class IRTree extends RTree {
 				double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
 				double queryCost = combinedScore(spatialCost, irScore);
 				
-				costs.get(child).add(queryCost);
+				costs.get(child).add(new Cost(irScore, spatialCost, queryCost));
 			}
 		}
 		return costs;
@@ -446,121 +447,13 @@ public class IRTree extends RTree {
 
 		@Override
 		public int compare(AggregateQuery.Result n1, AggregateQuery.Result n2) {
-			if (n1.cost > n2.cost)
+			if (n1.cost.totalCost > n2.cost.totalCost)
 				return -1;
-			if (n1.cost < n2.cost)
+			if (n1.cost.totalCost < n2.cost.totalCost)
 				return 1;
 			return 0;
 		}
 
 	}
-	
-	/**
-	 * @return A list of objects with size at most k, 
-	 * where objects are sorted according to the decreasing value of their costs.
-	 */
-//	public List<NNEntry> gnnkWithQuerySupernode(InvertedFile invertedFile, GNNKQuery gnnkQuery, int topk)
-//			throws Exception {
-//		
-//		PriorityQueue<NNEntry> queue = new PriorityQueue<>();
-//		NNEntry root = new NNEntry(new RtreeEntry(rootID, false), 0.0);
-//		queue.add(root);
-//
-//		// Current (at most) k best objects, sorted according to their decreasing value of cost.
-//		// So the highest cost object will always be on top.
-//		PriorityQueue<NNEntry> currentBestObjects = 
-//				new PriorityQueue<>(topk, new WorstFirstNNEntryComparator());
-//		// Dummy objects
-//		for (int i = 0; i < topk; i++) {
-//			currentBestObjects.add(new NNEntry(new RtreeEntry(-1, false), Double.MAX_VALUE));
-//		}
-//
-//		// Cost of the highest valued node of current best objects
-//		double costBound = Double.MAX_VALUE;
-//		
-//		Region queryMBR = gnnkQuery.getMBR();
-//		List<Integer> combinedQueryKeywords = gnnkQuery.getCombinedKeywords();
-//		
-//		while (queue.size() != 0) {
-//			NNEntry first = queue.poll();
-//			if (first.cost > costBound)
-//				continue;
-//			
-//			RtreeEntry rTreeEntry = (RtreeEntry) first.node;
-//		
-//			Node n = readNode(rTreeEntry.getIdentifier());
-//			invertedFile.load(n.identifier);
-//			
-//			noOfVisitedNodes++;
-//			if (n.level == 0) {
-//				// For each child node, calculate the cost for all queries.
-//				// The first parameter is the index of the child node, second parameter is the
-//				// corresponding list of costs calculated for individual queries
-//				HashMap<Integer, List<Double>> costs = new HashMap<>();
-//				for (int child = 0; child < n.children; child++) {
-//					costs.put(child, new ArrayList<Double>());
-//				}
-//
-//				for (Query q : gnnkQuery.queries) {
-//					HashMap<Integer, Double> similarities = invertedFile.rankingSum(q.keywords);
-//					
-//					for (int child = 0; child < n.children; child++) {
-//						int childId = n.pIdentifiers[child];
-//						double irScore = 0;
-//						if (similarities.containsKey(childId)) 
-//							irScore = similarities.get(childId) / q.keywords.size();
-//						
-//						double spatialCost = n.pMBR[child].getMinimumDistance(q.location);
-//						double queryCost = combinedScore(spatialCost, irScore);
-//						costs.get(child).add(queryCost);
-//					}
-//				}
-//				
-//				// Individual query costs are calculated, now calculate aggregate query cost
-//				// and prune the children based on this cost.
-//				for (int child = 0; child < n.children; child++) {
-//					List<Double> queryCosts = costs.get(child);
-//					double aggregateCost = gnnkQuery.aggregator.getAggregateValue(queryCosts);
-//					
-//					if (aggregateCost < costBound) {
-//						// The current object is better than at least one object in currentBestObjects.
-//						// So replace the worst object with current object
-//						int childId = n.pIdentifiers[child];
-//						currentBestObjects.poll();
-//						currentBestObjects.add(new NNEntry(new RtreeEntry(childId, true), aggregateCost));
-//					}
-//					costBound = currentBestObjects.peek().cost;
-//				}
-//			}
-//			else {
-//				HashMap<Integer, Double> similarities = invertedFile.rankingSum(
-//						combinedQueryKeywords);
-//				
-//				// Individual query costs are calculated, now calculate aggregate query cost
-//				// and prune the children based on this cost.
-//				for (int child = 0; child < n.children; child++) {
-//					double spatialCost = n.pMBR[child].getMinimumDistance(queryMBR);
-//					
-//					int childId = n.pIdentifiers[child];
-//					double irScore = 0;
-//					if (similarities.containsKey(childId)) 
-//						irScore = similarities.get(childId);
-//					double querySuperNodeCost = gnnkQuery.queries.size() * combinedScore(spatialCost, irScore);
-//					
-//					if (querySuperNodeCost > costBound)
-//						continue;
-//					
-//					rTreeEntry = new RtreeEntry(childId, false);
-//
-//					queue.add(new NNEntry(rTreeEntry, querySuperNodeCost));
-//				}
-//
-//			}
-//		}
-//
-//		List<NNEntry> results = new ArrayList<>(currentBestObjects);
-//		Collections.sort(results);
-//		return results;
-//	}
 
 }

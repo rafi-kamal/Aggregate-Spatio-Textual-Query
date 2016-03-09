@@ -31,7 +31,7 @@ public class ResultWriter {
 	public void writeGNNKResult(List<GNNKQuery.Result> results) throws IOException {
 		write("Query " + queryCount);
 		for (GNNKQuery.Result result : results) {
-			write(String.format("%d %.3f", result.id, result.cost));
+			write(String.format("%d %.3f", result.id, result.cost.totalCost));
 		}
 		queryCount++;
 		write("");
@@ -40,7 +40,7 @@ public class ResultWriter {
 	public void writeSGNNKResult(List<SGNNKQuery.Result> results) throws IOException {
 		write("Query " + queryCount);
 		for (SGNNKQuery.Result result : results) {
-			write(String.format("%d %.3f %s", result.id, result.cost, result.queryIds.toString()));
+			write(String.format("%d %.3f %s", result.id, result.cost.totalCost, result.queryIds.toString()));
 //			write(String.format("%d %.3f, ", result.id, result.cost));
 		}
 		queryCount++;
