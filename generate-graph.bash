@@ -25,6 +25,8 @@ mkdir -p $outdir"/flickr/cpu"
 mkdir -p $outdir"/yelp/io"
 mkdir -p $outdir"/yelp/cpu"
 
+mkdir -p combined-data
+
 combine $indir"/yelp"
 gnuplot -e 'indir="combined-data/cpu"; 	outdir="'$outdir'/yelp/cpu"; ylabel="running time (ms)"; offset=300' plot.gpl
 gnuplot -e 'indir="combined-data/io";  	outdir="'$outdir'/yelp/io";  ylabel="\\# page accesses"; offset=1000' plot.gpl
@@ -36,15 +38,20 @@ gnuplot -e 'indir="combined-data/io";  	outdir="'$outdir'/flickr/io";  ylabel="\
 function combineKeywordDropping {
 	dir=$1
 
-	file="keyword-dropping.dat"
+	file=$2
 	paste $dir'/sum/'$file $dir'/max/'$file | awk '{print $1,$2,$4}' \
 		> 'combined-data/'$file 
 }
 
-combineKeywordDropping $indir"/yelp"
-gnuplot -e 'indir="combined-data";	outdir="'$outdir'/yelp/";	ylabel="Query Cost";	offset=0' plot-dropping.gpl
+combineKeywordDropping $indir"/yelp" "keyword-dropping-cost.dat"
+gnuplot -e 'indir="combined-data";	outdir="'$outdir'/yelp/";	ylabel="Query Cost";	offset=0' plot-dropping-cost.gpl
 combineKeywordDropping $indir"/flickr"
-gnuplot -e 'indir="combined-data";	outdir="'$outdir'/flickr/";	ylabel="Query Cost";	offset=0' plot-dropping.gpl
+gnuplot -e 'indir="combined-data";	outdir="'$outdir'/flickr/";	ylabel="Query Cost";	offset=0' plot-dropping-cost.gpl
+
+combineKeywordDropping $indir"/yelp" "keyword-dropping-time.dat"
+gnuplot -e 'indir="combined-data";	outdir="'$outdir'/yelp/";	ylabel="Query Cost";	offset=0' plot-dropping-time.gpl
+combineKeywordDropping $indir"/flickr"
+gnuplot -e 'indir="combined-data";	outdir="'$outdir'/flickr/";	ylabel="Query Cost";	offset=0' plot-dropping-time.gpl
 
 # rm -rf $writingLocation
 cp -r $outdir "/home/rafi/Desktop/Writing/"

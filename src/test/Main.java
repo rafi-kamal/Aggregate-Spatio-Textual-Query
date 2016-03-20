@@ -30,7 +30,7 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		if (args.length < 6) {
 			System.out.println("Usage: Main index_file gnnk_query_file sgnnk_query_file "
-					+ "topk alpha query_type [keyword_drop_percentage]");
+					+ "topk alpha query_type [keyword_drop_percentage normalize]");
 			System.exit(-1);
 		}
 
@@ -43,7 +43,10 @@ public class Main {
 		int keywordDropPercentage = 0;
 		if (args.length > 6) 
 			keywordDropPercentage = Integer.parseInt(args[6]);
-
+		boolean normalize = false;
+		if (args.length > 7 && args[7].equals("1"))
+			normalize = true;
+			
 		PropertySet ps = new PropertySet();
 		ps.setProperty("FileName", indexFile + ".rtree");
 		IStorageManager diskfile = new DiskStorageManager(ps);
@@ -153,6 +156,8 @@ public class Main {
 		int averageFileIO = (tree.getIO() + invertedFile.getIO()) / numberOfQueries;
 		double averageNodesVisited = tree.noOfVisitedNodes * 1.0 / numberOfQueries;
 		double averageSpatialCost = spatialCost / numberOfQueries;
+		if (normalize)
+			averageSpatialCost /= 10;
 		
 		writer.write("Average nodes visited: " + averageNodesVisited);
 		writer.write("Total time millisecond: " + totalTime);

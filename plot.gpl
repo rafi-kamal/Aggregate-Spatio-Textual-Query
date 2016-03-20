@@ -1,6 +1,6 @@
 # USAGE: gnuplot -M "indir='input/cpu'; outdir='results/cpu'" plot.gpl
 
-set terminal epslatex size 4 inch, 2.5 inch font ",10"
+set terminal epslatex size 3 inch, 2 inch font ",8"
 # set format xy "$%g$"
 # set t wxt persist
 # set style data histograms

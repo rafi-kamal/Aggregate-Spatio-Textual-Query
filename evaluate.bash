@@ -127,15 +127,21 @@ function writeData {
 
 # Keyword Dropping
 
+
+rm "$2/keyword-dropping-cost.dat"
+rm "$2/keyword-dropping-cost.dat"
+
 droppingPercentages=(0 20 40 60 80)
 $runjava test.QueryGenerator $1 $nDefault $mPercentageDefault 10 \
 	$querySpaceAreaPercentageDefault $keywordSpaceSizePercentageDefault $3
 
 for droppingPercentage in ${droppingPercentages[@]}; do
-	result=($($runjava test.Main $1/rtree $1/gnnk.txt $1/sgnnk.txt $topkDefault $aplhaDefault 0 $droppingPercentage))
+	result=($($runjava test.Main $1/rtree $1/gnnk.txt $1/sgnnk.txt $topkDefault $aplhaDefault 0 $droppingPercentage $4))
+	time=${result[1]}
 	cost=${result[2]}
 
-	echo $droppingPercentage $cost | tee -a "$2/keyword-dropping.dat"
+	echo $droppingPercentage $cost | tee -a "$2/keyword-dropping-cost.dat"
+	echo $droppingPercentage $time | tee -a "$2/keyword-dropping-time.dat"
 done
 
 cp $2 ~/Desktop
