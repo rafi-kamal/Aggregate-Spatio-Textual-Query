@@ -131,7 +131,7 @@ function writeData {
 rm "$2/keyword-dropping-cost.dat"
 rm "$2/keyword-dropping-cost.dat"
 
-droppingPercentages=(0 20 40 60 80)
+droppingPercentages=(0 10 20 30 40)
 $runjava test.QueryGenerator $1 $nDefault $mPercentageDefault 10 \
 	$querySpaceAreaPercentageDefault $keywordSpaceSizePercentageDefault $3
 
