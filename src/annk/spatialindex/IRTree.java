@@ -25,7 +25,7 @@ import spatialindex.storagemanager.PropertySet;
 public class IRTree extends RTree {
 	
 	// TODO temporary variable, delete when no longer needed
-	private Map<Integer, List<AggregateQuery.Result>> levelVsVisitedNodes = new HashMap<>();
+//	private Map<Integer, List<AggregateQuery.Result>> levelVsVisitedNodes = new HashMap<>();
 
 	public IRTree(PropertySet propertySet, IStorageManager storageManager) {
 		super(propertySet, storageManager);
@@ -237,9 +237,9 @@ public class IRTree extends RTree {
 				Node n = readNode(rTreeEntry.getIdentifier());
 				noOfVisitedNodes++;
 				
-				if (!levelVsVisitedNodes.containsKey(n.level))
-					levelVsVisitedNodes.put(n.level, new ArrayList<AggregateQuery.Result>());
-				levelVsVisitedNodes.get(n.level).add(new AggregateQuery.Result(n.identifier, first.cost));
+//				if (!levelVsVisitedNodes.containsKey(n.level))
+//					levelVsVisitedNodes.put(n.level, new ArrayList<AggregateQuery.Result>());
+//				levelVsVisitedNodes.get(n.level).add(new AggregateQuery.Result(n.identifier, first.cost));
 				
 				HashMap<Integer, List<Cost>> costs = calculateQueryCosts(invertedFile, sgnnkQuery.queries, n);
 				
@@ -283,7 +283,9 @@ public class IRTree extends RTree {
 						rTreeEntry = new RtreeEntry(n.pIdentifiers[child], false);
 					}
 
-					queue.add(new NNEntry(rTreeEntry, minimumCostQueryIds, aggregateCost));
+					NNEntry entry = new NNEntry(rTreeEntry, minimumCostQueryIds, aggregateCost);
+//					System.out.println(entry);
+					queue.add(entry);
 				}
 			}
 		}

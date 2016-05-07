@@ -1120,7 +1120,12 @@ public class RTree implements ISpatialIndex {
 
 	public static double combinedScore(double spatial, double ir) {
 		double spatialCost = spatial / Parameters.maxD;
-		double keywordMismatchCost = (1 - ir / Parameters.maxWeight);
+		double keywordMismatchCost = (1 - ir);
+		
+		if (spatialCost < 0)
+			spatialCost = 0;
+		if (keywordMismatchCost < 0)
+			keywordMismatchCost = 0;
 		
 		double totalCost = alpha_dist * spatialCost + (1 - alpha_dist) * keywordMismatchCost;
 //		System.out.println(totalCost + " " + spatialCost + " " + keywordMismatchCost);

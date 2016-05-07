@@ -9,6 +9,10 @@ public class SumAggregator implements IAggregator {
 	double totalSum;
 	double spatialSum;
 	double irSum;
+	
+	public SumAggregator() {
+		initializeAccmulator();
+	}
 
 	@Override
 	public Cost getAggregateValue(List<Cost> values, List<Double> weights) {

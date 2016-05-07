@@ -139,7 +139,7 @@ public class QueryGenerator {
 		int queryWeightSum = 0;
 		
 		for (int i = 0; i < numberOfQueries; i++) {
-			queryWeights[i] = 1 + RANDOM.nextInt(Integer.MAX_VALUE / numberOfQueries);
+			queryWeights[i] = 1; //+ RANDOM.nextInt(Integer.MAX_VALUE / numberOfQueries);
 			queryWeightSum += queryWeights[i];
 		}
 		

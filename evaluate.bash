@@ -22,19 +22,19 @@ nDefault=10
 mPercentages=(40 50 60 70 80)
 mPercentageDefault=60
 
-numberOfKeywords=(1 2 3 5 8 10)
+numberOfKeywords=(1 2 4 8 10)
 numberOfKeywordsDefault=4
 
-querySpaceAreaPercentages=(0.01 0.10 0.20 0.50 1.0)
-querySpaceAreaPercentageDefault=0.20
+querySpaceAreaPercentages=(.001 .01 .02 .03 .04 .05)
+querySpaceAreaPercentageDefault=0.01
 
-keywordSpaceSizePercentages=(5 10 20 30 40)
-keywordSpaceSizePercentageDefault=20
+keywordSpaceSizePercentages=(1 2 3 4 5)
+keywordSpaceSizePercentageDefault=3
 
 topks=(1 10 20 30 40 50)
 topkDefault=10
 
-alphas=(0.0 0.3 0.5 0.7 1.0)
+alphas=(0.1 0.3 0.5 0.7 1.0)
 aplhaDefault=0.5
 
 # $1 = directory
@@ -55,6 +55,7 @@ function run {
 	local cpuCosts=()
 	local ioCosts=()
 	for queryType in ${queryTypes[@]}; do
+		echo $queryType
 		result=($($runjava test.Main $1/rtree $1/gnnk.txt $1/sgnnk.txt $7 $8 $queryType))
 		cpuCosts[queryType]=${result[0]}
 		ioCosts[queryType]=${result[1]}

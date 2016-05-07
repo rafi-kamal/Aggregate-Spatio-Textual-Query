@@ -18,7 +18,7 @@ function combine {
 }
 
 indir="/home/rafi/Dropbox/Thesis/Results"
-outdir="graphs"
+outdir="/home/rafi/Desktop/Writing/graphs"
 
 mkdir -p $outdir"/flickr/io"
 mkdir -p $outdir"/flickr/cpu"
@@ -28,8 +28,8 @@ mkdir -p $outdir"/yelp/cpu"
 mkdir -p combined-data
 
 combine $indir"/yelp"
-gnuplot -e 'indir="combined-data/cpu"; 	outdir="'$outdir'/yelp/cpu"; ylabel="running time (ms)"; offset=300' plot.gpl
-gnuplot -e 'indir="combined-data/io";  	outdir="'$outdir'/yelp/io";  ylabel="\\# page accesses"; offset=1000' plot.gpl
+gnuplot -e 'indir="combined-data/cpu"; 	outdir="'$outdir'/yelp/cpu"; ylabel="running time (ms)"; offset=200' plot.gpl
+gnuplot -e 'indir="combined-data/io";  	outdir="'$outdir'/yelp/io";  ylabel="\\# page accesses"; offset=2500' plot.gpl
 
 combine $indir"/flickr"
 gnuplot -e 'indir="combined-data/cpu"; 	outdir="'$outdir'/flickr/cpu"; ylabel="running time (ms)"; offset=5000' plot.gpl

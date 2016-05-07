@@ -8,9 +8,13 @@ public class MaxAggregator implements IAggregator {
 	
 	private Cost maximum;
 	
+	public MaxAggregator() {
+		initializeAccmulator();
+	}
+	
 	@Override
 	public Cost getAggregateValue(List<Cost> values, List<Double> weights) {
-        double maxTotal = 0;
+        double maxTotal = -1;
         Cost max = null;
         for (int i = 0; i < values.size(); i++) {
             if (maxTotal < values.get(i).totalCost * weights.get(i)) {
