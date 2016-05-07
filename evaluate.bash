@@ -8,9 +8,9 @@ if [ $# -lt 3 ]; then
 fi
 
 # delete all output files
-# rm -rf $2/*
-# mkdir -p $2/cpu/
-# mkdir -p $2/io/
+rm -rf $2/*
+mkdir -p $2/cpu/
+mkdir -p $2/io/
 
 runjava="java -ea -Dfile.encoding=UTF-8 -classpath ./bin:./lib/jdbm-1.0.jar"
 queryTypes=(5 4 3 2 1 0)
@@ -25,10 +25,10 @@ mPercentageDefault=60
 numberOfKeywords=(1 2 3 5 8 10)
 numberOfKeywordsDefault=4
 
-querySpaceAreaPercentages=(1 5 10 20 30 40)
-querySpaceAreaPercentageDefault=20
+querySpaceAreaPercentages=(0.01 0.10 0.20 0.50 1.0)
+querySpaceAreaPercentageDefault=0.20
 
-keywordSpaceSizePercentages=(1 5 10 20 30 40)
+keywordSpaceSizePercentages=(5 10 20 30 40)
 keywordSpaceSizePercentageDefault=20
 
 topks=(1 10 20 30 40 50)
@@ -83,65 +83,65 @@ function writeData {
 
 
 
-# for n in ${ns[@]}; do
-# 	run $1 $n $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-# 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
-# 	writeData $n $2 groupsize
-# done
+for n in ${ns[@]}; do
+	run $1 $n $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
+	writeData $n $2 groupsize
+done
 
-# for mPercentage in ${mPercentages[@]}; do
-# 	run $1 $nDefault $mPercentage $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-# 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
-# 	writeData $mPercentage $2 subgroup-size
-# done
+for mPercentage in ${mPercentages[@]}; do
+	run $1 $nDefault $mPercentage $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
+	writeData $mPercentage $2 subgroup-size
+done
 
-# for numberOfKeyword in ${numberOfKeywords[@]}; do
-# 	run $1 $nDefault $mPercentageDefault $numberOfKeyword $querySpaceAreaPercentageDefault \
-# 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
-# 	writeData $numberOfKeyword $2 number-of-keyword
-# done
+for numberOfKeyword in ${numberOfKeywords[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeyword $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
+	writeData $numberOfKeyword $2 number-of-keyword
+done
 
-# for querySpaceAreaPercentage in ${querySpaceAreaPercentages[@]}; do
-# 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentage \
-# 		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
-# 	writeData $querySpaceAreaPercentage $2 query-space-area
-# done
+for querySpaceAreaPercentage in ${querySpaceAreaPercentages[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentage \
+		$keywordSpaceSizePercentageDefault $topkDefault $aplhaDefault $3
+	writeData $querySpaceAreaPercentage $2 query-space-area
+done
 
-# for keywordSpaceSizePercentage in ${keywordSpaceSizePercentages[@]}; do
-# 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-# 		$keywordSpaceSizePercentage $topkDefault $aplhaDefault $3
-# 	writeData $keywordSpaceSizePercentage $2 keyword-space-size
-# done
+for keywordSpaceSizePercentage in ${keywordSpaceSizePercentages[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentage $topkDefault $aplhaDefault $3
+	writeData $keywordSpaceSizePercentage $2 keyword-space-size
+done
 
-# for topk in ${topks[@]}; do
-# 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-# 		$keywordSpaceSizePercentageDefault $topk $aplhaDefault $3
-# 	writeData $topk $2 topk
-# done
+for topk in ${topks[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topk $aplhaDefault $3
+	writeData $topk $2 topk
+done
 
-# for alpha in ${alphas[@]}; do
-# 	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
-# 		$keywordSpaceSizePercentageDefault $topkDefault $alpha $3
-# 	writeData $alpha $2 alpha
-# done
+for alpha in ${alphas[@]}; do
+	run $1 $nDefault $mPercentageDefault $numberOfKeywordsDefault $querySpaceAreaPercentageDefault \
+		$keywordSpaceSizePercentageDefault $topkDefault $alpha $3
+	writeData $alpha $2 alpha
+done
 
 # Keyword Dropping
 
 
-rm "$2/keyword-dropping-cost.dat"
-rm "$2/keyword-dropping-cost.dat"
+# rm "$2/keyword-dropping-cost.dat"
+# rm "$2/keyword-dropping-cost.dat"
 
-droppingPercentages=(0 10 20 30 40)
-$runjava test.QueryGenerator $1 $nDefault $mPercentageDefault 10 \
-	$querySpaceAreaPercentageDefault $keywordSpaceSizePercentageDefault $3
+# droppingPercentages=(0 10 20 30 40)
+# $runjava test.QueryGenerator $1 $nDefault $mPercentageDefault 10 \
+# 	$querySpaceAreaPercentageDefault $keywordSpaceSizePercentageDefault $3
 
-for droppingPercentage in ${droppingPercentages[@]}; do
-	result=($($runjava test.Main $1/rtree $1/gnnk.txt $1/sgnnk.txt $topkDefault $aplhaDefault 0 $droppingPercentage $4))
-	time=${result[1]}
-	cost=${result[2]}
+# for droppingPercentage in ${droppingPercentages[@]}; do
+# 	result=($($runjava test.Main $1/rtree $1/gnnk.txt $1/sgnnk.txt $topkDefault $aplhaDefault 0 $droppingPercentage $4))
+# 	time=${result[1]}
+# 	cost=${result[2]}
 
-	echo $droppingPercentage $cost | tee -a "$2/keyword-dropping-cost.dat"
-	echo $droppingPercentage $time | tee -a "$2/keyword-dropping-time.dat"
-done
+# 	echo $droppingPercentage $cost | tee -a "$2/keyword-dropping-cost.dat"
+# 	echo $droppingPercentage $time | tee -a "$2/keyword-dropping-time.dat"
+# done
 
-cp $2 ~/Desktop
+# cp $2 ~/Desktop
