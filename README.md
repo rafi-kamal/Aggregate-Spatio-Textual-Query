@@ -16,11 +16,11 @@
 + **Keyword file**: Each line contains the keywords of a data object. Example:
 
 	```
-	0,51650 1.0,51649 1.0,51648 1.0,698 1.0,99607 1.0,399 1.0,9 1.0,32456 1.0
-	1,25882 1.0,16561 1.0,29856 1.0,122824 1.0,122823 1.0,47345 1.0,18992 1.0
-	2,5134 1.0,2044 1.0,56 1.0
-	3,14350 1.0,35 1.0,375 1.0,457 1.0,2389 1.0
-	4,10161 1.0,2067 1.0,407 1.0
+	0,0,1,2,3,4,5,6,7,8,9
+	1,10,11,12
+	2,13,14,15
+	3,16,17,18,19,20
+	4,21,22
 	```
 	
 	The first column contains the object ID and the subsequent columns contains the keywords. In our dataset, `words.txt` is the keyword file.
