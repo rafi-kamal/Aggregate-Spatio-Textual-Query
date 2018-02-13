@@ -1,3 +1,14 @@
+We've proposed the flexible group spatial keyword query and algorithms to process three variants of the query in the spatial textual domain:
+
+1. The group nearest neighbor with keywords query, which finds the data object that optimizes the aggregate cost function for the whole group `Q` of size `n` query objects
+2. The subgroup nearest neighbor with keywords query, which finds the optimal subgroup of query objects and the data object that optimizes the aggregate cost function for a given subgroup size `m (  m≤n )`, and 
+3. The multiple subgroup nearest neighbor with keywords query, which finds optimal subgroups and corresponding data objects for each of the subgroup sizes in the range `[m, n]`. 
+
+We've designed query processing algorithms based on branch-and-bound and best-first paradigms and conducted extensive experiments with two real datasets to show the efficiency of the proposed algorithms.
+
+The publication is available at [Springer](https://link.springer.com/chapter/10.1007/978-3-319-68155-9_1) and at [arxiv.org](https://arxiv.org/abs/1704.07405).
+
+
 ## Input File Formats
 
 + **Location File**: Each line contains a location of a data object. Example:
